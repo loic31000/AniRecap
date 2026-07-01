@@ -1,19 +1,60 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Page inscription{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/register.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+{% endblock %}
 
 {% block body %}
-    <h1>Register</h1>
+<div class="register-page">
+    <div class="register-card">
 
-    {{ form_errors(registrationForm) }}
+        <div class="logo-wrap">
+            <img src="{{ asset('images/logo.png') }}" alt="AniRecap logo" class="logo-img">
+        </div>
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.pseudo) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
-        }) }}
+        <h1 class="brand-title">AniRecap</h1>
+        <p class="brand-subtitle">Inscrivez-vous pour profiter des fonctionnalités</p>
 
-        <button type="submit" class="btn">Register</button>
-    {{ form_end(registrationForm) }}
+        {{ form_start(registrationForm, {'attr': {'class': 'register-form'}}) }}
+
+            <div class="form-group">
+                {{ form_label(registrationForm.username, 'Username') }}
+                <div class="input-icon">
+                    <i class="fa-regular fa-user"></i>
+                    {{ form_widget(registrationForm.username, {'attr': {'placeholder': 'Entrer votre username'}}) }}
+                </div>
+                {{ form_errors(registrationForm.username) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(registrationForm.email, 'Email') }}
+                <div class="input-icon">
+                    <i class="fa-regular fa-envelope"></i>
+                    {{ form_widget(registrationForm.email, {'attr': {'placeholder': 'Entrer votre email'}}) }}
+                </div>
+                {{ form_errors(registrationForm.email) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(registrationForm.plainPassword, 'Password') }}
+                <div class="input-icon">
+                    <i class="fa-solid fa-lock"></i>
+                    {{ form_widget(registrationForm.plainPassword, {'attr': {'placeholder': 'Créer votre mots de passe'}}) }}
+                </div>
+                {{ form_errors(registrationForm.plainPassword) }}
+            </div>
+
+            <button type="submit" class="submit-btn">S'inscrire</button>
+
+        {{ form_end(registrationForm) }}
+
+        <p class="login-link">
+            Déjà membres ? <a href="{{ path('app_login') }}">Se connecter</a>
+        </p>
+    </div>
+</div>
 {% endblock %}
