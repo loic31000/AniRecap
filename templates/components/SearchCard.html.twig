@@ -1,0 +1,39 @@
+<section class="search-card">
+					<form class="search-form" method="get" action="{{ path('app_catalogue') }}">
+						<div class="search-wrapper">
+							<i class="fa-solid fa-magnifying-glass"></i>
+							<input type="text" name="q" placeholder="Rechercher une œuvre..." value="{{ app.request.query.get('q') }}">
+						</div>
+					</form>
+
+					<div class="filter-row">
+						<button type="button" class="filter-pill filter-pill--dropdown is-active" data-filter="type">
+							Tous
+							<i class="fa-solid fa-chevron-down"></i>
+						</button>
+						<button type="button" class="filter-pill" data-filter="anime">Anime</button>
+						<button type="button" class="filter-pill" data-filter="manga">Manga</button>
+					</div>
+
+					<div class="filter-row">
+						<button type="button" class="filter-pill filter-pill--dropdown" data-filter="genre">
+							Genre
+							<i class="fa-solid fa-chevron-down"></i>
+						</button>
+						<button type="button" class="filter-pill filter-pill--dropdown" data-filter="annee">
+							Année
+							<i class="fa-regular fa-calendar"></i>
+						</button>
+					</div>
+				</section>
+
+                <div class="active-filters">
+					<span class="active-filters-label">Filtres actifs :</span>
+					<span class="active-chip">Action
+						<i class="fa-solid fa-xmark"></i>
+					</span>
+					<span class="active-chip">2024
+						<i class="fa-solid fa-xmark"></i>
+					</span>
+					<button type="button" class="clear-filters">Tout effacer</button>
+				</div>

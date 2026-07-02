@@ -1,0 +1,98 @@
+	{% set oeuvres = [
+    {
+        type: 'Manga',
+        title: 'Dragon Ball Super',
+        subtitle: 'Chapitre 115 - Chapitre 120',
+        date: '10.05.2025',
+        votes: '150k',
+        gradient: 'linear-gradient(135deg, #ff8a3d, #ffcf5c)',
+        favorited: true
+    },
+    {
+        type: 'Anime',
+        title: 'Gundam Seed Destiny',
+        subtitle: 'Saison 2 - EP 11 - EP 24',
+        date: '10.05.2025',
+        votes: '15k',
+        gradient: 'linear-gradient(135deg, #274b7a, #6fa8dc)',
+        favorited: false
+    },
+    {
+        type: 'Manga',
+        title: 'Katekyo Hitman Reborn',
+        subtitle: 'Chapitre 115 - Chapitre 120',
+        date: '10.05.2025',
+        votes: '25k',
+        gradient: 'linear-gradient(135deg, #111111, #3a3a3a)',
+        favorited: true
+    },
+    {
+        type: 'Anime',
+        title: 'ガンダムSEED デスティニー',
+        subtitle: 'Saison 2 - EP 11 - EP 24',
+        date: '10.05.2025',
+        votes: '15k',
+        gradient: 'linear-gradient(135deg, #274b7a, #6fa8dc)',
+        favorited: false
+    },
+    {
+        type: 'Manga',
+        title: 'ドラゴンボール超',
+        subtitle: 'Chapitre 115 - Chapitre 120',
+        date: '10.05.2025',
+        votes: '150k',
+        gradient: 'linear-gradient(135deg, #ff8a3d, #ffcf5c)',
+        favorited: true
+    },
+    {
+        type: 'Anime',
+        title: 'ガンダムSEED デスティニー',
+        subtitle: 'Saison 2 - EP 11 - EP 24',
+        date: '10.05.2025',
+        votes: '15k',
+        gradient: 'linear-gradient(135deg, #274b7a, #6fa8dc)',
+        favorited: false
+    }
+] %}
+
+
+
+
+<div class="oeuvre-list">
+					{% for oeuvre in oeuvres %}
+						<article class="oeuvre-card">
+							<div class="oeuvre-thumb" style="background: {{ oeuvre.gradient }};">
+								<button type="button" class="btn-favorite {{ oeuvre.favorited ? 'is-active' : '' }}">
+									<i class="fa-{{ oeuvre.favorited ? 'solid' : 'regular' }} fa-star"></i>
+								</button>
+							</div>
+
+							<div class="oeuvre-body">
+								<div class="oeuvre-meta">
+									<span class="badge-type badge-type--{{ oeuvre.type|lower }}">{{ oeuvre.type }}</span>
+
+									<a href="#" class="btn-edit-inline" aria-label="Modifier {{ oeuvre.title }}">
+										<i class="fa-solid fa-pen"></i>
+									</a>
+								</div>
+
+								<h3 class="oeuvre-title">{{ oeuvre.title }}</h3>
+								<p class="oeuvre-subtitle">{{ oeuvre.subtitle }}</p>
+
+								<div class="oeuvre-footer">
+									<span class="oeuvre-date">
+										<i class="fa-solid fa-clock-rotate-left"></i>
+										Modifié le
+										{{ oeuvre.date }}
+									</span>
+									<span class="oeuvre-votes">{{ oeuvre.votes }}
+										Votes</span>
+								</div>
+							</div>
+						</article>
+						<button type="button" class="scroll-top" id="scrollTopBtn" aria-label="Remonter en haut">
+							<i class="fa-solid fa-chevron-up"></i>
+						</button>
+					{% endfor %}
+				</div>
+			</div>
