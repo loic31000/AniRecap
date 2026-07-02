@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Catalogue
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('css/catalogue.css') }}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+
+
+
+	<div class="catalogue-page">
+		{{ component('Header', { backRoute: 'app_home' }) }}
+
+		<main class="catalogue-shell">
+			<div class="catalogue-content">
+
+				<a href="{{ path('app_home') }}" class="retour-link">
+					<i class="fa-solid fa-arrow-left"></i>
+					Retour home
+				</a>
+
+				<h1 class="page-title">
+					<span>カタログ Catalogue</span>
+				</h1>
+
+				<twig:SearchCard/>
+
+				<h2 class="section-title">
+					<span>カタログ Catalogue</span>
+				</h2>
+
+				<twig:OeuvreCard />
+		</main>
+
+
+		{{ component('Navbar', { active: 'catalogue' }) }}
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	 <script>
+				        document.addEventListener('DOMContentLoaded', () => {
+				            const btn = document.getElementById('scrollTopBtn');
+				
+				            const toggleButton = () => {
+				                if (window.scrollY > 300) {
+				                    btn.classList.add('is-visible');
+				                } else {
+				                    btn.classList.remove('is-visible');
+				                }
+				            };
+				
+				            window.addEventListener('scroll', toggleButton);
+				            toggleButton();
+				
+				            btn.addEventListener('click', () => {
+				                window.scrollTo({
+				                    top: 0,
+				                    behavior: 'smooth'
+				                });
+				            });
+				        });
+				    </script>
+{% endblock %}

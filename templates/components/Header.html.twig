@@ -1,0 +1,18 @@
+<header class="app-header">
+	<div class="app-header-inner">
+		{% if backRoute %}
+			<a href="{{ path(backRoute) }}" class="back-link"></a>
+		{% else %}
+			<span class="header-spacer"></span>
+		{% endif %}
+
+		<a href="{{ path('app_home') }}" class="app-header-logo">
+			<img src="{{ asset('images/logo.png') }}" alt="Logo">
+		</a>
+		<a href="{{ path('app_home') }}" class="app-header-logo-title">
+			<img src="{{ asset('images/AniRecap.svg') }}" alt="AniRecap">
+		</a>
+
+		<span class="header-spacer"></span>
+	</div>
+</header>
