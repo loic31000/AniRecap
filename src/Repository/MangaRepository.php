@@ -16,28 +16,33 @@ class MangaRepository extends ServiceEntityRepository
         parent::__construct($registry, Manga::class);
     }
 
-    //    /**
-    //     * @return Manga[] Returns an array of Manga objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('m.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function searchCatalogue(array $filters): array
+    {
+        $qb = $this->createQueryBuilder('m')
+            ->leftJoin('m.categorie', 'c')
+            ->addSelect('c')
+            ->distinct();
 
-    //    public function findOneBySomeField($value): ?Manga
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        // 1. Ajout des parenthèses indispensables autour des OR
+        if (!empty($filters['q'])) {
+            $qb->andWhere('(LOWER(m.title) LIKE :q OR LOWER(m.synopsis) LIKE :q OR LOWER(m.author) LIKE :q)')
+                ->setParameter('q', '%' . mb_strtolower($filters['q']) . '%');
+        }
+
+        if (!empty($filters['genre'])) {
+            $qb->andWhere('c.slug = :genre')
+                ->setParameter('genre', $filters['genre']);
+        }
+
+        // 2. Gestion adaptative si mangaDate est un champ Date/DateTime en BDD
+        if (!empty($filters['annee'])) {
+            $qb->andWhere('m.mangaDate = :annee')
+                ->setParameter('annee', (int) $filters['annee']);
+        }
+
+        return $qb
+            ->orderBy('m.title', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
