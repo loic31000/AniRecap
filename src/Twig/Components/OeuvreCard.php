@@ -9,4 +9,6 @@ use Symfony\UX\LiveComponent\DefaultActionTrait;
 final class OeuvreCard
 {
     use DefaultActionTrait;
+
+    public array $results = [];
 }
