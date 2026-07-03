@@ -1,49 +1,47 @@
 {% set oeuvres = results is defined ? results : [] %}
 
 {% if oeuvres is empty %}
-    <div class="empty-results">
-        <p>Aucun résultat trouvé pour cette recherche / ces filtres.</p>
-    </div>
+	<div class="empty-results">
+		<p>Aucun résultat trouvé pour cette recherche / ces filtres.</p>
+	</div>
 {% else %}
 
 
-
-<div class="oeuvre-list">
-					{% for oeuvre in oeuvres %}
-						<article class="oeuvre-card">
-							<div class="oeuvre-thumb" style="background: {{ oeuvre.gradient }};">
-								<button type="button" class="btn-favorite {{ oeuvre.favorited ? 'is-active' : '' }}">
-									<i class="fa-{{ oeuvre.favorited ? 'solid' : 'regular' }} fa-star"></i>
-								</button>
-							</div>
-
-							<div class="oeuvre-body">
-								<div class="oeuvre-meta">
-									<span class="badge-type badge-type--{{ oeuvre.type|lower }}">{{ oeuvre.type }}</span>
-
-									<a href="#" class="btn-edit-inline" aria-label="Modifier {{ oeuvre.title }}">
-										<i class="fa-solid fa-pen"></i>
-									</a>
-								</div>
-
-								<h3 class="oeuvre-title">{{ oeuvre.title }}</h3>
-								<p class="oeuvre-subtitle">{{ oeuvre.subtitle }}</p>
-
-								<div class="oeuvre-footer">
-									<span class="oeuvre-date">
-										<i class="fa-solid fa-clock-rotate-left"></i>
-										Modifié le
-										{{ oeuvre.date }}
-									</span>
-									<span class="oeuvre-votes">{{ oeuvre.votes }}
-										Votes</span>
-								</div>
-							</div>
-						</article>
-					{% endfor %}
+	<div class="oeuvre-list">
+		{% for oeuvre in oeuvres %}
+			<article class="oeuvre-card">
+				<div class="oeuvre-thumb" style="background: {{ oeuvre.gradient }};">
+					<button type="button" class="btn-favorite {{ oeuvre.favorited ? 'is-active' : '' }}">
+						<i class="fa-{{ oeuvre.favorited ? 'solid' : 'regular' }} fa-star"></i>
+					</button>
 				</div>
-{% endif %}
 
-<button type="button" class="scroll-top" id="scrollTopBtn" aria-label="Remonter en haut">
-    <i class="fa-solid fa-chevron-up"></i>
-</button>
+				<div class="oeuvre-body">
+					<div class="oeuvre-meta">
+						<span class="badge-type badge-type--{{ oeuvre.type|lower }}">{{ oeuvre.type }}</span>
+
+						<a href="#" class="btn-edit-inline" aria-label="Modifier {{ oeuvre.title }}">
+							<i class="fa-solid fa-pen"></i>
+						</a>
+					</div>
+
+					<h3 class="oeuvre-title">{{ oeuvre.title }}</h3>
+					<p class="oeuvre-subtitle">{{ oeuvre.subtitle }}</p>
+
+					<div class="oeuvre-footer">
+						<span class="oeuvre-date">
+							<i class="fa-solid fa-clock-rotate-left"></i>
+							Modifié le
+							{{ oeuvre.date }}
+						</span>
+						<span class="oeuvre-votes">{{ oeuvre.votes }}
+							Votes</span>
+					</div>
+				</div>
+			</article>
+			<button type="button" class="scroll-top" id="scrollTopBtn" aria-label="Remonter en haut">
+				<i class="fa-solid fa-chevron-up"></i>
+			</button>
+		{% endfor %}
+	</div>
+{% endif %}
