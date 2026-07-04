@@ -1,0 +1,176 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ season.displayTitle|default('Gundam Seed') }}
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('css/season.css') }}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+{% endblock %}
+
+{% block body %}
+	{% set cover = season.coverImage is defined and season.coverImage is not empty ? season.coverImage : asset('images/coverAnime.png') %}
+	{% set favorite = season.isFavorite|default(false) %}
+	{% set likes = season.likesLabel|default("👍 いいね！ J'AIME") %}
+	{% set formatLabel = season.format|default('Animé') %}
+	{% set statusLabel = season.status|default('En cours') %}
+	{% set authorLabel = season.author|default('Utilisateur17') %}
+	{% set yearLabel = season.year|default(2004) %}
+	{% set originalTitle = season.originalTitle|default('ガンダムSEED') %}
+	{% set displayTitle = season.displayTitle|default('Gundam Seed') %}
+	{% set genres = season.genres|default(['Action', 'Fantasy', 'Shonen']) %}
+	{% set relatedSeasons = season.relatedSeasons|default([
+        {'title': 'Saison 1', 'episodesCount': 24},
+        {'title': 'Saison 2', 'episodesCount': 12},
+        {'title': 'Saison 3', 'episodesCount': 24},
+        {'title': 'Saison 4', 'episodesCount': 12}
+    ]) %}
+	{% set castList = season.cast|default([
+        {'name': 'Tsunayoshi Sawada', 'role': '澤田 綱義'},
+        {'name': 'Hajime No Hippo', 'role': '澤田 綱義'},
+        {'name': 'うずまき・ナルト', 'role': '澤田 綱義'},
+        {'name': 'Uchiha Sasuke', 'role': '澤田 綱義'},
+        {'name': 'ジン・モリ', 'role': '澤田 綱義'},
+        {'name': '澤田 綱義', 'role': '澤田 綱義'},
+        {'name': '澤田 綱義', 'role': '澤田 綱義'},
+        {'name': '澤田 綱義', 'role': '澤田 綱義'},
+        {'name': '澤田 綱義', 'role': '澤田 綱義'},
+        {'name': '澤田 綱義', 'role': '澤田 綱義'}
+    ]) %}
+
+	{{ component('Header', { backRoute: 'app_home' }) }}
+
+	<main class="page-season">
+		<div class="season-inner">
+			<a href="/" class="back-link">
+				<i class="fa-solid fa-arrow-left"></i>
+				<span>Retour au Catalogue</span>
+			</a>
+
+			<section class="season-hero">
+				<figure class="season-cover" style="background-image: url('{{ cover }}');">
+					<span class="visually-hidden">Affiche de
+						{{ displayTitle }}</span>
+				</figure>
+
+				<div class="season-copy">
+					<h1 class="season-title">
+						<span class="season-title__jp">{{ originalTitle }}</span>
+						<span class="season-title__main">{{ displayTitle }}</span>
+					</h1>
+
+					<div class="badge-row">
+						{% for genre in genres %}
+							<span class="badge">{{ genre|upper }}</span>
+						{% endfor %}
+					</div>
+
+					<button type="button" class="btn-favorite{{ favorite ? ' is-active' : '' }}">
+						<i class="fa-{{ favorite ? 'solid' : 'regular' }} fa-heart"></i>
+						<span>Ajouter aux favoris</span>
+					</button>
+
+					<div class="secondary-actions">
+						<button type="button" class="chip-btn">
+							<span>{{ likes }}</span>
+						</button>
+						<button type="button" class="chip-btn">
+							<i class="fa-solid fa-circle-play"></i>
+							<span>DIAPORAMA</span>
+						</button>
+					</div>
+				</div>
+			</section>
+
+			<section class="panel panel--synopsis" aria-labelledby="synopsis-title">
+				<h2 id="synopsis-title" class="section-title">
+					<span class="jp">あらすじ（全文）</span>
+					<span>Synopsis complet</span>
+				</h2>
+
+				<p class="synopsis">{{ season.synopsis|default("Dans un monde régi par des lois immuables, un jeune héros se dresse contre l'adversité pour rétablir l'équilibre. Ce voyage initiatique le mènera à travers des contrées hostiles où chaque rencontre forgera sa destinée.") }}</p>
+				<p class="synopsis">{{ season.synopsisExtra|default("Confronté à des dilemmes moraux et à des combats d'une intensité rare, il devra puiser au plus profond de lui-même pour éveiller le pouvoir latent qui sommeille en lui. Une épopée magistrale qui explore les tréfonds de l'âme humaine sous un trait clinique et acéré.") }}</p>
+
+				<div class="info-grid">
+					<article class="info-item">
+						<p class="info-label">
+							<span class="jp">タイプ</span>
+							TYPE</p>
+						<p class="info-value">{{ formatLabel }}</p>
+					</article>
+					<article class="info-item">
+						<p class="info-label">
+							<span class="jp">定款</span>
+							STATUT</p>
+						<p class="info-value">{{ statusLabel }}</p>
+					</article>
+					<article class="info-item">
+						<p class="info-label">
+							<span class="jp">著者</span>
+							AUTEUR</p>
+						<p class="info-value">{{ authorLabel }}</p>
+					</article>
+					<article class="info-item">
+						<p class="info-label">
+							<span class="jp">年</span>
+							ANNÉE</p>
+						<p class="info-value">{{ yearLabel }}</p>
+					</article>
+				</div>
+			</section>
+
+			<section class="panel panel--seasons" aria-labelledby="seasons-title">
+				<h2 id="seasons-title" class="section-title">
+					<span class="jp">シーズン</span>
+					<span>Saisons</span>
+				</h2>
+
+				<div class="season-list">
+					{% for item in relatedSeasons %}
+						<a href="#" class="season-row">
+							<span class="season-row__name">{{ item.title }}</span>
+							<span class="season-row__meta">
+								<span class="badge badge--pill">{{ item.episodesCount|default(12) }}
+									Épisodes</span>
+								<span class="icon-btn" aria-hidden="true">
+									<i class="fa-solid fa-pen"></i>
+								</span>
+								<i class="fa-solid fa-chevron-right season-row__chevron" aria-hidden="true"></i>
+							</span>
+						</a>
+					{% endfor %}
+				</div>
+			</section>
+
+			<section class="panel panel--cast" aria-labelledby="cast-title">
+				<h2 id="cast-title" class="section-title">
+					<span class="jp">登場人物</span>
+					<span>Personnages</span>
+				</h2>
+
+				<div class="cast-grid">
+					{% for person in castList %}
+						<article class="cast-card">
+							<div class="cast-avatar-wrap">
+								<div class="cast-avatar">
+									{% if person.avatar is defined and person.avatar %}
+										<img src="{{ person.avatar }}" alt="{{ person.name }}">
+									{% else %}
+										<span>{{ person.name|slice(0, 1)|upper }}</span>
+									{% endif %}
+								</div>
+							</div>
+							<p class="cast-name">{{ person.name }}</p>
+							<p class="cast-role">{{ person.role|default('澤田 綱義') }}</p>
+						</article>
+					{% endfor %}
+				</div>
+			</section>
+		</div>
+	</main>
+
+	{{ component('Navbar', { active: 'catalogue' }) }}
+{% endblock %}
