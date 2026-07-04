@@ -1,375 +1,414 @@
-html,
-body {
-    margin: 0;
-    padding: 0;
-}
-
+/* ==========================================================================
+   CHARTE GRAPHIQUE IDENTIQUE MAQUETTE
+   ========================================================================== */
 :root {
-    --season-bg: #051226;
-    --season-bg-deep: #020a14;
-    --season-surface: #05162d;
-    --season-surface-2: #071b38;
-    --season-surface-3: #0c2547;
-    --season-line-blue: #154985;
-    --season-gold: #e1a63c;
-    --season-gold-strong: #efb54a;
-    --season-text: #f4f6fb;
-    --season-text-muted: #edf1f6;
-    --season-text-faint: #94a2bc;
-    --season-shadow: 0 14px 30px rgba(0, 0, 0, 0.32);
-    --season-radius-md: 0.9rem;
-    --season-space-1: 0.25rem;
-    --season-space-2: 0.5rem;
-    --season-space-3: 0.75rem;
-    --season-space-4: 1rem;
-    --season-space-5: 1.25rem;
-    --season-space-6: 1.5rem;
-    --season-content: 30rem;
+    --bg-main: #001122;          /* Bleu nuit très sombre */
+    --bg-card: #091d34;          /* Bleu des panneaux */
+    --gold: #e5a93b;             /* Jaune/Or signature */
+    --border-blue: #132e4d;      /* Bordure subtile des blocs */
+    --text-white: #ffffff;
+    --text-muted: #cbd5e1;
 }
 
-.page-season,
-.page-season *,
-.page-season *::before,
-.page-season *::after {
-    box-sizing: border-box;
-}
-
-/* Conteneur plein écran : c'est LUI qui porte le fond, pas le body */
-.page-season {
-    width: 100%;
-    min-height: 100vh;
+body {
+    background-color: var(--bg-main);
+    color: var(--text-white);
+    font-family: sans-serif;
     margin: 0;
-    padding: 0;
+}
+
+.page-season {
     display: flex;
     justify-content: center;
-    color: var(--season-text);
-    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background:
-        radial-gradient(circle at 50% 12%, rgba(28, 85, 160, 0.12), transparent 28%),
-        linear-gradient(180deg, #03101f 0%, #041426 32%, #041427 100%);
+    /* 75px en haut pour laisser de la place au Header fixe */
+    padding: 75px 10px 100px 10px; 
 }
 
-/* Colonne de contenu centrée, largeur mobile préservée */
-.page-season .season-inner {
+.season-inner {
     width: 100%;
-    max-width: var(--season-content);
-    padding: 0.7rem 0.55rem calc(1.25rem + var(--nav-height, 78px));
+    max-width: 460px; /* Format WebApp/Mobile centré */
 }
 
-.page-season img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    border: 0;
-}
-
-.page-season figure {
-    margin: 0;
-    padding: 0;
-}
-
-.page-season a {
-    color: inherit;
+.back-link {
+    color: var(--gold);
     text-decoration: none;
-}
-
-.page-season button {
-    font: inherit;
-    cursor: pointer;
-}
-
-.page-season .back-link {
+    font-size: 0.9rem;
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    margin: 0 0 1rem;
-    color: var(--season-gold-strong);
-    font-size: 0.95rem;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+/* --- HERO & COVER --- */
+.season-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.season-cover {
+    width: 90%;
+    aspect-ratio: 2 / 3;
+    background-size: cover;
+    background-position: center;
+    border: 3px solid var(--gold);
+    border-radius: 2px;
+    margin: 0 0 20px 0;
+}
+
+.season-title {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0 0 15px 0;
+}
+
+.season-title__jp {
+    color: var(--gold);
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.season-title__main {
+    color: var(--gold);
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.badge-row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 20px;
+}
+
+.badge {
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    background: transparent;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.btn-favorite {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.secondary-actions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.chip-btn {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.panel {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-blue);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.section-title {
+    color: var(--gold);
+    font-size: 1rem;
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--gold);
+    display: flex;
+    gap: 8px;
+}
+
+.synopsis {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-white);
+    margin: 0 0 12px 0;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 20px;
+    margin-top: 16px;
+}
+
+.info-label {
+    color: var(--gold);
+    font-size: 0.75rem;
+    margin: 0 0 2px 0;
+    display: flex;
+    gap: 4px;
+}
+
+.info-value {
+    font-size: 0.9rem;
+    margin: 0;
+    color: var(--text-white);
+}
+
+/* ==========================================================================
+   DESIGN TIMELINE ET EPISODES FIGMA 
+   ========================================================================== */
+.episode-count-meta {
+    color: var(--gold);
+    font-size: 0.85rem;
+    margin: 8px 0 20px 0;
     font-weight: 500;
 }
 
-.page-season .season-hero {
-    display: grid;
-    gap: 0.95rem;
-    margin-bottom: 1.15rem;
-}
-
-.page-season .season-cover {
-    position: relative;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    aspect-ratio: 349 / 535;
-    border: 3px solid var(--season-gold);
-    overflow: hidden;
-    background-color: transparent;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    box-shadow: none;
-}
-
-.page-season .season-cover .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0,0,0,0);
-    white-space: nowrap;
-}
-
-.page-season .season-cover img {
-    position: absolute !important;
-    inset: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    max-width: none !important;
-    max-height: none !important;
-    min-width: 100% !important;
-    min-height: 100% !important;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    object-fit: cover !important;
-    object-position: center;
-}
-
-.page-season .season-copy {
-    display: grid;
-    gap: 0.8rem;
-}
-
-.page-season .season-title {
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.7rem;
-    color: var(--season-gold);
-    font-size: clamp(1.55rem, 6vw, 2.15rem);
-    font-weight: 900;
-    line-height: 1.08;
-    text-shadow: 0 2px 0 #000, 0 4px 10px rgba(0, 0, 0, 0.45);
-}
-
-.page-season .season-title__jp,
-.page-season .season-title__main {
-    display: inline-block;
-    white-space: nowrap;
-}
-
-.page-season .badge-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem;
-}
-
-.page-season .badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 1.75rem;
-    padding: 0.3rem 0.72rem;
-    border: 1px solid rgba(225, 166, 60, 0.7);
-    border-radius: 999px;
-    background: rgba(0, 0, 0, 0.38);
-    color: var(--season-gold);
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.035em;
-    text-transform: uppercase;
-    box-shadow: inset 0 0 0 1px rgba(255, 215, 133, 0.06);
-}
-
-.page-season .badge--pill {
-    min-height: 1.9rem;
-    padding: 0.35rem 0.65rem;
-    border-radius: 0.45rem;
-    font-size: 0.76rem;
-    background: transparent;
-}
-
-.page-season .btn-favorite,
-.page-season .chip-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--season-space-2);
-    border: 1px solid rgba(225, 166, 60, 0.3);
-    background: linear-gradient(180deg, rgba(2, 7, 14, 0.92), rgba(0, 0, 0, 0.98));
-    color: var(--season-gold);
-    box-shadow: inset 0 0 0 1px rgba(255, 207, 110, 0.05);
-}
-
-.page-season .btn-favorite {
-    width: 100%;
-    min-height: 2.9rem;
-    padding: 0.75rem 0.95rem;
-    border-radius: 0.08rem;
-    font-size: 0.92rem;
-    font-weight: 700;
-}
-
-.page-season .secondary-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.55rem;
-}
-
-.page-season .chip-btn {
-    min-height: 2.25rem;
-    padding: 0.5rem 0.4rem;
-    border-radius: 0.08rem;
-    font-size: 0.74rem;
-    font-weight: 800;
-}
-
-.page-season .panel {
-    margin-bottom: 0.95rem;
-    padding: 0.8rem 0.8rem 0.95rem;
-    background:
-        radial-gradient(circle at 100% 0%, rgba(25, 72, 138, 0.12), transparent 28%),
-        linear-gradient(180deg, rgba(6, 24, 48, 0.98), rgba(4, 20, 40, 0.98));
-    border: 1px solid rgba(21, 73, 133, 0.72);
-    border-radius: 0.85rem;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
-}
-
-.page-season .section-title {
-    margin: 0 0 0.9rem;
-    padding-bottom: 0.6rem;
-    border-bottom: 1px solid rgba(225, 166, 60, 0.85);
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 0.45rem;
-    color: var(--season-gold);
-    font-size: 1.05rem;
-    font-weight: 900;
-    line-height: 1.2;
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
-}
-
-.page-season .synopsis {
-    margin: 0 0 0.95rem;
-    color: var(--season-text-muted);
-    font-size: 0.92rem;
-    line-height: 1.68;
-}
-
-.page-season .info-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.7rem 0.95rem;
-}
-
-.page-season .info-item {
-    min-width: 0;
-}
-
-.page-season .info-label {
-    margin: 0 0 0.35rem;
-    color: var(--season-gold);
-    font-size: 0.7rem;
-    font-weight: 900;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-}
-
-.page-season .info-label .jp {
-    margin-right: 0.2rem;
-    text-transform: none;
-}
-
-.page-season .info-value {
-    margin: 0;
-    color: #fff;
-    font-size: 1rem;
-}
-
-/* Cards saisons, alignées sur le PDF : coins arrondis + espacement */
-.page-season .season-list {
+.episodes-timeline-list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 18px;
+    margin-bottom: 24px;
 }
 
-.page-season .season-row {
+.timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.timeline-node {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 0.65rem;
-    padding: 0.85rem 0.95rem;
-    background: linear-gradient(180deg, rgba(9, 30, 58, 0.9), rgba(5, 18, 38, 0.9));
-    border: 1px solid rgba(21, 73, 133, 0.95);
-    border-radius: 0.6rem;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    justify-content: center;
+    padding-top: 12px;
 }
 
-.page-season .season-row__name {
-    color: var(--season-gold);
-    font-size: 1rem;
-    font-weight: 900;
-}
-
-.page-season .season-row__meta {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.8rem;
-}
-
-.page-season .icon-btn,
-.page-season .season-row__chevron {
-    color: var(--season-gold);
-}
-
-.page-season .cast-grid {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 0.85rem 0.45rem;
-}
-
-.page-season .cast-card {
-    display: grid;
-    justify-items: center;
-    gap: 0.22rem;
-    text-align: center;
-}
-
-.page-season .cast-avatar {
-    width: 2.9rem;
-    height: 2.9rem;
-    overflow: hidden;
+.play-circle {
+    width: 22px;
+    height: 22px;
+    border: 1px solid var(--gold);
     border-radius: 50%;
-    display: grid;
-    place-items: center;
-    border: 1px solid rgba(225, 166, 60, 0.7);
-    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.14), rgba(225,166,60,0.2) 35%, rgba(5,10,18,0.94) 100%);
-    color: #fff;
-    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-main);
 }
 
-.page-season .cast-avatar img {
+.play-circle i {
+    color: var(--gold);
+    font-size: 0.6rem;
+    margin-left: 2px;
+}
+
+.episode-figma-card {
+    flex: 1;
+    background-color: #051528;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-media-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 7;
+    overflow: hidden;
+}
+
+.card-banner {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.page-season .cast-name,
-.page-season .cast-role {
+.card-content-wrap {
+    padding: 12px;
+}
+
+.card-meta-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.badge-episodes {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-size: 0.65rem;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.icon-edit-gold {
+    color: var(--gold);
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.card-episode-title {
+    color: var(--gold);
+    font-size: 0.9rem;
+    margin: 0 0 6px 0;
+    font-weight: bold;
+}
+
+.card-episode-desc {
+    color: #ffffff;
+    font-size: 0.75rem;
+    line-height: 1.4;
     margin: 0;
-    color: var(--season-gold);
-    font-size: 0.56rem;
-    font-weight: 700;
-    line-height: 1.18;
+    opacity: 0.85;
 }
 
-.page-season .cast-role {
-    color: var(--season-gold-strong);
+/* CARTES BLUR / SPOILER */
+.episode-figma-card.is-spoiler {
+    aspect-ratio: 16 / 7;
+    justify-content: center;
+    align-items: center;
 }
 
-@media (min-width: 480px) {
-    .page-season .season-inner {
-        padding-inline: 1rem;
-    }
+.spoiler-blur-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(8px) brightness(0.25);
+    z-index: 1;
+}
+
+.spoiler-overlay-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+}
+
+.warning-icon {
+    font-size: 1.4rem;
+    margin-bottom: 2px;
+}
+
+.spoiler-title-text {
+    font-weight: bold;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.spoiler-action-text {
+    color: #ffffff;
+    font-size: 0.65rem;
+    opacity: 0.6;
+}
+
+.spoiler-minor .warning-icon,
+.spoiler-minor .spoiler-title-text {
+    color: var(--gold);
+}
+
+.spoiler-major .warning-icon,
+.spoiler-major .spoiler-title-text {
+    color: #ef4444;
+}
+
+.btn-figma-more {
+    width: 100%;
+    background: transparent;
+    border: 1px dashed var(--gold);
+    color: var(--gold);
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-figma-more:hover {
+    background-color: rgba(229, 169, 59, 0.05);
+}
+
+/* --- PERSONNAGES (HORIZONTAL ROW) --- */
+.cast-grid {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 24px;
+    overflow-x: auto;
+    padding-top: 5px;
+}
+
+.cast-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 80px;
+}
+
+.cast-avatar-wrap {
+    margin-bottom: 8px;
+}
+
+.cast-avatar {
+    width: 45px;
+    height: 45px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.cast-avatar span {
+    color: var(--text-white);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.cast-name {
+    color: var(--gold);
+    font-size: 0.65rem;
+    margin: 0 0 2px 0;
+    line-height: 1.2;
+}
+
+.cast-role {
+    color: var(--text-white);
+    font-size: 0.65rem;
+    margin: 0;
 }

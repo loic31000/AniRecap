@@ -1,0 +1,372 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --anime-bg: #051226;
+    --anime-bg-deep: #020a14;
+    --anime-surface: #05162d;
+    --anime-surface-2: #071b38;
+    --anime-surface-3: #0c2547;
+    --anime-line-blue: #154985;
+    --anime-gold: #e1a63c;
+    --anime-gold-strong: #efb54a;
+    --anime-text: #f4f6fb;
+    --anime-text-muted: #edf1f6;
+    --anime-text-faint: #94a2bc;
+    --anime-shadow: 0 14px 30px rgba(0, 0, 0, 0.32);
+    --anime-radius-md: 0.9rem;
+    --anime-space-1: 0.25rem;
+    --anime-space-2: 0.5rem;
+    --anime-space-3: 0.75rem;
+    --anime-space-4: 1rem;
+    --anime-space-5: 1.25rem;
+    --anime-space-6: 1.5rem;
+    --anime-content: 30rem;
+}
+
+.page-anime,
+.page-anime *,
+.page-anime *::before,
+.page-anime *::after {
+    box-sizing: border-box;
+}
+
+.page-anime {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    color: var(--anime-text);
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background:
+        radial-gradient(circle at 50% 12%, rgba(28, 85, 160, 0.12), transparent 28%),
+        linear-gradient(180deg, #03101f 0%, #041426 32%, #041427 100%);
+}
+
+.page-anime .anime-inner {
+    width: 100%;
+    max-width: var(--anime-content);
+    padding: 0.7rem 0.55rem calc(1.25rem + var(--nav-height, 78px));
+}
+
+.page-anime img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border: 0;
+}
+
+.page-anime figure {
+    margin: 0;
+    padding: 0;
+}
+
+.page-anime a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.page-anime button {
+    font: inherit;
+    cursor: pointer;
+}
+
+.page-anime .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0 0 1rem;
+    color: var(--anime-gold-strong);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.page-anime .anime-hero {
+    display: grid;
+    gap: 0.95rem;
+    margin-bottom: 1.15rem;
+}
+
+.page-anime .anime-cover {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    aspect-ratio: 349 / 535;
+    border: 3px solid var(--anime-gold);
+    overflow: hidden;
+    background-color: transparent;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-shadow: none;
+}
+
+.page-anime .anime-cover .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+}
+
+.page-anime .anime-cover img {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    min-width: 100% !important;
+    min-height: 100% !important;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    object-fit: cover !important;
+    object-position: center;
+}
+
+.page-anime .anime-copy {
+    display: grid;
+    gap: 0.8rem;
+}
+
+.page-anime .anime-title {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.7rem;
+    color: var(--anime-gold);
+    font-size: clamp(1.55rem, 6vw, 2.15rem);
+    font-weight: 900;
+    line-height: 1.08;
+    text-shadow: 0 2px 0 #000, 0 4px 10px rgba(0, 0, 0, 0.45);
+}
+
+.page-anime .anime-title__jp,
+.page-anime .anime-title__main {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.page-anime .badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.page-anime .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.75rem;
+    padding: 0.3rem 0.72rem;
+    border: 1px solid rgba(225, 166, 60, 0.7);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.38);
+    color: var(--anime-gold);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
+    box-shadow: inset 0 0 0 1px rgba(255, 215, 133, 0.06);
+}
+
+.page-anime .badge--pill {
+    min-height: 1.9rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 0.45rem;
+    font-size: 0.76rem;
+    background: transparent;
+}
+
+.page-anime .btn-favorite,
+.page-anime .chip-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--anime-space-2);
+    border: 1px solid rgba(225, 166, 60, 0.3);
+    background: linear-gradient(180deg, rgba(2, 7, 14, 0.92), rgba(0, 0, 0, 0.98));
+    color: var(--anime-gold);
+    box-shadow: inset 0 0 0 1px rgba(255, 207, 110, 0.05);
+}
+
+.page-anime .btn-favorite {
+    width: 100%;
+    min-height: 2.9rem;
+    padding: 0.75rem 0.95rem;
+    border-radius: 0.08rem;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.page-anime .secondary-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+}
+
+.page-anime .chip-btn {
+    min-height: 2.25rem;
+    padding: 0.5rem 0.4rem;
+    border-radius: 0.08rem;
+    font-size: 0.74rem;
+    font-weight: 800;
+}
+
+.page-anime .panel {
+    margin-bottom: 0.95rem;
+    padding: 0.8rem 0.8rem 0.95rem;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(25, 72, 138, 0.12), transparent 28%),
+        linear-gradient(180deg, rgba(6, 24, 48, 0.98), rgba(4, 20, 40, 0.98));
+    border: 1px solid rgba(21, 73, 133, 0.72);
+    border-radius: 0.85rem;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.page-anime .section-title {
+    margin: 0 0 0.9rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid rgba(225, 166, 60, 0.85);
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    color: var(--anime-gold);
+    font-size: 1.05rem;
+    font-weight: 900;
+    line-height: 1.2;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.page-anime .synopsis {
+    margin: 0 0 0.95rem;
+    color: var(--anime-text-muted);
+    font-size: 0.92rem;
+    line-height: 1.68;
+}
+
+.page-anime .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem 0.95rem;
+}
+
+.page-anime .info-item {
+    min-width: 0;
+}
+
+.page-anime .info-label {
+    margin: 0 0 0.35rem;
+    color: var(--anime-gold);
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.page-anime .info-label .jp {
+    margin-right: 0.2rem;
+    text-transform: none;
+}
+
+.page-anime .info-value {
+    margin: 0;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.page-anime .anime-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.page-anime .anime-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.65rem;
+    padding: 0.85rem 0.95rem;
+    background: linear-gradient(180deg, rgba(9, 30, 58, 0.9), rgba(5, 18, 38, 0.9));
+    border: 1px solid rgba(21, 73, 133, 0.95);
+    border-radius: 0.6rem;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.page-anime .anime-row__name {
+    color: var(--anime-gold);
+    font-size: 1rem;
+    font-weight: 900;
+}
+
+.page-anime .anime-row__meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.page-anime .icon-btn,
+.page-anime .anime-row__chevron {
+    color: var(--anime-gold);
+}
+
+.page-anime .cast-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.85rem 0.45rem;
+}
+
+.page-anime .cast-card {
+    display: grid;
+    justify-items: center;
+    gap: 0.22rem;
+    text-align: center;
+}
+
+.page-anime .cast-avatar {
+    width: 2.9rem;
+    height: 2.9rem;
+    overflow: hidden;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(225, 166, 60, 0.7);
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.14), rgba(225,166,60,0.2) 35%, rgba(5,10,18,0.94) 100%);
+    color: #fff;
+    font-weight: 800;
+}
+
+.page-anime .cast-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.page-anime .cast-name,
+.page-anime .cast-role {
+    margin: 0;
+    color: var(--anime-gold);
+    font-size: 0.56rem;
+    font-weight: 700;
+    line-height: 1.18;
+}
+
+.page-anime .cast-role {
+    color: var(--anime-gold-strong);
+}
+
+@media (min-width: 480px) {
+    .page-anime .anime-inner {
+        padding-inline: 1rem;
+    }
+}

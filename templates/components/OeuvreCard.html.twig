@@ -10,7 +10,15 @@
 	<div class="oeuvre-list">
 		{% for oeuvre in oeuvres %}
 			<article class="oeuvre-card">
+				{% if oeuvre.type == 'anime' %}
+					<a href="{{ path('app_anime') }}" class="oeuvre-card-link" aria-label="Voir {{ oeuvre.title }}"></a>
+				{% endif %}
 				<div class="oeuvre-thumb" style="background: {{ oeuvre.gradient }};">
+					<img
+						src="{{ asset(oeuvre.type == 'anime' ? 'images/coverAnime.png' : 'images/coverMangaCard.png') }}"
+						alt="{{ oeuvre.title }}"
+						class="oeuvre-thumb-image"
+					>
 					<button type="button" class="btn-favorite {{ oeuvre.favorited ? 'is-active' : '' }}">
 						<i class="fa-{{ oeuvre.favorited ? 'solid' : 'regular' }} fa-star"></i>
 					</button>
