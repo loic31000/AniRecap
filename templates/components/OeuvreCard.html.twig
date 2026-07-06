@@ -12,6 +12,8 @@
 			<article class="oeuvre-card">
 				{% if oeuvre.type == 'anime' %}
 					<a href="{{ path('app_anime') }}" class="oeuvre-card-link" aria-label="Voir {{ oeuvre.title }}"></a>
+				{% elseif oeuvre.type == 'manga' %}
+					<a href="{{ path('app_manga') }}" class="oeuvre-card-link" aria-label="Voir {{ oeuvre.title }}"></a>
 				{% endif %}
 				<div class="oeuvre-thumb" style="background: {{ oeuvre.gradient }};">
 					<img
