@@ -1,0 +1,245 @@
+{# templates/manga/manga.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ manga.displayTitle|default('Dragon Ball Z') }}
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('css/manga.css') }}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+	{% set cover = manga.coverImage is defined and manga.coverImage is not empty ? manga.coverImage : asset('images/coverManga.png') %}
+	{% set favorite = manga.isFavorite|default(false) %}
+	{% set liked = manga.isLiked|default(false) %}
+	{% set formatLabel = manga.format|default('Manga') %}
+	{% set statusLabel = manga.status|default('Terminé') %}
+	{% set authorLabel = manga.author|default('Utilisateur17') %}
+	{% set yearLabel = manga.year|default(1984) %}
+	{% set originalTitle = manga.originalTitle|default('ドラゴンボール') %}
+	{% set displayTitle = manga.displayTitle|default('Dragon Ball Z') %}
+	{% set genres = manga.genres|default(['Action', 'Fantasy', 'Shonen']) %}
+
+	{# Onglet actif de la section liste : 'chapters' ou 'tomes' #}
+	{% set activeTab = manga.activeTab|default('chapters') %}
+
+	{% set chaptersCountText = manga.chaptersCountText|default('6 Chapitres disponibles') %}
+
+	{# Liste des arcs / chapitres, avec un attribut spoiler optionnel : null, 'minor' ou 'major' #}
+	{% set chapterList = manga.chapters|default([
+        {
+            'range': 'CHAP. 01 - CHAP. 15',
+            'title': 'Arc Saiyens',
+            'description': "L'attaque surprise des Net-Hunters déstabilise la défense locale et force Kael à fuir.",
+            'image': asset('images/coverCardManga.png'),
+            'spoiler': null
+        },
+        {
+            'range': 'CHAP. 16 - CHAP. 45',
+            'title': 'Arc Cyborgs',
+            'description': "L'attaque surprise des Net-Hunters déstabilise la défense locale et force Kael à fuir.",
+            'image': asset('images/coverCardManga.png'),
+            'spoiler': null
+        },
+        {
+            'range': 'CHAP. 46 - CHAP. 78',
+            'title': 'Arc Buu',
+            'description': "L'attaque surprise des Net-Hunters déstabilise la défense locale et force Kael à fuir.",
+            'image': asset('images/coverCardManga.png'),
+            'spoiler': null
+        },
+        {
+            'range': 'CHAP. 79 - CHAP. 90',
+            'title': 'Film La revanche des Cyborgs',
+            'description': "L'attaque surprise des Net-Hunters déstabilise la défense locale et force Kael à fuir.",
+            'image': asset('images/coverCardManga.png'),
+            'spoiler': null
+        },
+        {
+            'range': 'CHAP. 91 - CHAP. 100',
+            'title': 'Spoiler mineur',
+            'description': null,
+            'image': asset('images/coverCardManga.png'),
+            'spoiler': 'minor'
+        },
+        {
+            'range': 'CHAP. 101 - CHAP. 120',
+            'title': 'Spoiler majeur',
+            'description': null,
+            'image': asset('images/coverCardManga.png'),
+            'spoiler': 'major'
+        }
+    ]) %}
+
+	{% set castList = manga.cast|default([
+        {'name': 'Tsunayoshi Sawada', 'role': '澤田綱義'},
+        {'name': 'Uchiha Sasuke', 'role': 'うちは・サスケ'},
+        {'name': 'Uzumaki Naruto', 'role': 'うずまき・ナルト'},
+        {'name': 'Hajime No Hippo', 'role': 'ジン・モリ'},
+        {'name': 'Tsunayoshi Sawada', 'role': '澤田綱義'},
+        {'name': 'Tsunayoshi Sawada', 'role': '澤田綱義'},
+        {'name': 'Tsunayoshi Sawada', 'role': '澤田綱義'},
+        {'name': 'Tsunayoshi Sawada', 'role': '澤田綱義'}
+    ]) %}
+
+	{{ component('Header', { backRoute: 'app_home' }) }}
+
+	<main class="page-manga">
+		<div class="manga-inner">
+			<a href="/catalogue" class="back-link">
+				<i class="fa-solid fa-arrow-left"></i>
+				<span>Retour au Catalogue</span>
+			</a>
+
+			<section class="manga-hero">
+				<figure class="manga-cover" style="background-image: url('{{ cover }}');">
+					<span class="visually-hidden">Affiche de
+						{{ displayTitle }}</span>
+				</figure>
+
+				<div class="manga-copy">
+					<h1 class="manga-title">
+						<span class="manga-title__jp">{{ originalTitle }}</span>
+						<span class="manga-title__main">{{ displayTitle }}</span>
+					</h1>
+
+					<div class="badge-row">
+						{% for genre in genres %}
+							<span class="badge">{{ genre|upper }}</span>
+						{% endfor %}
+					</div>
+
+					<button type="button" class="btn-favorite{{ favorite ? ' is-active' : '' }}">
+						<i class="fa-{{ favorite ? 'solid' : 'regular' }} fa-heart"></i>
+						<span>Ajouter aux favoris</span>
+					</button>
+
+					<div class="secondary-actions-row">
+						<button type="button" class="chip-btn chip-btn--like{{ liked ? ' is-active' : '' }}">
+							<span class="chip-btn__emoji">👍</span>
+							<span>J'AIME</span>
+						</button>
+						<button type="button" class="chip-btn">
+							<i class="fa-solid fa-circle-play"></i>
+							<span>DIAPORAMA</span>
+						</button>
+					</div>
+				</div>
+			</section>
+
+			{# Panneau Synopsis #}
+			<section class="panel panel--synopsis" aria-labelledby="synopsis-title">
+				<h2 id="synopsis-title" class="section-title">
+					<span class="jp">あらすじ（全文）</span>
+					<span>Synopsis complet</span>
+				</h2>
+
+				<p class="synopsis">{{ manga.synopsis|default("Dans un monde régi par des lois immuables, un jeune héros se dresse contre l'adversité pour rétablir l'équilibre. Ce voyage initiatique le mènera à travers des contrées hostiles où chaque rencontre forgera sa destinée.") }}</p>
+				<p class="synopsis">{{ manga.synopsisExtra|default("Confronté à des dilemmes moraux et à des combats d'une intensité rare, il devra puiser au plus profond de lui-même pour éveiller le pouvoir latent qui sommeille en lui. Une épopée magistrale qui explore les tréfonds de l'âme humaine sous un trait clinique et acéré.") }}</p>
+
+				<div class="info-grid">
+					<article class="info-item">
+						<p class="info-label">
+							<span class="jp">タイプ</span>TYPE</p>
+						<p class="info-value">{{ formatLabel }}</p>
+					</article>
+					<article class="info-item">
+						<p class="info-label">
+							<span class="jp">定款</span>STATUT</p>
+						<p class="info-value text-status">{{ statusLabel }}</p>
+					</article>
+					<article class="info-item">
+						<p class="info-label">
+							<span class="jp">著者</span>AUTEUR</p>
+						<p class="info-value">{{ authorLabel }}</p>
+					</article>
+					<article class="info-item">
+						<p class="info-label">
+							<span class="jp">年</span>ANNÉE</p>
+						<p class="info-value">{{ yearLabel }}</p>
+					</article>
+				</div>
+			</section>
+
+			{# Panneau Chapitres / Tomes #}
+			<section class="panel panel--chapters" aria-labelledby="chapters-title">
+				<div class="tabs-row" role="tablist" aria-label="Type de contenu">
+					<button type="button" class="tab-btn{{ activeTab == 'chapters' ? ' is-active' : '' }}" role="tab" aria-selected="{{ activeTab == 'chapters' ? 'true' : 'false' }}">
+						<span id="chapters-title">Chapitres</span>
+					</button>
+					<button type="button" class="tab-btn{{ activeTab == 'tomes' ? ' is-active' : '' }}" role="tab" aria-selected="{{ activeTab == 'tomes' ? 'true' : 'false' }}">
+						<span>Tomes</span>
+					</button>
+				</div>
+
+				<p class="episode-count-meta">{{ chaptersCountText }}</p>
+
+				<div class="episodes-timeline-list">
+					{% for chapter in chapterList %}
+						<div class="timeline-item">
+							<div class="timeline-node">
+								<span class="timeline-index">{{ loop.index }}</span>
+							</div>
+
+							{% if chapter.spoiler is not empty %}
+								<div class="episode-figma-card is-spoiler spoiler-{{ chapter.spoiler == 'major' ? 'major' : 'minor' }}">
+									<div class="spoiler-blur-bg" style="background-image: url('{{ chapter.image }}');"></div>
+									<div class="spoiler-overlay-content">
+										<i class="fa-solid fa-triangle-exclamation warning-icon"></i>
+										<span class="spoiler-title-text">SPOILER {{ chapter.spoiler == 'major' ? 'MAJEUR' : 'MINEUR' }}</span>
+										<span class="spoiler-action-text">APPUYER POUR RÉVÉLER</span>
+									</div>
+								</div>
+							{% else %}
+								<div class="episode-figma-card">
+									<div class="card-media-wrap">
+										<img src="{{ chapter.image }}" alt="" class="card-banner">
+									</div>
+									<div class="card-content-wrap">
+										<div class="card-meta-line">
+											<span class="badge-episodes">{{ chapter.range }}</span>
+											<i class="fa-solid fa-pencil icon-edit-gold"></i>
+										</div>
+										<h3 class="card-episode-title">{{ chapter.title }}</h3>
+										<p class="card-episode-desc">{{ chapter.description }}</p>
+									</div>
+								</div>
+							{% endif %}
+						</div>
+					{% endfor %}
+				</div>
+
+				<div class="action-row-center">
+					<button type="button" class="btn-figma-more">Voir plus de chapitres</button>
+				</div>
+			</section>
+
+			{# Panneau Personnages #}
+			<section class="panel panel--cast" aria-labelledby="cast-title">
+				<h2 id="cast-title" class="section-title">
+					<span class="jp">登場人物</span>
+					<span>Personnages</span>
+				</h2>
+
+				<div class="cast-grid">
+					{% for person in castList %}
+						<article class="cast-card">
+							<div class="cast-avatar-wrap">
+								<div class="cast-avatar">
+									<span>{{ person.name|slice(0, 1)|upper }}</span>
+								</div>
+							</div>
+							<p class="cast-name">{{ person.name }}</p>
+							<p class="cast-role">{{ person.role }}</p>
+						</article>
+					{% endfor %}
+				</div>
+			</section>
+		</div>
+	</main>
+
+	{{ component('Navbar', { active: 'catalogue' }) }}
+{% endblock %}
