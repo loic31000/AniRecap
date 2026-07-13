@@ -1,0 +1,244 @@
+{# templates/profile/profile.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ 'Profil'|default('Profil') }}
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('css/profile.css') }}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+	{% set avatar = user.avatar is defined and user.avatar is not empty ? user.avatar : asset('images/avatarDefault.png') %}
+	{% set username = user.username|default('Otaku17') %}
+	{% set email = user.email|default('otaku17@mail.com') %}
+	{% set synopsisCount = user.synopsisCount|default(124) %}
+	{% set favoritesCount = user.favoritesCount|default(42) %}
+
+	{% set favoritesList = user.favorites|default([
+        {
+            'type': 'Manga',
+            'title': 'Dragon Ball Super',
+            'range': 'Chapitre 115 - Chapitre 120',
+            'modifiedDate': '10.05.2025',
+            'votes': '150k Votes',
+            'image': asset('images/coverCardManga.png'),
+            'isFavorite': true
+        },
+        {
+            'type': 'Anime',
+            'title': 'Gundam Seed Destiny',
+            'range': 'Saison 2 - EP 11 - EP 24',
+            'modifiedDate': '10.05.2025',
+            'votes': '15k Votes',
+            'image': asset('images/coverCardSeason.png'),
+            'isFavorite': true
+        }
+    ]) %}
+
+	{% set summariesList = user.summaries|default([
+        {
+            'type': 'Manga',
+            'title': 'ドラゴンボール超',
+            'range': 'Chapitre 115 - Chapitre 120',
+            'modifiedDate': '10.05.2025',
+            'votes': '150k Votes',
+            'image': asset('images/coverCardManga.png'),
+            'isFavorite': true
+        },
+        {
+            'type': 'Anime',
+            'title': 'ガンダムSEED デスティニー',
+            'range': 'Saison 2 - EP 11 - EP 24',
+            'modifiedDate': '10.05.2025',
+            'votes': '15k Votes',
+            'image': asset('images/coverCardSeason.png'),
+            'isFavorite': true
+        },
+        {
+            'type': 'Manga',
+            'title': '家庭教師ヒットマンREBORN!',
+            'range': 'Chapitre 115 - Chapitre 120',
+            'modifiedDate': '10.05.2025',
+            'votes': '25k Votes',
+            'image': asset('images/coverCardManga.png'),
+            'isFavorite': false
+        },
+        {
+            'type': 'Anime',
+            'title': 'Gundam Seed Destiny',
+            'range': 'Saison 2 - EP 11 - EP 24',
+            'modifiedDate': '10.05.2025',
+            'votes': '15k Votes',
+            'image': asset('images/coverCardSeason.png'),
+            'isFavorite': true
+        }
+    ]) %}
+
+	{{ component('Header', { backRoute: null }) }}
+
+	<main class="page-profile">
+		<div class="profile-inner">
+
+			{# Flash messages #}
+			{% for label, messages in app.flashes %}
+				{% for message in messages %}
+					<div class="flash-{{ label }}">{{ message }}</div>
+				{% endfor %}
+			{% endfor %}
+
+			<h1 class="profile-page-title">
+				<span class="jp">プロフィール</span>
+				<span>Profil</span>
+			</h1>
+
+			<section class="profile-identity">
+				<div class="profile-avatar-wrap">
+					<img src="{{ avatar }}" alt="Avatar de {{ username }}" class="profile-avatar">
+
+					<form action="{{ path('app_profile_upload') }}" method="post" enctype="multipart/form-data" class="avatar-upload-form">
+						<label for="avatarInput" class="avatar-edit-btn" title="Changer l'avatar">
+							<i class="fa-solid fa-pencil"></i>
+						</label>
+						<input id="avatarInput" type="file" name="avatar" accept="image/png,image/jpeg" style="display:none">
+					</form>
+				</div>
+
+				<p class="profile-username">{{ username }}</p>
+				<p class="profile-email">{{ email }}</p>
+
+				<div class="profile-stats">
+					<div class="stat-item">
+						<span class="stat-value">{{ synopsisCount }}</span>
+						<span class="stat-label">Synopsis Rédigé</span>
+					</div>
+					<div class="stat-divider"></div>
+					<div class="stat-item">
+						<span class="stat-value">{{ favoritesCount }}</span>
+						<span class="stat-label">Favorites</span>
+					</div>
+				</div>
+			</section>
+
+			{# Section Favoris #}
+			<section class="panel panel--profile-list" aria-labelledby="favorites-title">
+				<div class="panel-header-row">
+					<h2 id="favorites-title" class="section-title section-title--inline">
+						<span class="jp">お気に入り</span>
+						<span>Mes Favoris</span>
+					</h2>
+					<a href="#" class="see-all-link">Voir Tout <i class="fa-solid fa-arrow-right"></i></a>
+				</div>
+
+				<div class="profile-card-list">
+					{% for item in favoritesList %}
+						<article class="profile-card">
+							<div class="card-media-wrap">
+								<img src="{{ item.image }}" alt="" class="card-banner">
+								<span class="type-badge">{{ item.type }}</span>
+								<div class="card-icons">
+									<i class="fa-{{ item.isFavorite ? 'solid' : 'regular' }} fa-star icon-star"></i>
+									<i class="fa-solid fa-pencil icon-edit-gold"></i>
+								</div>
+							</div>
+							<div class="card-content-wrap">
+								<h3 class="card-item-title">{{ item.title }}</h3>
+								<p class="card-item-range">{{ item.range }}</p>
+								<div class="card-meta-row">
+									<span class="card-modified">
+										<i class="fa-solid fa-arrows-rotate"></i>
+										Modifié le {{ item.modifiedDate }}
+									</span>
+									<span class="votes-badge">{{ item.votes }}</span>
+								</div>
+							</div>
+						</article>
+					{% endfor %}
+				</div>
+			</section>
+
+			{# Section Mes Résumés #}
+			<section class="panel panel--profile-list" aria-labelledby="summaries-title">
+				<div class="panel-header-row">
+					<h2 id="summaries-title" class="section-title section-title--inline">
+						<span class="jp">私の要約</span>
+						<span>Mes Résumés</span>
+					</h2>
+					<a href="#" class="see-all-link">Voir Tout <i class="fa-solid fa-arrow-right"></i></a>
+				</div>
+
+				<div class="profile-card-list">
+					{% for item in summariesList %}
+						<article class="profile-card">
+							<div class="card-media-wrap">
+								<img src="{{ item.image }}" alt="" class="card-banner">
+								<span class="type-badge">{{ item.type }}</span>
+								<div class="card-icons">
+									<i class="fa-{{ item.isFavorite ? 'solid' : 'regular' }} fa-star icon-star"></i>
+									<i class="fa-solid fa-pencil icon-edit-gold"></i>
+								</div>
+							</div>
+							<div class="card-content-wrap">
+								<h3 class="card-item-title">{{ item.title }}</h3>
+								<p class="card-item-range">{{ item.range }}</p>
+								<div class="card-meta-row">
+									<span class="card-modified">
+										<i class="fa-solid fa-arrows-rotate"></i>
+										Modifié le {{ item.modifiedDate }}
+									</span>
+									<span class="votes-badge">{{ item.votes }}</span>
+								</div>
+							</div>
+						</article>
+					{% endfor %}
+				</div>
+			</section>
+
+			<form action="{{ path('app_logout') }}" method="post" class="logout-form">
+				<button type="submit" class="btn-logout">
+					<i class="fa-solid fa-right-from-bracket"></i>
+					<span>Déconnexion</span>
+				</button>
+			</form>
+
+			<button type="button" class="btn-scroll-top" aria-label="Retour en haut de page">
+				<i class="fa-solid fa-chevron-up"></i>
+			</button>
+		</div>
+	</main>
+
+	{{ component('Navbar', { active: 'profile' }) }}
+{% block javascripts_extra %}
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const input = document.getElementById('avatarInput');
+			if (!input) return;
+
+			input.addEventListener('change', function () {
+				const file = input.files && input.files[0];
+				if (!file) return;
+
+				const allowed = ['image/png', 'image/jpeg'];
+				const maxSize = 2 * 1024 * 1024; // 2MB
+
+				if (!allowed.includes(file.type)) {
+					alert('Format invalide — seuls PNG et JPEG sont acceptés.');
+					input.value = '';
+					return;
+				}
+
+				if (file.size > maxSize) {
+					alert('Fichier trop volumineux — taille maximale 2MB.');
+					input.value = '';
+					return;
+				}
+
+				input.form.submit();
+			});
+		});
+	</script>
+{% endblock %}
+{% endblock %}

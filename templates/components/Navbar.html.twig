@@ -1,10 +1,10 @@
 <nav class="bottom-nav">
-	<a href="/home" class="nav-item">
+	<a href="{{ path('app_home') }}" class="nav-item {{ active is defined and active == 'home' ? 'is-active' : '' }}">
 		<i class="fa-solid fa-house"></i>
 		<span>Accueil</span>
 	</a>
 
-	<a href="/catalogue" class="nav-item is-active">
+	<a href="{{ path('app_catalogue') }}" class="nav-item {{ active is defined and active == 'catalogue' ? 'is-active' : '' }}">
 		<i class="fa-solid fa-book"></i>
 		<span>Catalogue</span>
 	</a>
@@ -16,12 +16,12 @@
 	</div>
 
 
-	<a href="#" class="nav-item">
+	<a href="#" class="nav-item {{ active is defined and active == 'favorites' ? 'is-active' : '' }}">
 		<i class="fa-solid fa-heart"></i>
 		<span>Favoris</span>
 	</a>
 
-	<a href="#" class="nav-item">
+	<a href="{{ path('app_profile') }}" class="nav-item {{ active is defined and active == 'profile' ? 'is-active' : '' }}">
 		<i class="fa-solid fa-user"></i>
 		<span>Profil</span>
 	</a>
