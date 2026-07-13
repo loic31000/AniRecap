@@ -40,6 +40,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 500, nullable: true)]
     private ?string $avatarUrl = null;
+    
 
     /**
      * @var Collection<int, Episode>
@@ -218,6 +219,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
 
     /**
      * @return Collection<int, Episode>
