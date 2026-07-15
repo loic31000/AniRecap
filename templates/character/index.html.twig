@@ -1,0 +1,95 @@
+{# templates/personnage/show.html.twig
+
+  Attendu depuis le Controller, par ex. :
+
+  return $this->render('personnage/show.html.twig', [
+      'character'         => $character,          // entite Character (name, description, imageUrl)
+      'workType'          => 'マンガ',              // 'マンガ' (manga) ou 'アニメ' (anime)
+      'workTitle'         => 'GINTAMA',             // titre de l'oeuvre d'ou vient le personnage
+      'catalogueRoute'    => 'app_catalogue',       // route du bouton retour
+      'relatedCharacters' => $otherCharacters,      // Collection<Character> affiches en bas
+  ]);
+
+  Chaque entree de relatedCharacters doit exposer :
+    - id (pour le lien vers sa propre fiche)
+    - name
+    - imageUrl
+#}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ character.name }}{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('css/character.css') }}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+	{{ component('Header', { backRoute: null }) }}
+
+	<main class="page-personnage">
+		<div class="personnage-inner">
+
+			<div class="personnage-toolbar">
+				<a href="{{ path(catalogueRoute|default('app_catalogue')) }}" class="back-link">
+					<i class="fa-solid fa-arrow-left"></i>
+					<span>Retour au Catalogue</span>
+				</a>
+				<a href="{{ path('app_character_edit', { id: character.id }) }}" class="edit-link" aria-label="Modifier le personnage">
+					<i class="fa-solid fa-pencil"></i>
+				</a>
+			</div>
+
+			<div class="personnage-portrait-wrap">
+				<img src="{{ asset(character.imageUrl|default('images/placeholder-character.png')) }}" alt="{{ character.name }}" class="personnage-portrait">
+			</div>
+
+			{% if workType is defined and workTitle is defined %}
+				<div class="personnage-meta-row">
+					<span class="jp">{{ workType }}</span>
+					<span class="value">{{ workTitle }}</span>
+				</div>
+			{% endif %}
+			<div class="personnage-meta-row">
+				<span class="jp">登場人物</span>
+				<span class="value">{{ character.name }}</span>
+			</div>
+
+			<section class="panel panel--synopsis">
+				<h2 class="section-title--inline">
+					<span class="jp">あらすじ</span>
+					<span>Synopsis</span>
+				</h2>
+				<div class="synopsis-content">
+					{% for paragraph in character.description|default('')|split('\n\n') %}
+						{% if paragraph|trim is not empty %}
+							<p>{{ paragraph|trim }}</p>
+						{% endif %}
+					{% endfor %}
+				</div>
+			</section>
+
+			{% if relatedCharacters is defined and relatedCharacters|length > 0 %}
+				<section class="panel panel--characters">
+					<h2 class="section-title--inline">
+						<span class="jp">登場人物</span>
+						<span>Personnages</span>
+					</h2>
+
+					<div class="character-grid">
+						{% for related in relatedCharacters %}
+							<a href="{{ path('app_character_show', { id: related.id }) }}" class="character-chip">
+								<img src="{{ asset(related.imageUrl|default('images/placeholder-character.png')) }}" alt="{{ related.name }}" class="character-chip-avatar" loading="lazy">
+								<span class="character-chip-name">{{ related.name }}</span>
+							</a>
+						{% endfor %}
+					</div>
+				</section>
+			{% endif %}
+		</div>
+	</main>
+
+	{{ component('Navbar', { active: 'catalogue' }) }}
+{% endblock %}

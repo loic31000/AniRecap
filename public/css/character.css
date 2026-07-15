@@ -1,0 +1,208 @@
+/* css/personnage.css */
+
+:root {
+	--perso-bg: #0c1425;
+	--perso-bg-alt: #121c33;
+	--perso-panel: #16223d;
+	--perso-panel-border: rgba(212, 175, 55, 0.18);
+	--perso-gold: #d4af37;
+	--perso-gold-soft: rgba(212, 175, 55, 0.35);
+	--perso-text: #eef1f8;
+	--perso-text-muted: #9aa4bd;
+	--radius-lg: 18px;
+	--radius-md: 12px;
+}
+
+.page-personnage {
+	background: radial-gradient(circle at top, var(--perso-bg-alt) 0%, var(--perso-bg) 55%);
+	color: var(--perso-text);
+	min-height: 100vh;
+	font-family: "Noto Sans JP", "Inter", system-ui, sans-serif;
+}
+
+.personnage-inner {
+	max-width: 720px;
+	margin: 0 auto;
+	padding: 16px 16px 32px;
+}
+
+/* ---------- TOOLBAR (retour / edition) ---------- */
+
+.personnage-toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin: 4px 0 16px;
+}
+
+.back-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--perso-text);
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.back-link i {
+	color: var(--perso-text);
+}
+
+.edit-link {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	color: var(--perso-gold);
+	text-decoration: none;
+	font-size: 16px;
+}
+
+/* ---------- PORTRAIT ---------- */
+
+.personnage-portrait-wrap {
+	width: 100%;
+	aspect-ratio: 1 / 1.05;
+	border-radius: var(--radius-lg);
+	border: 2px solid var(--perso-gold);
+	overflow: hidden;
+	margin-bottom: 20px;
+}
+
+.personnage-portrait {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+/* ---------- META (type d'oeuvre / nom du personnage) ---------- */
+
+.personnage-meta-row {
+	display: flex;
+	align-items: baseline;
+	justify-content: center;
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+.personnage-meta-row .jp {
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--perso-gold);
+}
+
+.personnage-meta-row .value {
+	font-size: 20px;
+	font-weight: 700;
+	color: var(--perso-gold);
+}
+
+/* ---------- PANELS ---------- */
+
+.panel {
+	background: var(--perso-panel);
+	border: 1px solid var(--perso-panel-border);
+	border-radius: var(--radius-lg);
+	padding: 18px 18px 20px;
+	margin-top: 20px;
+}
+
+.panel--characters {
+	background: transparent;
+	border: none;
+	padding: 0;
+}
+
+.section-title--inline {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	margin: 0 0 14px;
+	padding-bottom: 10px;
+	border-bottom: 2px solid var(--perso-gold);
+}
+
+.panel--synopsis .section-title--inline {
+	border-bottom-color: var(--perso-panel-border);
+}
+
+.section-title--inline .jp {
+	font-size: 13px;
+	font-weight: 400;
+	color: var(--perso-text-muted);
+}
+
+.section-title--inline span:last-child {
+	font-size: 17px;
+	font-weight: 700;
+	color: var(--perso-text);
+}
+
+.synopsis-content {
+	font-size: 14px;
+	line-height: 1.7;
+	color: var(--perso-text-muted);
+}
+
+.synopsis-content p {
+	margin: 0 0 16px;
+}
+
+.synopsis-content p:last-child {
+	margin-bottom: 0;
+}
+
+/* ---------- GRILLE PERSONNAGES ---------- */
+
+.character-grid {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 14px 8px;
+}
+
+.character-chip {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	text-decoration: none;
+}
+
+.character-chip-avatar {
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid var(--perso-gold);
+}
+
+.character-chip-name {
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--perso-text);
+	text-align: center;
+	line-height: 1.3;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (min-width: 600px) {
+	.character-grid {
+		grid-template-columns: repeat(6, 1fr);
+	}
+}
+
+@media (min-width: 900px) {
+	.personnage-inner {
+		max-width: 960px;
+	}
+
+	.personnage-portrait-wrap {
+		max-width: 420px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+}
