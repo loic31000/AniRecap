@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Enum\SpoilerLevel;
 use App\Repository\CharacterRepository;
+use App\Security\Ownable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -11,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CharacterRepository::class)]
 #[ORM\Table(name: '`character`')]
-class Character
+class Character implements Ownable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -26,6 +27,9 @@ class Character
 
     #[ORM\Column(length: 500, nullable: true)]
     private ?string $imageUrl = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'characters')]
+    private ?User $owner = null;
 
     #[ORM\Column(length: 20, enumType: SpoilerLevel::class)]
     private SpoilerLevel $spoilerLevel = SpoilerLevel::Aucun;
@@ -120,6 +124,18 @@ class Character
     public function setImageUrl(?string $imageUrl): static
     {
         $this->imageUrl = $imageUrl;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
 
         return $this;
     }

@@ -3,11 +3,12 @@
 namespace App\Entity;
 
 use App\Repository\SummaryRepository;
+use App\Security\Ownable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SummaryRepository::class)]
-class Summary
+class Summary implements Ownable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -35,6 +36,9 @@ class Summary
 
     #[ORM\ManyToOne(inversedBy: 'summaries')]
     private ?Manga $manga = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $spoilerLevel = null;
 
     #[ORM\ManyToOne(inversedBy: 'summaries')]
     private ?Tome $tome = null;
@@ -72,6 +76,11 @@ class Summary
     }
 
     public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function getOwner(): ?User
     {
         return $this->user;
     }
@@ -139,6 +148,18 @@ class Summary
     public function setTome(?Tome $tome): static
     {
         $this->tome = $tome;
+
+        return $this;
+    }
+
+    public function getSpoilerLevel(): ?string
+    {
+        return $this->spoilerLevel;
+    }
+
+    public function setSpoilerLevel(?string $spoilerLevel): static
+    {
+        $this->spoilerLevel = $spoilerLevel;
 
         return $this;
     }

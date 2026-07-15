@@ -3,13 +3,14 @@ namespace App\Entity;
 
 use App\Enum\SpoilerLevel;
 use App\Repository\ChapitreRepository;
+use App\Security\Ownable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ChapitreRepository::class)]
-class Chapitre
+class Chapitre implements Ownable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -199,6 +200,11 @@ class Chapitre
     }
 
     public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function getOwner(): ?User
     {
         return $this->user;
     }

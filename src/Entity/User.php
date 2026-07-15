@@ -43,6 +43,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     
 
     /**
+     * @var Collection<int, Character>
+     */
+    #[ORM\OneToMany(targetEntity: Character::class, mappedBy: 'owner')]
+    private Collection $characters;
+
+    /**
      * @var Collection<int, Episode>
      */
     #[ORM\OneToMany(targetEntity: Episode::class, mappedBy: 'user')]
@@ -98,6 +104,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
+        $this->characters = new ArrayCollection();
         $this->episodes = new ArrayCollection();
         $this->tomes = new ArrayCollection();
         $this->chapitres = new ArrayCollection();
@@ -220,6 +227,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+
+    /**
+     * @return Collection<int, Character>
+     */
+    public function getCharacters(): Collection
+    {
+        return $this->characters;
+    }
+
+    public function addCharacter(Character $character): static
+    {
+        if (!$this->characters->contains($character)) {
+            $this->characters->add($character);
+            $character->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCharacter(Character $character): static
+    {
+        if ($this->characters->removeElement($character)) {
+            if ($character->getOwner() === $this) {
+                $character->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
 
     /**
      * @return Collection<int, Episode>

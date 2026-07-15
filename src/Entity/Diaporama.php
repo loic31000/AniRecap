@@ -3,13 +3,14 @@
 namespace App\Entity;
 
 use App\Repository\DiaporamaRepository;
+use App\Security\Ownable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DiaporamaRepository::class)]
-class Diaporama
+class Diaporama implements Ownable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -37,6 +38,9 @@ class Diaporama
     #[ORM\ManyToOne(inversedBy: 'diaporamas')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Chapitre $chapitre = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $spoilerLevel = null;
 
     /**
      * @var Collection<int, Categorie>
@@ -83,6 +87,11 @@ class Diaporama
         return $this->user;
     }
 
+    public function getOwner(): ?User
+    {
+        return $this->user;
+    }
+
     public function setUser(?User $user): static
     {
         $this->user = $user;
@@ -122,6 +131,18 @@ class Diaporama
     public function setChapitre(?Chapitre $chapitre): static
     {
         $this->chapitre = $chapitre;
+
+        return $this;
+    }
+
+    public function getSpoilerLevel(): ?string
+    {
+        return $this->spoilerLevel;
+    }
+
+    public function setSpoilerLevel(?string $spoilerLevel): static
+    {
+        $this->spoilerLevel = $spoilerLevel;
 
         return $this;
     }
