@@ -29,61 +29,9 @@
 	{% set chaptersCountText = manga.chaptersCountText|default('6 Chapitres disponibles') %}
 
 	{# Liste des arcs / chapitres, avec un attribut spoiler optionnel : null, 'minor' ou 'major' #}
-	{% set chapterList = manga.chapters|default([
-        {
-            'range': 'CHAP. 01 - CHAP. 15',
-            'title': 'Arc Saiyens',
-            'description': "L'attaque surprise des Net-Hunters déstabilise la défense locale et force Kael à fuir.",
-            'image': asset('images/coverCardManga.png'),
-            'spoiler': null
-        },
-        {
-            'range': 'CHAP. 16 - CHAP. 45',
-            'title': 'Arc Cyborgs',
-            'description': "L'attaque surprise des Net-Hunters déstabilise la défense locale et force Kael à fuir.",
-            'image': asset('images/coverCardManga.png'),
-            'spoiler': null
-        },
-        {
-            'range': 'CHAP. 46 - CHAP. 78',
-            'title': 'Arc Buu',
-            'description': "L'attaque surprise des Net-Hunters déstabilise la défense locale et force Kael à fuir.",
-            'image': asset('images/coverCardManga.png'),
-            'spoiler': null
-        },
-        {
-            'range': 'CHAP. 79 - CHAP. 90',
-            'title': 'Film La revanche des Cyborgs',
-            'description': "L'attaque surprise des Net-Hunters déstabilise la défense locale et force Kael à fuir.",
-            'image': asset('images/coverCardManga.png'),
-            'spoiler': null
-        },
-        {
-            'range': 'CHAP. 91 - CHAP. 100',
-            'title': 'Spoiler mineur',
-            'description': null,
-            'image': asset('images/coverCardManga.png'),
-            'spoiler': 'minor'
-        },
-        {
-            'range': 'CHAP. 101 - CHAP. 120',
-            'title': 'Spoiler majeur',
-            'description': null,
-            'image': asset('images/coverCardManga.png'),
-            'spoiler': 'major'
-        }
-    ]) %}
+	{% set chapterList = manga.chapters|default([]) %}
 
-	{% set castList = manga.cast|default([
-        {'name': 'Tsunayoshi Sawada', 'role': '澤田綱義'},
-        {'name': 'Uchiha Sasuke', 'role': 'うちは・サスケ'},
-        {'name': 'Uzumaki Naruto', 'role': 'うずまき・ナルト'},
-        {'name': 'Hajime No Hippo', 'role': 'ジン・モリ'},
-        {'name': 'Tsunayoshi Sawada', 'role': '澤田綱義'},
-        {'name': 'Tsunayoshi Sawada', 'role': '澤田綱義'},
-        {'name': 'Tsunayoshi Sawada', 'role': '澤田綱義'},
-        {'name': 'Tsunayoshi Sawada', 'role': '澤田綱義'}
-    ]) %}
+	{% set castList = manga.cast|default([]) %}
 
 	{{ component('Header', { backRoute: 'app_home' }) }}
 

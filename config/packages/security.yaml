@@ -44,6 +44,7 @@ security:
         - { path: ^/home, roles: ROLE_USER }
         - { path: ^/catalogue, roles: ROLE_USER }
         - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/diaporama, roles: ROLE_USER }
 
 when@test:
     security:

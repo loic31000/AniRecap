@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Diaporama{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/diaporama.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="story" id="story">
+
+    {# Barre de progression segmentee, une portion par slide #}
+    <div class="story__progress" id="storyProgress">
+        {% for item in items %}
+            <span class="story__progress-bar{{ loop.first ? ' is-active' : '' }}"></span>
+        {% endfor %}
+    </div>
+
+    {% for item in items %}
+        {% set seriesTitle = item.episode.season.anime.title
+            ?? item.tome.manga.title
+            ?? item.chapitre.manga.title %}
+
+        {% set cover = item.episode.coverEpisodeUrl
+            ?? item.episode.season.anime.coverAnimeUrl
+            ?? item.tome.coverTomeUrl
+            ?? item.tome.manga.coverMangaUrl
+            ?? item.chapitre.coverChapitreUrl
+            ?? item.chapitre.manga.coverMangaUrl %}
+
+        <div class="story__slide{{ loop.first ? ' is-active' : '' }}" data-index="{{ loop.index0 }}"
+             style="background-image: url('{{ asset(cover) }}');">
+
+            {# Zones de tap invisibles : gauche = precedent, droite = suivant #}
+            <button type="button" class="story__tap story__tap--prev" aria-label="Precedent"></button>
+            <button type="button" class="story__tap story__tap--next" aria-label="Suivant"></button>
+
+            <a href="{{ path('app_diaporama') }}" class="story__close" aria-label="Fermer">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="4" y1="4" x2="20" y2="20"/>
+                    <line x1="20" y1="4" x2="4" y2="20"/>
+                </svg>
+            </a>
+
+            <h1 class="story__series-title">{{ seriesTitle }}</h1>
+
+            <div class="story__card">
+                {% for categorie in item.categorie %}
+                    <span class="story__badge">{{ categorie.name }}</span>
+                {% endfor %}
+
+                <h2 class="story__title-jp">{{ item.title }}</h2>
+
+                {# item.content est stocke en HTML brut (wiki, "mafia", etc.) -> |raw #}
+                <div class="story__description">
+                    {{ item.content|raw }}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const story = document.getElementById('story');
+            if (!story) {
+                return; // securite si le bloc body n'a pas encore ete injecte
+            }
+            const slides = Array.from(story.querySelectorAll('.story__slide'));
+            const bars = Array.from(document.getElementById('storyProgress').querySelectorAll('.story__progress-bar'));
+            let current = 0;
+
+            function render() {
+                slides.forEach((slide, i) => slide.classList.toggle('is-active', i === current));
+                bars.forEach((bar, i) => {
+                    bar.classList.toggle('is-active', i === current);
+                    bar.classList.toggle('is-done', i < current);
+                });
+            }
+
+            function goTo(index) {
+                if (index < 0 || index >= slides.length) {
+                    return; // on ne boucle pas, ferme via le bouton X si besoin
+                }
+                current = index;
+                render();
+            }
+
+            story.querySelectorAll('.story__tap--prev').forEach(btn => {
+                btn.addEventListener('click', () => goTo(current - 1));
+            });
+            story.querySelectorAll('.story__tap--next').forEach(btn => {
+                btn.addEventListener('click', () => goTo(current + 1));
+            });
+
+            render();
+        });
+    </script>
+{% endblock %}

@@ -26,74 +26,47 @@ final class CatalogueController extends AbstractController
             'annee' => $request->query->get('annee') ?: null,
         ];
 
-        $genreOptions = [
-            ['slug' => 'action-adventure', 'name' => 'Action / Aventure'],
-            ['slug' => 'romance', 'name' => 'Romance'],
-            ['slug' => 'comedie', 'name' => 'Comédie'],
-            ['slug' => 'drama', 'name' => 'Drame'],
-            ['slug' => 'fantasy', 'name' => 'Fantasy'],
-            ['slug' => 'science-fiction', 'name' => 'Science-Fiction'],
-            ['slug' => 'thriller-mystere', 'name' => 'Thriller / Mystère'],
-            ['slug' => 'tranche-de-vie', 'name' => 'Tranche de vie'],
-        ];
+        $genreOptions = array_values(array_map(
+            static fn ($categorie) => ['slug' => $categorie->getSlug(), 'name' => $categorie->getName()],
+            $categorieRepository->findAll()
+        ));
 
-        $catalogueItems = [
-            [
+        if ($genreOptions === []) {
+            $genreOptions = [
+                ['slug' => 'action-adventure', 'name' => 'Action / Aventure'],
+                ['slug' => 'romance', 'name' => 'Romance'],
+            ];
+        }
+
+        $catalogueItems = [];
+
+        foreach ($animeRepository->findAll() as $anime) {
+            $catalogueItems[] = [
                 'type' => 'anime',
-                'title' => 'Demon Slayer',
-                'subtitle' => 'Saison 3 • 24 épisodes',
-                'author' => 'Koyoharu Gotouge',
-                'categories' => ['action-adventure', 'fantasy'],
-                'date' => '2024',
-                'votes' => 843,
+                'title' => $anime->getTitle(),
+                'subtitle' => sprintf('Saison %d • %s', $anime->getSeasons()->count() ?: 1, $anime->getStatus() ?: 'À venir'),
+                'author' => $anime->getAuthor(),
+                'categories' => array_map(static fn ($categorie) => $categorie->getSlug(), iterator_to_array($anime->getCategories())),
+                'date' => (string) ($anime->getAnimeDate() ?? ''),
+                'votes' => 500 + ($anime->getId() ?? 0) * 50,
                 'gradient' => 'linear-gradient(135deg, #274b7a, #6fa8dc)',
-                'favorited' => true,
-            ],
-            [
+                'favorited' => false,
+            ];
+        }
+
+        foreach ($mangaRepository->findAll() as $manga) {
+            $catalogueItems[] = [
                 'type' => 'manga',
-                'title' => 'One Piece',
-                'subtitle' => 'Chapitre 1200+ • Eiichiro Oda',
-                'author' => 'Eiichiro Oda',
-                'categories' => ['action-adventure'],
-                'date' => '2025',
-                'votes' => 1250,
+                'title' => $manga->getTitle(),
+                'subtitle' => sprintf('Chapitre %s • %s', $manga->getMangaDate() ?? '1', $manga->getAuthor()),
+                'author' => $manga->getAuthor(),
+                'categories' => array_map(static fn ($categorie) => $categorie->getSlug(), iterator_to_array($manga->getCategorie())),
+                'date' => (string) ($manga->getMangaDate() ?? ''),
+                'votes' => 600 + ($manga->getId() ?? 0) * 40,
                 'gradient' => 'linear-gradient(135deg, #ff8a3d, #ffcf5c)',
-                'favorited' => false,
-            ],
-            [
-                'type' => 'anime',
-                'title' => 'Attack on Titan',
-                'subtitle' => 'Final season • Épisode 28',
-                'author' => 'Hajime Isayama',
-                'categories' => ['action-adventure', 'drama'],
-                'date' => '2023',
-                'votes' => 980,
-                'gradient' => 'linear-gradient(135deg, #111111, #3a3a3a)',
                 'favorited' => true,
-            ],
-            [
-                'type' => 'manga',
-                'title' => 'Tokyo Ghoul',
-                'subtitle' => 'Chapitre 200 • Classics',
-                'author' => 'Sui Ishida',
-                'categories' => ['thriller-mystere', 'drama'],
-                'date' => '2022',
-                'votes' => 432,
-                'gradient' => 'linear-gradient(135deg, #4b2e3e, #a83f5e)',
-                'favorited' => false,
-            ],
-            [
-                'type' => 'anime',
-                'title' => 'My Hero Academia',
-                'subtitle' => 'Saison 6 • Nouveaux héros',
-                'author' => 'Kohei Horikoshi',
-                'categories' => ['action-adventure', 'comedie'],
-                'date' => '2025',
-                'votes' => 1090,
-                'gradient' => 'linear-gradient(135deg, #2d3d5b, #7ca6f8)',
-                'favorited' => false,
-            ],
-        ];
+            ];
+        }
 
         $viewResults = array_filter($catalogueItems, function (array $item) use ($filters): bool {
             if ($filters['type'] !== 'all' && $item['type'] !== $filters['type']) {
