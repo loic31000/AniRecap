@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\Entity\Anime;
 use App\Entity\Categorie;
+use App\Entity\Character;
 use App\Entity\Diaporama;
 use App\Entity\Episode;
 use App\Entity\Favorite;
@@ -70,6 +71,15 @@ class AppFixtures extends Fixture
         $season->setAnime($anime);
         $season->addCategorie($categorieAction);
         $manager->persist($season);
+
+        $character = new Character();
+        $character->setName('Gintoki');
+        $character->setDescription('Un adolescent maladroit qui découvre qu\'il est destiné à devenir le dixième boss de la Vongola.');
+        $character->setImageUrl('/images/coverAnime.png');
+        $character->setSpoilerLevel(SpoilerLevel::Aucun);
+        $character->addAnime($anime);
+        $character->addSeason($season);
+        $manager->persist($character);
 
         $manga = new Manga();
         $manga->setTitle('ONE PIECE');
