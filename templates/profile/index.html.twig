@@ -211,7 +211,10 @@
 	</main>
 
 	{{ component('Navbar', { active: 'profile' }) }}
-{% block javascripts_extra %}
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
 	<script>
 		document.addEventListener('DOMContentLoaded', function () {
 			const input = document.getElementById('avatarInput');
@@ -240,5 +243,4 @@
 			});
 		});
 	</script>
-{% endblock %}
 {% endblock %}
