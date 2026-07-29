@@ -1,28 +1,46 @@
-<nav class="bottom-nav">
-	<a href="{{ path('app_home') }}" class="nav-item {{ active is defined and active == 'home' ? 'is-active' : '' }}">
-		<i class="fa-solid fa-house"></i>
-		<span>Accueil</span>
-	</a>
+<nav class="bottom-nav" aria-label="Navigation principale">
+    <a
+        href="{{ path('app_home') }}"
+        class="nav-item {{ active is defined and active == 'home' ? 'is-active' : '' }}"
+    >
+        <i class="fa-solid fa-house"></i>
+        <span>Accueil</span>
+    </a>
 
-	<a href="{{ path('app_catalogue') }}" class="nav-item {{ active is defined and active == 'catalogue' ? 'is-active' : '' }}">
-		<i class="fa-solid fa-book"></i>
-		<span>Catalogue</span>
-	</a>
+    <a
+        href="{{ path('app_catalogue') }}"
+        class="nav-item {{ active is defined and active == 'catalogue' ? 'is-active' : '' }}"
+    >
+        <i class="fa-solid fa-book"></i>
+        <span>Catalogue</span>
+    </a>
 
-	<div class="nav-item--center-wrapper">
-		<a href="{{ path('app_home') }}" class="nav-item--center">
-			<img src="{{ asset('images/Icon.svg') }}" alt="Icône">
-		</a>
-	</div>
+    {% if app.user %}
+        <div class="nav-item--center-wrapper">
+            <a
+                href="{{ path('app_forms_index') }}"
+                class="nav-item--center {{ active is defined and active == 'forms' ? 'is-active' : '' }}"
+                aria-label="Accéder aux formulaires de création"
+                {% if active is defined and active == 'forms' %}aria-current="page"{% endif %}
+            >
+                <img src="{{ asset('images/Icon.svg') }}" alt="">
+            </a>
+        </div>
+    {% endif %}
 
+    <span
+        class="nav-item {{ active is defined and active == 'favorites' ? 'is-active' : '' }}"
+        aria-disabled="true"
+    >
+        <i class="fa-solid fa-heart"></i>
+        <span>Favoris</span>
+    </span>
 
-	<a href="#" class="nav-item {{ active is defined and active == 'favorites' ? 'is-active' : '' }}">
-		<i class="fa-solid fa-heart"></i>
-		<span>Favoris</span>
-	</a>
-
-	<a href="{{ path('app_profile') }}" class="nav-item {{ active is defined and active == 'profile' ? 'is-active' : '' }}">
-		<i class="fa-solid fa-user"></i>
-		<span>Profil</span>
-	</a>
+    <a
+        href="{{ path('app_profile') }}"
+        class="nav-item {{ active is defined and active == 'profile' ? 'is-active' : '' }}"
+    >
+        <i class="fa-solid fa-user"></i>
+        <span>Profil</span>
+    </a>
 </nav>
