@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Éditeur de synopsis animé{% endblock %}
+{% block title %}Ajouter un synopsis animé{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -9,26 +9,82 @@
 {% endblock %}
 
 {% block body %}
-    {{ component('Header', { backRoute: 'app_forms_index' }) }}
+    <header class="synopsis-editor-hero">
+        <a href="{{ path('app_forms_index') }}" aria-label="Retour aux formulaires">
+            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+        </a>
+        <h1>Ajouter un Synopsis</h1>
+    </header>
 
-    <main class="forms-page forms-page--orientation">
-        <article class="orientation-card">
-            <span class="orientation-card__icon" aria-hidden="true">
-                <i class="fa-solid fa-file-pen"></i>
-            </span>
-            <p class="orientation-card__eyebrow">Formulaire spécialisé</p>
-            <h1>Éditeur de synopsis animé</h1>
-            <p>
-                Cet écran permettra de créer ou de modifier le synopsis associé à une fiche d'animé.
-            </p>
-            <p class="orientation-card__notice">
-                La création et l'enregistrement seront ajoutés dans une prochaine user story.
-            </p>
-            <a class="orientation-card__back" href="{{ path('app_forms_index') }}">
-                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-                Retour aux formulaires
-            </a>
-        </article>
+    <main class="forms-page forms-page--editor">
+        <div class="forms-shell synopsis-editor">
+            <header class="synopsis-editor__intro">
+                <h2>NOUVEAUX SYNOPSIS</h2>
+                <p>Créez un récapitulatif immersif.</p>
+            </header>
+
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="flash-{{ label }}" role="{{ label == 'error' ? 'alert' : 'status' }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            {{ form_start(form, { attr: { enctype: 'multipart/form-data', class: 'synopsis-form' } }) }}
+                {% if form.vars.submitted and not form.vars.valid %}
+                    <section class="form-error-summary" role="alert" aria-labelledby="anime-form-errors">
+                        <h2 id="anime-form-errors">Vérifiez les informations suivantes :</h2>
+                        <ul>
+                            {% for error in form.vars.errors %}
+                                <li>{{ error.message }}</li>
+                            {% endfor %}
+                            {% for field in form %}
+                                {% for error in field.vars.errors %}
+                                    <li>
+                                        <a href="#{{ field.vars.id }}">{{ field.vars.label }} : {{ error.message }}</a>
+                                    </li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
+
+                <div class="synopsis-upload-field">
+                    {{ form_label(form.image) }}
+                    <label class="synopsis-upload-zone" for="{{ form.image.vars.id }}">
+                        <span class="synopsis-upload-zone__icon" aria-hidden="true">
+                            <i class="fa-regular fa-image"></i>
+                            <i class="fa-solid fa-plus"></i>
+                        </span>
+                        <strong>Cliquez pour importer</strong>
+                        <small>PNG, JPG (9:16 recommandé)</small>
+                    </label>
+                    {{ form_widget(form.image, { attr: { class: 'synopsis-upload-input' } }) }}
+                    {{ form_errors(form.image) }}
+                </div>
+                {{ form_row(form.title) }}
+                {{ form_row(form.categories) }}
+                {{ form_row(form.synopsis) }}
+
+                <fieldset class="synopsis-fieldset synopsis-fieldset--plain">
+                    {{ form_row(form.sourceType) }}
+                    {{ form_row(form.status) }}
+                    {{ form_row(form.author) }}
+                    {{ form_row(form.releaseDate) }}
+                </fieldset>
+
+                <fieldset class="synopsis-fieldset synopsis-fieldset--columns">
+                    <legend class="sr-only">Saison et épisodes</legend>
+                    {{ form_row(form.initialSeasonNumber) }}
+                    {{ form_row(form.episodeCount) }}
+                </fieldset>
+
+                <div class="synopsis-save-bar">
+                    {{ form_widget(form.save) }}
+                </div>
+            {{ form_end(form) }}
+        </div>
     </main>
 
     {{ component('Navbar', { active: 'forms' }) }}

@@ -37,6 +37,28 @@ class Manga
     #[ORM\Column(length: 150, nullable: true)]
     private ?string $author = null;
 
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $releaseDate = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $tomeStart = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $tomeEnd = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $chapterStart = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $chapterEnd = null;
+
+    #[ORM\Column(options: ['default' => true])]
+    private bool $isPublic = true;
+
+    #[ORM\ManyToOne(inversedBy: 'mangas')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $owner = null;
+
     /**
      * @var Collection<int, Tome>
      */
@@ -182,6 +204,90 @@ class Manga
     public function setAuthor(?string $author): static
     {
         $this->author = $author;
+
+        return $this;
+    }
+
+    public function getReleaseDate(): ?\DateTimeImmutable
+    {
+        return $this->releaseDate;
+    }
+
+    public function setReleaseDate(?\DateTimeImmutable $releaseDate): static
+    {
+        $this->releaseDate = $releaseDate;
+
+        return $this;
+    }
+
+    public function getTomeStart(): ?int
+    {
+        return $this->tomeStart;
+    }
+
+    public function setTomeStart(?int $tomeStart): static
+    {
+        $this->tomeStart = $tomeStart;
+
+        return $this;
+    }
+
+    public function getTomeEnd(): ?int
+    {
+        return $this->tomeEnd;
+    }
+
+    public function setTomeEnd(?int $tomeEnd): static
+    {
+        $this->tomeEnd = $tomeEnd;
+
+        return $this;
+    }
+
+    public function getChapterStart(): ?int
+    {
+        return $this->chapterStart;
+    }
+
+    public function setChapterStart(?int $chapterStart): static
+    {
+        $this->chapterStart = $chapterStart;
+
+        return $this;
+    }
+
+    public function getChapterEnd(): ?int
+    {
+        return $this->chapterEnd;
+    }
+
+    public function setChapterEnd(?int $chapterEnd): static
+    {
+        $this->chapterEnd = $chapterEnd;
+
+        return $this;
+    }
+
+    public function isPublic(): bool
+    {
+        return $this->isPublic;
+    }
+
+    public function setIsPublic(bool $isPublic): static
+    {
+        $this->isPublic = $isPublic;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
 
         return $this;
     }

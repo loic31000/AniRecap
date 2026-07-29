@@ -79,6 +79,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $summaries;
 
     /**
+     * @var Collection<int, Anime>
+     */
+    #[ORM\OneToMany(targetEntity: Anime::class, mappedBy: 'owner')]
+    private Collection $animes;
+
+    /**
+     * @var Collection<int, Manga>
+     */
+    #[ORM\OneToMany(targetEntity: Manga::class, mappedBy: 'owner')]
+    private Collection $mangas;
+
+    /**
      * @var Collection<int, Favorite>
      */
     #[ORM\OneToMany(targetEntity: Favorite::class, mappedBy: 'user')]
@@ -110,6 +122,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->chapitres = new ArrayCollection();
         $this->diaporamas = new ArrayCollection();
         $this->summaries = new ArrayCollection();
+        $this->animes = new ArrayCollection();
+        $this->mangas = new ArrayCollection();
         $this->favorites = new ArrayCollection();
         $this->votes = new ArrayCollection();
         $this->recommandations = new ArrayCollection();
@@ -223,6 +237,60 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setAvatarUrl(?string $avatarUrl): static
     {
         $this->avatarUrl = $avatarUrl;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Anime>
+     */
+    public function getAnimes(): Collection
+    {
+        return $this->animes;
+    }
+
+    public function addAnime(Anime $anime): static
+    {
+        if (!$this->animes->contains($anime)) {
+            $this->animes->add($anime);
+            $anime->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAnime(Anime $anime): static
+    {
+        if ($this->animes->removeElement($anime) && $anime->getOwner() === $this) {
+            $anime->setOwner(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Manga>
+     */
+    public function getMangas(): Collection
+    {
+        return $this->mangas;
+    }
+
+    public function addManga(Manga $manga): static
+    {
+        if (!$this->mangas->contains($manga)) {
+            $this->mangas->add($manga);
+            $manga->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeManga(Manga $manga): static
+    {
+        if ($this->mangas->removeElement($manga) && $manga->getOwner() === $this) {
+            $manga->setOwner(null);
+        }
 
         return $this;
     }
