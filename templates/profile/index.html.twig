@@ -100,6 +100,7 @@
 					<img src="{{ avatar }}" alt="Avatar de {{ username }}" class="profile-avatar">
 
 					<form action="{{ path('app_profile_upload') }}" method="post" enctype="multipart/form-data" class="avatar-upload-form">
+						<input type="hidden" name="_token" value="{{ csrf_token('avatar_upload') }}">
 						<label for="avatarInput" class="avatar-edit-btn" title="Changer l'avatar">
 							<i class="fa-solid fa-pencil"></i>
 						</label>
