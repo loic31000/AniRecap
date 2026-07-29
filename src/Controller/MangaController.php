@@ -12,7 +12,7 @@ final class MangaController extends AbstractController
     #[Route('/manga', name: 'app_manga')]
     public function index(MangaRepository $mangaRepository): Response
     {
-        $manga = $mangaRepository->findOneBy([], ['id' => 'ASC']);
+        $manga = $mangaRepository->findOnePublic();
 
         $mangaData = [
             'displayTitle' => $manga?->getTitle() ?? 'Dragon Ball Z',

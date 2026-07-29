@@ -40,7 +40,7 @@ final class CatalogueController extends AbstractController
 
         $catalogueItems = [];
 
-        foreach ($animeRepository->findAll() as $anime) {
+        foreach ($animeRepository->findPublic() as $anime) {
             $catalogueItems[] = [
                 'type' => 'anime',
                 'title' => $anime->getTitle(),
@@ -54,7 +54,7 @@ final class CatalogueController extends AbstractController
             ];
         }
 
-        foreach ($mangaRepository->findAll() as $manga) {
+        foreach ($mangaRepository->findPublic() as $manga) {
             $catalogueItems[] = [
                 'type' => 'manga',
                 'title' => $manga->getTitle(),

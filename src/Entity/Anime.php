@@ -37,6 +37,22 @@ class Anime
     #[ORM\Column(nullable: true)]
     private ?int $animeDate = null;
 
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $releaseDate = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $initialSeasonNumber = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $episodeCount = null;
+
+    #[ORM\Column(options: ['default' => true])]
+    private bool $isPublic = true;
+
+    #[ORM\ManyToOne(inversedBy: 'animes')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $owner = null;
+
     /**
      * @var Collection<int, Categorie>
      */
@@ -169,6 +185,66 @@ class Anime
     public function setAnimeDate(?int $animeDate): static
     {
         $this->animeDate = $animeDate;
+        return $this;
+    }
+
+    public function getReleaseDate(): ?\DateTimeImmutable
+    {
+        return $this->releaseDate;
+    }
+
+    public function setReleaseDate(?\DateTimeImmutable $releaseDate): static
+    {
+        $this->releaseDate = $releaseDate;
+
+        return $this;
+    }
+
+    public function getInitialSeasonNumber(): ?int
+    {
+        return $this->initialSeasonNumber;
+    }
+
+    public function setInitialSeasonNumber(?int $initialSeasonNumber): static
+    {
+        $this->initialSeasonNumber = $initialSeasonNumber;
+
+        return $this;
+    }
+
+    public function getEpisodeCount(): ?int
+    {
+        return $this->episodeCount;
+    }
+
+    public function setEpisodeCount(?int $episodeCount): static
+    {
+        $this->episodeCount = $episodeCount;
+
+        return $this;
+    }
+
+    public function isPublic(): bool
+    {
+        return $this->isPublic;
+    }
+
+    public function setIsPublic(bool $isPublic): static
+    {
+        $this->isPublic = $isPublic;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
+
         return $this;
     }
 

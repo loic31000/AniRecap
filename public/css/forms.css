@@ -198,6 +198,360 @@
     text-decoration: none;
 }
 
+.synopsis-editor-hero {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) 42px;
+    align-items: center;
+    min-height: 88px;
+    padding: env(safe-area-inset-top, 0) 18px 0;
+    border-bottom: 0;
+    background: #215492;
+}
+
+.synopsis-editor-hero a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    color: #efa92f;
+    text-decoration: none;
+}
+
+.synopsis-editor-hero h1 {
+    margin: 0;
+    color: #efa92f;
+    font-size: clamp(1.85rem, 8vw, 2.55rem);
+    font-weight: 900;
+    line-height: 1.1;
+    text-align: center;
+    text-shadow:
+        0 4px 2px #000,
+        0 7px 8px rgba(0, 0, 0, 0.8);
+}
+
+.forms-page--editor {
+    min-height: calc(100vh - 88px);
+    padding: 30px 22px calc(105px + env(safe-area-inset-bottom, 0px));
+    background: #071526;
+}
+
+.forms-page--editor .forms-shell {
+    width: min(100%, 546px);
+}
+
+.synopsis-editor__intro {
+    margin-bottom: 30px;
+}
+
+.synopsis-editor__intro h2 {
+    margin: 0 0 7px;
+    color: #efa92f;
+    font-size: clamp(1.3rem, 6vw, 1.85rem);
+    font-weight: 900;
+    letter-spacing: 0.025em;
+    text-shadow: 0 4px 5px #000;
+}
+
+.synopsis-editor__intro p {
+    margin: 0;
+    color: #e6a337;
+    font-size: clamp(1rem, 4.5vw, 1.35rem);
+    line-height: 1.4;
+}
+
+.synopsis-form {
+    color: #efa92f;
+}
+
+.synopsis-form > div:not(.synopsis-upload-field, .synopsis-save-bar),
+.synopsis-fieldset--plain > div,
+.synopsis-fieldset--columns > div,
+.synopsis-fieldset--range > div {
+    margin-bottom: 27px;
+}
+
+.synopsis-form label,
+.synopsis-form legend,
+.synopsis-upload-field > label:first-child {
+    display: block;
+    margin: 0 0 14px;
+    color: #efa92f;
+    font-size: 1.05rem;
+    font-weight: 900;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+    text-shadow: 0 3px 4px #000;
+}
+
+.synopsis-form input[type="text"],
+.synopsis-form input[type="number"],
+.synopsis-form input[type="date"],
+.synopsis-form select,
+.synopsis-form textarea {
+    width: 100%;
+    min-height: 58px;
+    padding: 14px 22px;
+    border: 1px solid #06101d;
+    border-radius: 16px;
+    outline: 0;
+    background: #000;
+    color: #efa92f;
+    font: inherit;
+    font-size: 1rem;
+    box-shadow:
+        0 4px 7px rgba(0, 0, 0, 0.75),
+        0 0 0 1px rgba(27, 73, 116, 0.4);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.synopsis-form select[multiple] {
+    min-height: 78px;
+}
+
+.synopsis-form textarea {
+    min-height: 166px;
+    resize: vertical;
+}
+
+.synopsis-form input::placeholder,
+.synopsis-form textarea::placeholder {
+    color: #d99b32;
+    opacity: 1;
+}
+
+.synopsis-form input:focus-visible,
+.synopsis-form select:focus-visible,
+.synopsis-form textarea:focus-visible,
+.synopsis-upload-zone:focus-within,
+.synopsis-editor-hero a:focus-visible {
+    border-color: #efa92f;
+    outline: 3px solid rgba(239, 169, 47, 0.35);
+    outline-offset: 3px;
+}
+
+.synopsis-upload-field {
+    margin-bottom: 28px;
+}
+
+.synopsis-upload-zone {
+    display: flex !important;
+    min-height: 270px;
+    margin: 0 !important;
+    padding: 28px 20px;
+    border: 2px dashed #102a48;
+    border-radius: 18px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #000;
+    cursor: pointer;
+    box-shadow: 0 6px 9px rgba(0, 0, 0, 0.7);
+    text-align: center;
+}
+
+.synopsis-upload-zone__icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 76px;
+    height: 76px;
+    margin-bottom: 3px;
+    border: 2px solid #efa92f;
+    border-radius: 50%;
+    font-size: 1.9rem;
+}
+
+.synopsis-upload-zone__icon .fa-plus {
+    position: absolute;
+    top: 17px;
+    right: 16px;
+    padding: 1px;
+    background: #000;
+    font-size: 0.8rem;
+}
+
+.synopsis-upload-zone strong {
+    color: #efa92f;
+    font-size: 1.15rem;
+}
+
+.synopsis-upload-zone small {
+    color: #9a722d;
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-shadow: none;
+}
+
+.synopsis-upload-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.synopsis-fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.synopsis-fieldset--columns,
+.synopsis-fieldset--range {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 22px;
+}
+
+.synopsis-fieldset--range legend {
+    grid-column: 1 / -1;
+}
+
+.synopsis-form [id$="_sourceType"],
+.synopsis-form [id$="_status"] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 5px;
+    border: 2px solid #e8a226;
+    border-radius: 16px;
+    background: #000;
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.7);
+}
+
+.synopsis-form [id$="_sourceType"] > div,
+.synopsis-form [id$="_status"] > div {
+    min-width: 0;
+}
+
+.synopsis-form [id$="_sourceType"] input,
+.synopsis-form [id$="_status"] input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.synopsis-form [id$="_sourceType"] label,
+.synopsis-form [id$="_status"] label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 47px;
+    margin: 0;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    color: #efa92f;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-shadow: none;
+}
+
+.synopsis-form [id$="_sourceType"] input:checked + label,
+.synopsis-form [id$="_status"] input:checked + label {
+    border-color: #e8a226;
+    background: #071526;
+}
+
+.synopsis-form ul {
+    margin: 8px 0 0;
+    padding-left: 20px;
+    color: #ff8d8d;
+    font-size: 0.9rem;
+}
+
+.synopsis-form .help-text {
+    color: #b98936;
+}
+
+.form-error-summary,
+.flash-error,
+.flash-success {
+    margin: 0 0 24px;
+    padding: 15px 18px;
+    border-radius: 12px;
+    background: #160a0d;
+}
+
+.form-error-summary,
+.flash-error {
+    border: 1px solid #ef6f77;
+    color: #ffd7da;
+}
+
+.flash-success {
+    border: 1px solid #5ecb91;
+    color: #d9ffe9;
+}
+
+.form-error-summary h2 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+}
+
+.form-error-summary ul {
+    margin: 0;
+}
+
+.form-error-summary a {
+    color: inherit;
+}
+
+.synopsis-save-bar {
+    margin: 5px calc(50% - 50vw) -30px;
+    padding: 22px max(22px, calc((100vw - 546px) / 2));
+    border-top: 2px solid #efa92f;
+    background: #215492;
+}
+
+.synopsis-save-bar button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 13px;
+    width: min(100%, 285px);
+    min-height: 72px;
+    margin: 0 auto;
+    border: 2px solid #efa92f;
+    border-radius: 18px;
+    background: #000;
+    color: #efa92f;
+    font-size: 1.15rem;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.75);
+    cursor: pointer;
+}
+
+.synopsis-save-bar button::before {
+    content: "\f0c7";
+    font: var(--fa-font-solid);
+}
+
+.synopsis-save-bar button:hover {
+    background: #071526;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 @media (max-width: 480px) {
     .forms-page {
         padding-right: 14px;
@@ -225,6 +579,36 @@
         height: 50px;
         border-radius: 14px;
         font-size: 1.25rem;
+    }
+
+    .synopsis-editor-hero {
+        grid-template-columns: 32px minmax(0, 1fr) 32px;
+        min-height: 88px;
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+
+    .synopsis-editor-hero a {
+        width: 32px;
+        height: 32px;
+    }
+
+    .forms-page--editor {
+        padding: 29px 22px calc(105px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .synopsis-upload-zone {
+        min-height: 270px;
+    }
+
+    .synopsis-fieldset--columns,
+    .synopsis-fieldset--range {
+        column-gap: 18px;
+    }
+
+    .synopsis-fieldset--columns label,
+    .synopsis-fieldset--range label {
+        min-height: 42px;
     }
 }
 

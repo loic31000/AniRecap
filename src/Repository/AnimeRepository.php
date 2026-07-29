@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Anime;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,6 +22,8 @@ class AnimeRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('a')
             ->leftJoin('a.categories', 'c')
             ->addSelect('c')
+            ->andWhere('a.isPublic = :isPublic')
+            ->setParameter('isPublic', true)
             ->distinct();
 
         // 1. Ajout des parenthèses indispensables autour des OR
@@ -44,5 +47,21 @@ class AnimeRepository extends ServiceEntityRepository
             ->orderBy('a.title', "ASC")
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @return Anime[]
+     */
+    public function findPublic(): array
+    {
+        return $this->findBy(['isPublic' => true], ['title' => 'ASC']);
+    }
+
+    public function findOneOwnedByCoverUrl(string $coverUrl, User $owner): ?Anime
+    {
+        return $this->findOneBy([
+            'coverAnimeUrl' => $coverUrl,
+            'owner' => $owner,
+        ]);
     }
 }

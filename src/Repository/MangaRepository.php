@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Manga;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,6 +22,8 @@ class MangaRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('m')
             ->leftJoin('m.categorie', 'c')
             ->addSelect('c')
+            ->andWhere('m.isPublic = :isPublic')
+            ->setParameter('isPublic', true)
             ->distinct();
 
         // 1. Ajout des parenthèses indispensables autour des OR
@@ -44,5 +47,26 @@ class MangaRepository extends ServiceEntityRepository
             ->orderBy('m.title', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @return Manga[]
+     */
+    public function findPublic(): array
+    {
+        return $this->findBy(['isPublic' => true], ['title' => 'ASC']);
+    }
+
+    public function findOnePublic(): ?Manga
+    {
+        return $this->findOneBy(['isPublic' => true], ['id' => 'ASC']);
+    }
+
+    public function findOneOwnedByCoverUrl(string $coverUrl, User $owner): ?Manga
+    {
+        return $this->findOneBy([
+            'coverMangaUrl' => $coverUrl,
+            'owner' => $owner,
+        ]);
     }
 }
