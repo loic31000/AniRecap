@@ -52,9 +52,9 @@
 
                 <h2 class="story__title-jp">{{ item.title }}</h2>
 
-                {# item.content est stocke en HTML brut (wiki, "mafia", etc.) -> |raw #}
+                {# Le contenu est affiche en texte pour ne pas interpreter de HTML utilisateur. #}
                 <div class="story__description">
-                    {{ item.content|raw }}
+                    {{ item.content|striptags }}
                 </div>
             </div>
         </div>
