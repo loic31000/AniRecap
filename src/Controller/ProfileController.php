@@ -7,9 +7,12 @@ use App\Entity\Summary;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class ProfileController extends AbstractController
 {
@@ -131,76 +134,117 @@ final class ProfileController extends AbstractController
     }
 
     #[Route('/profile/upload', name: 'app_profile_upload', methods: ['POST'])]
-    public function upload(Request $request, EntityManagerInterface $em): Response
+    public function upload(
+        Request $request,
+        EntityManagerInterface $em,
+        ValidatorInterface $validator,
+    ): Response
     {
-        $uploadedFile = $request->files->get('avatar');
-        if (!($uploadedFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile)) {
-            $this->addFlash('error', 'Aucun fichier sélectionné.');
-            return $this->redirectToRoute('app_profile');
-        }
-
-        $allowedMime = ['image/png', 'image/jpeg'];
-        $maxSize = 2 * 1024 * 1024;
-
-        if (!in_array($uploadedFile->getClientMimeType(), $allowedMime, true)) {
-            $this->addFlash('error', 'Format invalide — seuls PNG et JPEG sont acceptés.');
-            return $this->redirectToRoute('app_profile');
-        }
-
-        if ($uploadedFile->getSize() > $maxSize) {
-            $this->addFlash('error', 'Fichier trop volumineux — taille maximale 2MB.');
-            return $this->redirectToRoute('app_profile');
-        }
-
         $current = $this->getUser();
-
-        if ($current instanceof User) {
-            $uploadsDir = $this->getParameter('kernel.project_dir') . '/public/uploads/avatars';
-            if (!is_dir($uploadsDir)) {
-                @mkdir($uploadsDir, 0755, true);
-            }
-
-            $extension = $uploadedFile->guessExtension() ?: 'png';
-            if ($extension === 'jpeg') {
-                $extension = 'jpg';
-            }
-
-            $userId = $current->getId() ?? uniqid('user_', true);
-            $newFilename = 'avatar_user_' . $userId . '.' . $extension;
-
-            try {
-                $uploadedFile->move($uploadsDir, $newFilename);
-
-                $current->setAvatarUrl('/uploads/avatars/' . $newFilename);
-
-                $em->persist($current);
-                $em->flush();
-
-                $this->addFlash('success', 'Avatar enregistré (fichier unique par utilisateur).');
-            } catch (\Exception $e) {
-                $this->addFlash('error', 'Échec de l\'enregistrement de l\'avatar.');
-            }
-        } else {
-            $uploadsDir = $this->getParameter('kernel.project_dir') . '/public/uploads/avatars';
-            if (!is_dir($uploadsDir)) {
-                @mkdir($uploadsDir, 0755, true);
-            }
-
-            $extension = $uploadedFile->guessExtension() ?: 'png';
-            if ($extension === 'jpeg') {
-                $extension = 'jpg';
-            }
-            $newFilename = uniqid('avatar_', true) . '.' . $extension;
-
-            try {
-                $uploadedFile->move($uploadsDir, $newFilename);
-                $request->getSession()->set('user_avatar', '/uploads/avatars/' . $newFilename);
-                $this->addFlash('success', 'Avatar mis à jour en session.');
-            } catch (\Exception $e) {
-                $this->addFlash('error', 'Échec de l\'upload.');
-            }
+        if (!$current instanceof User) {
+            throw $this->createAccessDeniedException();
         }
+
+        if (!$this->isCsrfTokenValid('avatar_upload', (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $uploadedFile = $request->files->get('avatar');
+        if (!$uploadedFile instanceof UploadedFile) {
+            $this->addFlash('error', 'Aucun fichier sélectionné.');
+
+            return $this->redirectToRoute('app_profile');
+        }
+
+        if (!$uploadedFile->isValid()) {
+            $this->addFlash('error', 'Le téléversement du fichier a échoué.');
+
+            return $this->redirectToRoute('app_profile');
+        }
+
+        $violations = $validator->validate($uploadedFile, new Assert\Image(
+            maxSize: '2M',
+            mimeTypes: ['image/png', 'image/jpeg'],
+            extensions: ['png', 'jpg', 'jpeg'],
+            maxWidth: 4096,
+            maxHeight: 4096,
+            maxPixels: 16_777_216,
+            detectCorrupted: true,
+        ));
+
+        if (count($violations) > 0) {
+            $this->addFlash('error', (string) $violations[0]->getMessage());
+
+            return $this->redirectToRoute('app_profile');
+        }
+
+        $extension = match ($uploadedFile->getMimeType()) {
+            'image/png' => 'png',
+            'image/jpeg' => 'jpg',
+            default => null,
+        };
+
+        if ($extension === null) {
+            $this->addFlash('error', 'Format invalide — seuls PNG et JPEG sont acceptés.');
+
+            return $this->redirectToRoute('app_profile');
+        }
+
+        $uploadsDir = $this->getParameter('kernel.project_dir') . '/public/uploads/avatars';
+        $oldAvatarUrl = $current->getAvatarUrl();
+        $newFilename = bin2hex(random_bytes(16)) . '.' . $extension;
+        $newAvatarUrl = '/uploads/avatars/' . $newFilename;
+        $newFilePath = $uploadsDir . DIRECTORY_SEPARATOR . $newFilename;
+
+        try {
+            if (!is_dir($uploadsDir) && !mkdir($uploadsDir, 0755, true) && !is_dir($uploadsDir)) {
+                throw new \RuntimeException('Impossible de créer le répertoire des avatars.');
+            }
+
+            $uploadedFile->move($uploadsDir, $newFilename);
+
+            $current->setAvatarUrl($newAvatarUrl);
+            $em->flush();
+        } catch (\Throwable) {
+            $current->setAvatarUrl($oldAvatarUrl);
+
+            if (is_file($newFilePath)) {
+                unlink($newFilePath);
+            }
+
+            $this->addFlash('error', 'Échec de l\'enregistrement de l\'avatar.');
+
+            return $this->redirectToRoute('app_profile');
+        }
+
+        $this->removeManagedAvatar($oldAvatarUrl, $uploadsDir, $newFilePath);
+        $this->addFlash('success', 'Avatar enregistré.');
 
         return $this->redirectToRoute('app_profile');
+    }
+
+    private function removeManagedAvatar(?string $avatarUrl, string $uploadsDir, string $currentAvatarPath): void
+    {
+        $urlPrefix = '/uploads/avatars/';
+        if ($avatarUrl === null || !str_starts_with($avatarUrl, $urlPrefix)) {
+            return;
+        }
+
+        $filename = substr($avatarUrl, strlen($urlPrefix));
+        if ($filename === '' || basename($filename) !== $filename) {
+            return;
+        }
+
+        $managedDirectory = realpath($uploadsDir);
+        $avatarPath = realpath($uploadsDir . DIRECTORY_SEPARATOR . $filename);
+        if ($managedDirectory === false || $avatarPath === false || $avatarPath === $currentAvatarPath) {
+            return;
+        }
+
+        if (!str_starts_with($avatarPath, $managedDirectory . DIRECTORY_SEPARATOR) || !is_file($avatarPath)) {
+            return;
+        }
+
+        unlink($avatarPath);
     }
 }
