@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Formulaires de création{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+    {{ component('Header', { backRoute: 'app_home' }) }}
+
+    <main class="forms-page">
+        <div class="forms-shell">
+            <header class="forms-heading">
+                <span class="forms-heading__line" aria-hidden="true"></span>
+                <h1>
+                    <span lang="ja">フォーム</span>
+                    Création
+                </h1>
+                <span class="forms-heading__line" aria-hidden="true"></span>
+            </header>
+
+            <p class="forms-introduction">
+                Choisissez le type de contenu que vous souhaitez préparer dans votre espace personnel.
+            </p>
+
+            <nav class="forms-list" aria-label="Choisir un éditeur">
+                <a class="forms-card" href="{{ path('app_forms_anime_synopsis') }}">
+                    <span class="forms-card__icon" aria-hidden="true">
+                        <i class="fa-solid fa-file-pen"></i>
+                    </span>
+                    <span class="forms-card__content">
+                        <strong>Éditeur de synopsis animé</strong>
+                        <small>Préparer le synopsis d'une fiche animée</small>
+                    </span>
+                    <i class="fa-solid fa-chevron-right forms-card__arrow" aria-hidden="true"></i>
+                </a>
+
+                <a class="forms-card" href="{{ path('app_forms_season') }}">
+                    <span class="forms-card__icon" aria-hidden="true">
+                        <i class="fa-solid fa-file-pen"></i>
+                    </span>
+                    <span class="forms-card__content">
+                        <strong>Éditeur de saison</strong>
+                        <small>Préparer les informations d'une saison</small>
+                    </span>
+                    <i class="fa-solid fa-chevron-right forms-card__arrow" aria-hidden="true"></i>
+                </a>
+
+                <a class="forms-card" href="{{ path('app_forms_season_scene') }}">
+                    <span class="forms-card__icon" aria-hidden="true">
+                        <i class="fa-solid fa-film"></i>
+                    </span>
+                    <span class="forms-card__content">
+                        <strong>Éditeur de scène saison</strong>
+                        <small>Préparer une scène liée à une saison</small>
+                    </span>
+                    <i class="fa-solid fa-chevron-right forms-card__arrow" aria-hidden="true"></i>
+                </a>
+
+                <a class="forms-card" href="{{ path('app_forms_manga_synopsis') }}">
+                    <span class="forms-card__icon" aria-hidden="true">
+                        <i class="fa-solid fa-file-pen"></i>
+                    </span>
+                    <span class="forms-card__content">
+                        <strong>Éditeur de synopsis manga</strong>
+                        <small>Préparer le synopsis d'une fiche manga</small>
+                    </span>
+                    <i class="fa-solid fa-chevron-right forms-card__arrow" aria-hidden="true"></i>
+                </a>
+
+                <a class="forms-card" href="{{ path('app_forms_manga_scene') }}">
+                    <span class="forms-card__icon" aria-hidden="true">
+                        <i class="fa-solid fa-film"></i>
+                    </span>
+                    <span class="forms-card__content">
+                        <strong>Éditeur de scène manga</strong>
+                        <small>Préparer une scène liée à un manga</small>
+                    </span>
+                    <i class="fa-solid fa-chevron-right forms-card__arrow" aria-hidden="true"></i>
+                </a>
+
+                <a class="forms-card" href="{{ path('app_forms_character') }}">
+                    <span class="forms-card__icon" aria-hidden="true">
+                        <i class="fa-solid fa-user"></i>
+                    </span>
+                    <span class="forms-card__content">
+                        <strong>Éditeur de personnage</strong>
+                        <small>Préparer la fiche d'un personnage</small>
+                    </span>
+                    <i class="fa-solid fa-chevron-right forms-card__arrow" aria-hidden="true"></i>
+                </a>
+            </nav>
+        </div>
+    </main>
+
+    {{ component('Navbar', { active: 'forms' }) }}
+{% endblock %}

@@ -10,12 +10,11 @@ use Symfony\Component\Routing\Attribute\Route;
 final class CharacterController extends AbstractController
 {
     #[Route('/character', name: 'app_character_index')]
-    #[Route('/character/', name: 'app_character_index_slash')]
     public function index(CharacterRepository $characterRepository): Response
     {
         $characters = $characterRepository->findAll();
 
-        return $this->render('character/list.html.twig', [
+        return $this->render('character/index.html.twig', [
             'characters' => $characters,
         ]);
     }
@@ -39,20 +38,6 @@ final class CharacterController extends AbstractController
                 static fn ($related) => $related->getId() !== $character->getId()
             ),
             'catalogueRoute'    => 'app_catalogue',
-        ]);
-    }
-
-    #[Route('/character/{id}/edit', name: 'app_character_edit')]
-    public function edit(int $id, CharacterRepository $characterRepository): Response
-    {
-        $character = $characterRepository->find($id);
-
-        if (!$character) {
-            throw $this->createNotFoundException('Personnage introuvable.');
-        }
-
-        return $this->render('character/edit.html.twig', [
-            'character' => $character,
         ]);
     }
 }

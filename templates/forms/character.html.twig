@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Éditeur de personnage{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+    {{ component('Header', { backRoute: 'app_forms_index' }) }}
+
+    <main class="forms-page forms-page--orientation">
+        <article class="orientation-card">
+            <span class="orientation-card__icon" aria-hidden="true">
+                <i class="fa-solid fa-user"></i>
+            </span>
+            <p class="orientation-card__eyebrow">Formulaire spécialisé</p>
+            <h1>Éditeur de personnage</h1>
+            <p>
+                Cet écran permettra de créer ou de modifier la fiche d'un personnage lié à une œuvre.
+            </p>
+            <p class="orientation-card__notice">
+                La création et l'enregistrement seront ajoutés dans une prochaine user story.
+            </p>
+            <a class="orientation-card__back" href="{{ path('app_forms_index') }}">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                Retour aux formulaires
+            </a>
+        </article>
+    </main>
+
+    {{ component('Navbar', { active: 'forms' }) }}
+{% endblock %}

@@ -18,7 +18,7 @@
 
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ character.name }}{% endblock %}
+{% block title %}{{ (character is defined and character is not null and character is not iterable and character.name is defined) ? character.name : 'Personnages' }}{% endblock %}
 
 {% block stylesheets %}
 	{{ parent() }}
@@ -37,39 +37,61 @@
 					<i class="fa-solid fa-arrow-left"></i>
 					<span>Retour au Catalogue</span>
 				</a>
-				<a href="{{ path('app_character_edit', { id: character.id }) }}" class="edit-link" aria-label="Modifier le personnage">
-					<i class="fa-solid fa-pencil"></i>
-				</a>
+				{% if character is defined and character is not null and character is not iterable %}
+					<a href="{{ path('app_character_edit', { id: character.id }) }}" class="edit-link" aria-label="Modifier le personnage">
+						<i class="fa-solid fa-pencil"></i>
+					</a>
+				{% endif %}
 			</div>
 
-			<div class="personnage-portrait-wrap">
-				<img src="{{ asset(character.imageUrl|default('images/placeholder-character.png')) }}" alt="{{ character.name }}" class="personnage-portrait">
-			</div>
+			{% if character is defined and character is not null and character is not iterable %}
+				<div class="personnage-portrait-wrap">
+					<img src="{{ asset(character.imageUrl|default('images/placeholder-character.png')) }}" alt="{{ character.name }}" class="personnage-portrait">
+				</div>
 
-			{% if workType is defined and workTitle is defined %}
+				{% if workType is defined and workTitle is defined %}
+					<div class="personnage-meta-row">
+						<span class="jp">{{ workType }}</span>
+						<span class="value">{{ workTitle }}</span>
+					</div>
+				{% endif %}
 				<div class="personnage-meta-row">
-					<span class="jp">{{ workType }}</span>
-					<span class="value">{{ workTitle }}</span>
+					<span class="jp">登場人物</span>
+					<span class="value">{{ character.name }}</span>
 				</div>
-			{% endif %}
-			<div class="personnage-meta-row">
-				<span class="jp">登場人物</span>
-				<span class="value">{{ character.name }}</span>
-			</div>
 
-			<section class="panel panel--synopsis">
-				<h2 class="section-title--inline">
-					<span class="jp">あらすじ</span>
-					<span>Synopsis</span>
-				</h2>
-				<div class="synopsis-content">
-					{% for paragraph in character.description|default('')|split('\n\n') %}
-						{% if paragraph|trim is not empty %}
-							<p>{{ paragraph|trim }}</p>
-						{% endif %}
-					{% endfor %}
-				</div>
-			</section>
+				<section class="panel panel--synopsis">
+					<h2 class="section-title--inline">
+						<span class="jp">あらすじ</span>
+						<span>Synopsis</span>
+					</h2>
+					<div class="synopsis-content">
+						{% for paragraph in character.description|default('')|split('\n\n') %}
+							{% if paragraph|trim is not empty %}
+								<p>{{ paragraph|trim }}</p>
+							{% endif %}
+						{% endfor %}
+					</div>
+				</section>
+			{% else %}
+				<section class="panel panel--characters">
+					<h2 class="section-title--inline">
+						<span class="jp">登場人物</span>
+						<span>Personnages</span>
+					</h2>
+
+					<div class="character-grid">
+						{% for characterItem in characters|default([]) %}
+							<a href="{{ path('app_character_show', { id: characterItem.id }) }}" class="character-chip">
+								<img src="{{ asset(characterItem.imageUrl|default('images/placeholder-character.png')) }}" alt="{{ characterItem.name }}" class="character-chip-avatar" loading="lazy">
+								<span class="character-chip-name">{{ characterItem.name }}</span>
+							</a>
+						{% else %}
+							<p>Aucun personnage disponible.</p>
+						{% endfor %}
+					</div>
+				</section>
+			{% endif %}
 
 			{% if relatedCharacters is defined and relatedCharacters|length > 0 %}
 				<section class="panel panel--characters">
