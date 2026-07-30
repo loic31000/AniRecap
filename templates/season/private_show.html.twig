@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ season.title }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/season.css') }}">
+{% endblock %}
+
+{% block body %}
+    {{ component('Header', { backRoute: 'app_forms_index' }) }}
+
+    <main class="page-season">
+        <div class="season-inner">
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="flash-{{ label }}" role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</div>
+                {% endfor %}
+            {% endfor %}
+
+            <a href="{{ path('app_forms_index') }}" class="back-link">Retour aux formulaires</a>
+
+            <section class="season-hero">
+                <figure class="season-cover" style="background-image: url('{{ season.coverSeasonUrl }}');">
+                    <span class="visually-hidden">Miniature de {{ season.title }}</span>
+                </figure>
+                <div class="season-copy">
+                    <h1 class="season-title">
+                        <span class="season-title__main">{{ season.title }}</span>
+                    </h1>
+                    <p>Saison {{ season.number }} de {{ season.anime.title }}</p>
+                    <div class="badge-row">
+                        {% for category in season.categorie %}
+                            <span class="badge">{{ category.name|upper }}</span>
+                        {% endfor %}
+                    </div>
+                    <a href="{{ path('app_forms_season_edit', {id: season.id}) }}" class="chip-btn">Modifier la saison</a>
+                </div>
+            </section>
+
+            <section class="panel panel--synopsis" aria-labelledby="synopsis-title">
+                <h2 id="synopsis-title" class="section-title">Description</h2>
+                <p class="synopsis">{{ season.synopsis }}</p>
+                <div class="info-grid">
+                    <article class="info-item"><p class="info-label">TYPE</p><p class="info-value">{{ season.type }}</p></article>
+                    <article class="info-item"><p class="info-label">STATUT</p><p class="info-value">{{ season.status }}</p></article>
+                    <article class="info-item"><p class="info-label">AUTEUR</p><p class="info-value">{{ season.author }}</p></article>
+                    <article class="info-item"><p class="info-label">ANNÉE</p><p class="info-value">{{ season.seasonDate }}</p></article>
+                </div>
+            </section>
+
+            <section id="episodes" class="panel panel--episodes" aria-labelledby="episodes-title">
+                <h2 id="episodes-title" class="section-title">Épisodes</h2>
+                <p>
+                    <a href="{{ path('app_forms_episode_create', {seasonId: season.id}) }}" class="chip-btn">
+                        Ajouter un épisode
+                    </a>
+                </p>
+
+                {% if episodes is empty %}
+                    <p class="episode-count-meta">Aucun épisode n’a encore été ajouté à cette saison.</p>
+                {% else %}
+                    <div class="episodes-timeline-list">
+                        {% for episode in episodes %}
+                            <article class="episode-figma-card">
+                                <div class="card-media-wrap">
+                                    <img src="{{ episode.coverEpisodeUrl }}" alt="Miniature de l’épisode {{ episode.number }}" class="card-banner">
+                                </div>
+                                <div class="card-content-wrap">
+                                    <div class="card-meta-line">
+                                        <span class="badge-episodes">ÉP. {{ episode.number }}</span>
+                                        <span>{{ episode.spoilerLevel.value|upper }}</span>
+                                    </div>
+                                    <h3 class="card-episode-title">{{ episode.title }}</h3>
+                                    <p class="card-episode-desc">{{ episode.synopsis }}</p>
+                                    <a href="{{ path('app_forms_episode_edit', {id: episode.id}) }}">Modifier</a>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </section>
+        </div>
+    </main>
+
+    {{ component('Navbar', { active: 'forms' }) }}
+{% endblock %}

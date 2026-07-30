@@ -10,12 +10,16 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: EpisodeRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_EPISODE_SEASON_NUMBER', columns: ['season_id', 'number'])]
 class Episode implements Ownable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\Column]
+    private ?int $number = null;
 
     #[ORM\Column(length: 255)]
     private ?string $title = null;
@@ -98,6 +102,18 @@ class Episode implements Ownable
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getNumber(): ?int
+    {
+        return $this->number;
+    }
+
+    public function setNumber(int $number): static
+    {
+        $this->number = $number;
+
+        return $this;
     }
 
     public function getTitle(): ?string
@@ -206,7 +222,7 @@ class Episode implements Ownable
 
     public function getOwner(): ?User
     {
-        return $this->user;
+        return $this->season?->getOwner();
     }
 
     public function setUser(?User $user): static

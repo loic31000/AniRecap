@@ -11,7 +11,9 @@ use App\Entity\User;
 use App\Form\AnimeSynopsisType;
 use App\Form\MangaSynopsisType;
 use App\Repository\AnimeRepository;
+use App\Repository\EpisodeRepository;
 use App\Repository\MangaRepository;
+use App\Repository\SeasonRepository;
 use App\Service\SynopsisImageUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -99,12 +101,6 @@ final class FormsController extends AbstractController
         return $this->render('forms/anime_synopsis.html.twig', [
             'form' => $form,
         ]);
-    }
-
-    #[Route('/formulaires/saison', name: 'app_forms_season', methods: ['GET'])]
-    public function season(): Response
-    {
-        return $this->render('forms/season.html.twig');
     }
 
     #[Route('/formulaires/scene-saison', name: 'app_forms_season_scene', methods: ['GET'])]
@@ -195,7 +191,9 @@ final class FormsController extends AbstractController
     public function synopsisImage(
         string $filename,
         AnimeRepository $animeRepository,
+        EpisodeRepository $episodeRepository,
         MangaRepository $mangaRepository,
+        SeasonRepository $seasonRepository,
         SynopsisImageUploader $imageUploader,
     ): Response {
         $user = $this->getUser();
@@ -205,9 +203,11 @@ final class FormsController extends AbstractController
 
         $coverUrl = $this->generateUrl('app_forms_synopsis_image', ['filename' => $filename]);
         $anime = $animeRepository->findOneOwnedByCoverUrl($coverUrl, $user);
+        $episode = $episodeRepository->findOneOwnedByCoverUrl($coverUrl, $user);
         $manga = $mangaRepository->findOneOwnedByCoverUrl($coverUrl, $user);
+        $season = $seasonRepository->findOneOwnedByCoverUrl($coverUrl, $user);
 
-        if ($anime === null && $manga === null) {
+        if ($anime === null && $episode === null && $manga === null && $season === null) {
             throw $this->createNotFoundException();
         }
 

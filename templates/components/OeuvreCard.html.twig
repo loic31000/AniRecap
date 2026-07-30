@@ -1,57 +1,53 @@
-{% set oeuvres = results is defined ? results : [] %}
+{% set oeuvres = results|default([]) %}
 
 {% if oeuvres is empty %}
-	<div class="empty-results">
-		<p>Aucun résultat trouvé pour cette recherche / ces filtres.</p>
-	</div>
+    <div class="empty-results" role="status">
+        <p>Aucune œuvre disponible.</p>
+    </div>
 {% else %}
+    <div class="oeuvre-list">
+        {% for oeuvre in oeuvres %}
+            <article class="oeuvre-card">
+                <a
+                    href="{{ oeuvre.type == 'anime'
+                        ? path('app_anime_show', {id: oeuvre.id})
+                        : path('app_manga_show', {id: oeuvre.id}) }}"
+                    class="oeuvre-card-link"
+                    aria-label="Voir {{ oeuvre.title }}"
+                ></a>
 
+                <div class="oeuvre-thumb">
+                    <img
+                        src="{{ oeuvre.cover ?: asset(oeuvre.type == 'anime' ? 'images/coverAnime.png' : 'images/coverMangaCard.png') }}"
+                        alt="Miniature de {{ oeuvre.title }}"
+                        class="oeuvre-thumb-image"
+                    >
+                </div>
 
-	<div class="oeuvre-list">
-		{% for oeuvre in oeuvres %}
-			<article class="oeuvre-card">
-				{% if oeuvre.type == 'anime' %}
-					<a href="{{ path('app_anime') }}" class="oeuvre-card-link" aria-label="Voir {{ oeuvre.title }}"></a>
-				{% elseif oeuvre.type == 'manga' %}
-					<a href="{{ path('app_manga') }}" class="oeuvre-card-link" aria-label="Voir {{ oeuvre.title }}"></a>
-				{% endif %}
-				<div class="oeuvre-thumb" style="background: {{ oeuvre.gradient }};">
-					<img
-						src="{{ asset(oeuvre.type == 'anime' ? 'images/coverAnime.png' : 'images/coverMangaCard.png') }}"
-						alt="{{ oeuvre.title }}"
-						class="oeuvre-thumb-image"
-					>
-					<button type="button" class="btn-favorite {{ oeuvre.favorited ? 'is-active' : '' }}">
-						<i class="fa-{{ oeuvre.favorited ? 'solid' : 'regular' }} fa-star"></i>
-					</button>
-				</div>
+                <div class="oeuvre-body">
+                    <div class="oeuvre-meta">
+                        <span class="badge-type badge-type--{{ oeuvre.type }}">{{ oeuvre.type }}</span>
+                        {% if oeuvre.isPrivate %}
+                            <span class="badge-type">Privé</span>
+                        {% endif %}
+                    </div>
 
-				<div class="oeuvre-body">
-					<div class="oeuvre-meta">
-						<span class="badge-type badge-type--{{ oeuvre.type|lower }}">{{ oeuvre.type }}</span>
+                    <h3 class="oeuvre-title">{{ oeuvre.title }}</h3>
+                    <p class="oeuvre-subtitle">{{ oeuvre.subtitle }}</p>
 
-						<a href="#" class="btn-edit-inline" aria-label="Modifier {{ oeuvre.title }}">
-							<i class="fa-solid fa-pen"></i>
-						</a>
-					</div>
-
-					<h3 class="oeuvre-title">{{ oeuvre.title }}</h3>
-					<p class="oeuvre-subtitle">{{ oeuvre.subtitle }}</p>
-
-					<div class="oeuvre-footer">
-						<span class="oeuvre-date">
-							<i class="fa-solid fa-clock-rotate-left"></i>
-							Modifié le
-							{{ oeuvre.date }}
-						</span>
-						<span class="oeuvre-votes">{{ oeuvre.votes }}
-							Votes</span>
-					</div>
-				</div>
-			</article>
-			<button type="button" class="scroll-top" id="scrollTopBtn" aria-label="Remonter en haut">
-				<i class="fa-solid fa-chevron-up"></i>
-			</button>
-		{% endfor %}
-	</div>
+                    <div class="oeuvre-footer">
+                        <span class="oeuvre-date">
+                            {% if oeuvre.date %}
+                                <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                                {{ oeuvre.date }}
+                            {% else %}
+                                Date non renseignée
+                            {% endif %}
+                        </span>
+                        <span class="oeuvre-votes">{{ oeuvre.votesCount }} vote{{ oeuvre.votesCount > 1 ? 's' : '' }}</span>
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
 {% endif %}

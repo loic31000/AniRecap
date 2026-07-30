@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Manga;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -17,16 +18,24 @@ class MangaRepository extends ServiceEntityRepository
         parent::__construct($registry, Manga::class);
     }
 
-    public function searchCatalogue(array $filters): array
+    /**
+     * @return Manga[]
+     */
+    public function findVisibleTo(User $viewer): array
     {
-        $qb = $this->createQueryBuilder('m')
-            ->leftJoin('m.categorie', 'c')
-            ->addSelect('c')
-            ->andWhere('m.isPublic = :isPublic')
-            ->setParameter('isPublic', true)
-            ->distinct();
+        return $this->createVisibleQueryBuilder($viewer)
+            ->orderBy('m.title', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 
-        // 1. Ajout des parenthèses indispensables autour des OR
+    /**
+     * @return Manga[]
+     */
+    public function searchVisibleTo(array $filters, User $viewer): array
+    {
+        $qb = $this->createVisibleQueryBuilder($viewer);
+
         if (!empty($filters['q'])) {
             $qb->andWhere('(LOWER(m.title) LIKE :q OR LOWER(m.synopsis) LIKE :q OR LOWER(m.author) LIKE :q)')
                 ->setParameter('q', '%' . mb_strtolower($filters['q']) . '%');
@@ -37,7 +46,6 @@ class MangaRepository extends ServiceEntityRepository
                 ->setParameter('genre', $filters['genre']);
         }
 
-        // 2. Gestion adaptative si mangaDate est un champ Date/DateTime en BDD
         if (!empty($filters['annee'])) {
             $qb->andWhere('m.mangaDate = :annee')
                 ->setParameter('annee', (int) $filters['annee']);
@@ -47,6 +55,26 @@ class MangaRepository extends ServiceEntityRepository
             ->orderBy('m.title', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function findOneVisibleTo(int $id, User $viewer): ?Manga
+    {
+        return $this->createVisibleQueryBuilder($viewer)
+            ->andWhere('m.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    private function createVisibleQueryBuilder(User $viewer): QueryBuilder
+    {
+        return $this->createQueryBuilder('m')
+            ->leftJoin('m.categorie', 'c')
+            ->addSelect('c')
+            ->andWhere('(m.isPublic = :isPublic OR m.owner = :viewer)')
+            ->setParameter('isPublic', true)
+            ->setParameter('viewer', $viewer)
+            ->distinct();
     }
 
     /**
