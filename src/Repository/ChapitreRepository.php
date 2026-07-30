@@ -3,6 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Chapitre;
+use App\Entity\Manga;
+use App\Entity\User;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +19,65 @@ class ChapitreRepository extends ServiceEntityRepository
         parent::__construct($registry, Chapitre::class);
     }
 
-    //    /**
-    //     * @return Chapitre[] Returns an array of Chapitre objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findOneOwned(int $id, User $owner): ?Chapitre
+    {
+        return $this->createOwnedQueryBuilder($owner)
+            ->andWhere('c.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Chapitre
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * @return Chapitre[]
+     */
+    public function findOwnedByManga(Manga $manga, User $owner): array
+    {
+        return $this->createOwnedQueryBuilder($owner)
+            ->andWhere('c.manga = :manga')
+            ->setParameter('manga', $manga)
+            ->orderBy('c.number', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findOneOwnedByCoverUrl(string $coverUrl, User $owner): ?Chapitre
+    {
+        return $this->createOwnedQueryBuilder($owner)
+            ->andWhere('c.coverChapitreUrl = :coverUrl')
+            ->setParameter('coverUrl', $coverUrl)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function numberExistsForManga(Manga $manga, int $number, ?int $excludedId = null): bool
+    {
+        $queryBuilder = $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->andWhere('c.manga = :manga')
+            ->andWhere('c.number = :number')
+            ->setParameter('manga', $manga)
+            ->setParameter('number', $number);
+
+        if ($excludedId !== null) {
+            $queryBuilder
+                ->andWhere('c.id != :excludedId')
+                ->setParameter('excludedId', $excludedId);
+        }
+
+        return (int) $queryBuilder->getQuery()->getSingleScalarResult() > 0;
+    }
+
+    private function createOwnedQueryBuilder(User $owner): QueryBuilder
+    {
+        return $this->createQueryBuilder('c')
+            ->innerJoin('c.manga', 'm')
+            ->leftJoin('c.categorie', 'category')
+            ->addSelect('m', 'category')
+            ->andWhere('c.user = :owner')
+            ->andWhere('m.owner = :owner')
+            ->andWhere('m.isPublic = :isPublic')
+            ->setParameter('owner', $owner)
+            ->setParameter('isPublic', false);
+    }
 }

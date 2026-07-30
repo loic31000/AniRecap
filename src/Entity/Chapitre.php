@@ -10,12 +10,16 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ChapitreRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_CHAPITRE_MANGA_NUMBER', columns: ['manga_id', 'number'])]
 class Chapitre implements Ownable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\Column]
+    private ?int $number = null;
 
     #[ORM\Column(length: 255)]
     private ?string $title = null;
@@ -98,6 +102,18 @@ class Chapitre implements Ownable
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getNumber(): ?int
+    {
+        return $this->number;
+    }
+
+    public function setNumber(int $number): static
+    {
+        $this->number = $number;
+
+        return $this;
     }
 
     public function getTitle(): ?string
@@ -206,7 +222,7 @@ class Chapitre implements Ownable
 
     public function getOwner(): ?User
     {
-        return $this->user;
+        return $this->manga?->getOwner();
     }
 
     public function setUser(?User $user): static
