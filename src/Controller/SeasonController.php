@@ -9,10 +9,10 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class SeasonController extends AbstractController
 {
-    #[Route('/season', name: 'app_season')]
+    #[Route('/season', name: 'app_season', methods: ['GET'])]
     public function index(SeasonRepository $seasonRepository): Response
     {
-        $seasonEntity = $seasonRepository->findOneBy([], ['id' => 'ASC']);
+        $seasonEntity = $seasonRepository->findFirstPublic();
 
         $seasonData = [
             'displayTitle' => $seasonEntity?->getTitle() ?? 'Gundam Seed Destiny',

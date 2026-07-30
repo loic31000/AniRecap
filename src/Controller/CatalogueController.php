@@ -5,6 +5,9 @@ namespace App\Controller;
 use App\Repository\AnimeRepository;
 use App\Repository\MangaRepository;
 use App\Repository\CategorieRepository;
+use App\Entity\Anime;
+use App\Entity\Manga;
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,6 +22,11 @@ final class CatalogueController extends AbstractController
         MangaRepository $mangaRepository,
         CategorieRepository $categorieRepository
     ): Response {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
         $filters = [
             'q' => trim((string) $request->query->get('q', '')),
             'type' => (string) $request->query->get('type', 'all'),
@@ -40,64 +48,52 @@ final class CatalogueController extends AbstractController
 
         $catalogueItems = [];
 
-        foreach ($animeRepository->findPublic() as $anime) {
-            $catalogueItems[] = [
-                'type' => 'anime',
-                'title' => $anime->getTitle(),
-                'subtitle' => sprintf('Saison %d • %s', $anime->getSeasons()->count() ?: 1, $anime->getStatus() ?: 'À venir'),
-                'author' => $anime->getAuthor(),
-                'categories' => array_map(static fn ($categorie) => $categorie->getSlug(), iterator_to_array($anime->getCategories())),
-                'date' => (string) ($anime->getAnimeDate() ?? ''),
-                'votes' => 500 + ($anime->getId() ?? 0) * 50,
-                'gradient' => 'linear-gradient(135deg, #274b7a, #6fa8dc)',
-                'favorited' => false,
-            ];
+        if ($filters['type'] === 'all' || $filters['type'] === 'anime') {
+            foreach ($animeRepository->searchVisibleTo($filters, $user) as $anime) {
+                $catalogueItems[] = $this->mapAnime($anime);
+            }
         }
 
-        foreach ($mangaRepository->findPublic() as $manga) {
-            $catalogueItems[] = [
-                'type' => 'manga',
-                'title' => $manga->getTitle(),
-                'subtitle' => sprintf('Chapitre %s • %s', $manga->getMangaDate() ?? '1', $manga->getAuthor()),
-                'author' => $manga->getAuthor(),
-                'categories' => array_map(static fn ($categorie) => $categorie->getSlug(), iterator_to_array($manga->getCategorie())),
-                'date' => (string) ($manga->getMangaDate() ?? ''),
-                'votes' => 600 + ($manga->getId() ?? 0) * 40,
-                'gradient' => 'linear-gradient(135deg, #ff8a3d, #ffcf5c)',
-                'favorited' => true,
-            ];
+        if ($filters['type'] === 'all' || $filters['type'] === 'manga') {
+            foreach ($mangaRepository->searchVisibleTo($filters, $user) as $manga) {
+                $catalogueItems[] = $this->mapManga($manga);
+            }
         }
-
-        $viewResults = array_filter($catalogueItems, function (array $item) use ($filters): bool {
-            if ($filters['type'] !== 'all' && $item['type'] !== $filters['type']) {
-                return false;
-            }
-
-            if (!empty($filters['genre']) && !in_array($filters['genre'], $item['categories'], true)) {
-                return false;
-            }
-
-            if (!empty($filters['annee']) && $item['date'] !== (string) $filters['annee']) {
-                return false;
-            }
-
-            if (!empty($filters['q'])) {
-                $search = mb_strtolower($filters['q']);
-                $matchesTitle = mb_stripos($item['title'], $search) !== false;
-                $matchesAuthor = mb_stripos($item['author'], $search) !== false;
-                return $matchesTitle || $matchesAuthor;
-            }
-
-            return true;
-        });
-
-        $viewResults = array_values($viewResults);
 
         return $this->render('catalogue/index.html.twig', [
-            'controller_name' => 'CatalogueController',
-            'results' => $viewResults,
+            'results' => $catalogueItems,
             'genres' => $genreOptions,
             'filters' => $filters,
         ]);
+    }
+
+    private function mapAnime(Anime $anime): array
+    {
+        return [
+            'id' => $anime->getId(),
+            'type' => 'anime',
+            'title' => $anime->getTitle(),
+            'subtitle' => sprintf('%d saison(s) • %s', $anime->getSeasons()->count(), $anime->getStatus() ?: 'Statut non renseigné'),
+            'author' => $anime->getAuthor(),
+            'date' => (string) ($anime->getAnimeDate() ?? ''),
+            'cover' => $anime->getCoverAnimeUrl(),
+            'votesCount' => $anime->getVotes()->count(),
+            'isPrivate' => !$anime->isPublic(),
+        ];
+    }
+
+    private function mapManga(Manga $manga): array
+    {
+        return [
+            'id' => $manga->getId(),
+            'type' => 'manga',
+            'title' => $manga->getTitle(),
+            'subtitle' => $manga->getStatus() ?: 'Statut non renseigné',
+            'author' => $manga->getAuthor(),
+            'date' => (string) ($manga->getMangaDate() ?? ''),
+            'cover' => $manga->getCoverMangaUrl(),
+            'votesCount' => $manga->getVotes()->count(),
+            'isPrivate' => !$manga->isPublic(),
+        ];
     }
 }

@@ -1,0 +1,233 @@
+<?php
+
+namespace App\Controller;
+
+use App\Dto\SeasonInput;
+use App\Entity\Anime;
+use App\Entity\Season;
+use App\Entity\User;
+use App\Form\SeasonType;
+use App\Repository\SeasonRepository;
+use App\Repository\EpisodeRepository;
+use App\Service\SynopsisImageUploader;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+#[IsGranted('ROLE_USER')]
+final class SeasonFormController extends AbstractController
+{
+    #[Route('/formulaires/saison', name: 'app_forms_season', methods: ['GET', 'POST'])]
+    public function create(
+        Request $request,
+        SeasonRepository $seasonRepository,
+        EntityManagerInterface $entityManager,
+        SynopsisImageUploader $imageUploader,
+    ): Response {
+        $user = $this->requireUser();
+        $input = new SeasonInput();
+        $form = $this->createForm(SeasonType::class, $input, [
+            'owner' => $user,
+            'validation_groups' => ['Default', 'create'],
+            'csrf_token_id' => 'season_create',
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            if (!$this->isOwnedPrivateAnime($input->anime, $user)) {
+                throw $this->createNotFoundException();
+            }
+
+            if ($seasonRepository->numberExistsForAnime($input->anime, $input->number)) {
+                $form->get('number')->addError(new FormError('Ce numéro de saison existe déjà pour cet animé.'));
+            } else {
+                $filename = null;
+                $season = new Season();
+
+                try {
+                    if (!$input->image instanceof UploadedFile) {
+                        throw new \RuntimeException('La miniature est obligatoire.');
+                    }
+
+                    $filename = $imageUploader->store($input->image);
+                    $coverUrl = $this->generateUrl('app_forms_synopsis_image', ['filename' => $filename]);
+
+                    $entityManager->wrapInTransaction(function (EntityManagerInterface $entityManager) use ($input, $season, $coverUrl): void {
+                        $this->applyInput($season, $input, $coverUrl);
+                        $entityManager->persist($season);
+                    });
+                } catch (\Throwable) {
+                    if ($filename !== null) {
+                        $imageUploader->remove($filename);
+                    }
+
+                    $this->addFlash('error', 'La saison n’a pas pu être enregistrée. Veuillez réessayer.');
+
+                    return $this->redirectToRoute('app_forms_season');
+                }
+
+                $this->addFlash('success', 'La saison a été créée avec succès.');
+
+                return $this->redirectToRoute('app_private_season_show', ['id' => $season->getId()]);
+            }
+        }
+
+        return $this->render('forms/season.html.twig', [
+            'form' => $form,
+            'is_edit' => false,
+            'current_cover_url' => null,
+        ]);
+    }
+
+    #[Route('/formulaires/saisons/{id}/modifier', name: 'app_forms_season_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
+    public function edit(
+        int $id,
+        Request $request,
+        SeasonRepository $seasonRepository,
+        EntityManagerInterface $entityManager,
+        SynopsisImageUploader $imageUploader,
+    ): Response {
+        $user = $this->requireUser();
+        $season = $seasonRepository->findOneOwned($id, $user);
+        if ($season === null) {
+            throw $this->createNotFoundException();
+        }
+
+        $input = $this->createInputFromSeason($season);
+        $form = $this->createForm(SeasonType::class, $input, [
+            'owner' => $user,
+            'is_edit' => true,
+            'csrf_token_id' => 'season_edit_' . $season->getId(),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            if (!$this->isOwnedPrivateAnime($input->anime, $user)) {
+                throw $this->createNotFoundException();
+            }
+
+            if ($seasonRepository->numberExistsForAnime($input->anime, $input->number, $season->getId())) {
+                $form->get('number')->addError(new FormError('Ce numéro de saison existe déjà pour cet animé.'));
+            } else {
+                $newFilename = null;
+                $oldCoverUrl = $season->getCoverSeasonUrl();
+                $coverUrl = $oldCoverUrl;
+
+                try {
+                    if ($input->image instanceof UploadedFile) {
+                        $newFilename = $imageUploader->store($input->image);
+                        $coverUrl = $this->generateUrl('app_forms_synopsis_image', ['filename' => $newFilename]);
+                    }
+
+                    $entityManager->wrapInTransaction(function () use ($season, $input, $coverUrl): void {
+                        $this->applyInput($season, $input, $coverUrl);
+                    });
+                } catch (\Throwable) {
+                    if ($newFilename !== null) {
+                        $imageUploader->remove($newFilename);
+                    }
+
+                    $this->addFlash('error', 'Les modifications n’ont pas pu être enregistrées. Veuillez réessayer.');
+
+                    return $this->redirectToRoute('app_forms_season_edit', ['id' => $season->getId()]);
+                }
+
+                if ($newFilename !== null && $oldCoverUrl !== null) {
+                    $oldFilename = basename((string) parse_url($oldCoverUrl, PHP_URL_PATH));
+                    $imageUploader->remove($oldFilename);
+                }
+
+                $this->addFlash('success', 'La saison a été modifiée avec succès.');
+
+                return $this->redirectToRoute('app_private_season_show', ['id' => $season->getId()]);
+            }
+        }
+
+        return $this->render('forms/season.html.twig', [
+            'form' => $form,
+            'is_edit' => true,
+            'current_cover_url' => $season->getCoverSeasonUrl(),
+        ]);
+    }
+
+    #[Route('/saisons/{id}', name: 'app_private_season_show', methods: ['GET'], requirements: ['id' => '\d+'])]
+    public function show(
+        int $id,
+        SeasonRepository $seasonRepository,
+        EpisodeRepository $episodeRepository,
+    ): Response
+    {
+        $user = $this->requireUser();
+        $season = $seasonRepository->findOneOwned($id, $user);
+        if ($season === null) {
+            throw $this->createNotFoundException();
+        }
+
+        return $this->render('season/private_show.html.twig', [
+            'season' => $season,
+            'episodes' => $episodeRepository->findOwnedBySeason($season, $user),
+        ]);
+    }
+
+    private function requireUser(): User
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        return $user;
+    }
+
+    private function isOwnedPrivateAnime(?Anime $anime, User $user): bool
+    {
+        return $anime !== null
+            && $anime->getOwner()?->getId() === $user->getId()
+            && $anime->isPublic() === false;
+    }
+
+    private function applyInput(Season $season, SeasonInput $input, ?string $coverUrl): void
+    {
+        $season
+            ->setAnime($input->anime)
+            ->setTitle($input->title)
+            ->setNumber($input->number)
+            ->setSynopsis($input->description)
+            ->setCoverSeasonUrl($coverUrl)
+            ->setType($input->type)
+            ->setStatus($input->status)
+            ->setAuthor($input->author)
+            ->setSeasonDate($input->releaseYear);
+
+        foreach ($season->getCategorie()->toArray() as $category) {
+            if (!in_array($category, $input->categories, true)) {
+                $season->removeCategorie($category);
+            }
+        }
+
+        foreach ($input->categories as $category) {
+            $season->addCategorie($category);
+        }
+    }
+
+    private function createInputFromSeason(Season $season): SeasonInput
+    {
+        $input = new SeasonInput();
+        $input->anime = $season->getAnime();
+        $input->title = $season->getTitle();
+        $input->number = $season->getNumber();
+        $input->description = $season->getSynopsis();
+        $input->type = $season->getType();
+        $input->status = $season->getStatus();
+        $input->author = $season->getAuthor();
+        $input->releaseYear = $season->getSeasonDate();
+        $input->categories = $season->getCategorie()->toArray();
+
+        return $input;
+    }
+}

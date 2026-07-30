@@ -1,22 +1,43 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Accueil AniRecap{% endblock %}
+
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/catalogue.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/oeuvreCard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 {% endblock %}
 
-{% block title %}Hello HomeController!{% endblock %}
-
-
-
 {% block body %}
+    <div class="catalogue-page">
+        {{ component('Header', { backRoute: null }) }}
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+        <main class="catalogue-shell">
+            <div class="catalogue-content">
+                <h1 class="page-title"><span>ホーム Accueil</span></h1>
+                <p>
+                    Retrouvez les œuvres publiques et les créations privées de votre espace.
+                </p>
+                <p>
+                    <a href="{{ path('app_catalogue') }}" class="retour-link">
+                        Rechercher dans le catalogue
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </p>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/home/loic/AniRecap/src/Controller/HomeController.php</code></li>
-        <li>Your template at <code>/home/loic/AniRecap/templates/home/index.html.twig</code></li>
-    </ul>
-</div>
+                <section aria-labelledby="popular-title">
+                    <h2 id="popular-title" class="section-title"><span>Populaire</span></h2>
+                    <twig:OeuvreCard :results="popular"/>
+                </section>
+
+                <section aria-labelledby="latest-title">
+                    <h2 id="latest-title" class="section-title"><span>Dernière modification</span></h2>
+                    <twig:OeuvreCard :results="latest"/>
+                </section>
+            </div>
+        </main>
+
+        {{ component('Navbar', { active: 'home' }) }}
+    </div>
 {% endblock %}

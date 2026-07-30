@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ is_edit ? 'Modifier une saison' : 'Ajouter une saison' }}{% endblock %}
+{% block title %}{{ is_edit ? 'Modifier un épisode' : 'Ajouter un épisode' }}{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -10,17 +10,17 @@
 
 {% block body %}
     <header class="synopsis-editor-hero">
-        <a href="{{ path('app_forms_index') }}" aria-label="Retour aux formulaires">
+        <a href="{{ path('app_private_season_show', {id: season.id}) }}" aria-label="Retour à la saison">
             <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
         </a>
-        <h1>{{ is_edit ? 'Modifier une Saison' : 'Ajouter une Saison' }}</h1>
+        <h1>{{ is_edit ? 'Modifier un Épisode' : 'Ajouter un Épisode' }}</h1>
     </header>
 
     <main class="forms-page forms-page--editor">
         <div class="forms-shell synopsis-editor">
             <header class="synopsis-editor__intro">
-                <h2>{{ is_edit ? 'MODIFIER LA SAISON' : 'NOUVELLE SAISON' }}</h2>
-                <p>Cette saison restera privée dans votre espace personnel.</p>
+                <h2>{{ is_edit ? 'MODIFIER L’ÉPISODE' : 'NOUVEL ÉPISODE' }}</h2>
+                <p>Saison {{ season.number }} — {{ season.title }}</p>
             </header>
 
             {% for label, messages in app.flashes %}
@@ -31,8 +31,8 @@
 
             {{ form_start(form, { attr: { enctype: 'multipart/form-data', class: 'synopsis-form' } }) }}
                 {% if form.vars.submitted and not form.vars.valid %}
-                    <section class="form-error-summary" role="alert" aria-labelledby="season-form-errors">
-                        <h2 id="season-form-errors">Vérifiez les informations suivantes :</h2>
+                    <section class="form-error-summary" role="alert" aria-labelledby="episode-form-errors">
+                        <h2 id="episode-form-errors">Vérifiez les informations suivantes :</h2>
                         <ul>
                             {% for error in form.vars.errors %}
                                 <li>{{ error.message }}</li>
@@ -46,10 +46,8 @@
                     </section>
                 {% endif %}
 
-                {{ form_row(form.anime) }}
-
                 {% if current_cover_url %}
-                    <img src="{{ current_cover_url }}" alt="Miniature actuelle de la saison" class="synopsis-current-cover">
+                    <img src="{{ current_cover_url }}" alt="Miniature actuelle de l’épisode" class="synopsis-current-cover">
                 {% endif %}
 
                 <div class="synopsis-upload-field">
@@ -60,9 +58,9 @@
                             <i class="fa-solid fa-plus"></i>
                         </span>
                         <strong>{{ is_edit ? 'Remplacer la miniature' : 'Cliquez pour importer' }}</strong>
-                        <small>PNG, JPG (9:16 recommandé)</small>
+                        <small>PNG ou JPG, 2 Mio maximum</small>
                     </label>
-                    {{ form_widget(form.image, { attr: { class: 'synopsis-upload-input' } }) }}
+                    {{ form_widget(form.image, {attr: {class: 'synopsis-upload-input'}}) }}
                     {{ form_help(form.image) }}
                     {{ form_errors(form.image) }}
                 </div>
@@ -77,6 +75,7 @@
                     {{ form_row(form.status) }}
                     {{ form_row(form.author) }}
                     {{ form_row(form.releaseYear) }}
+                    {{ form_row(form.spoilerLevel) }}
                 </fieldset>
 
                 <div class="synopsis-save-bar">

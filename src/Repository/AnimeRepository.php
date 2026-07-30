@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Anime;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -17,16 +18,24 @@ class AnimeRepository extends ServiceEntityRepository
         parent::__construct($registry, Anime::class);
     }
 
-    public function searchCatalogue(array $filters): array
+    /**
+     * @return Anime[]
+     */
+    public function findVisibleTo(User $viewer): array
     {
-        $qb = $this->createQueryBuilder('a')
-            ->leftJoin('a.categories', 'c')
-            ->addSelect('c')
-            ->andWhere('a.isPublic = :isPublic')
-            ->setParameter('isPublic', true)
-            ->distinct();
+        return $this->createVisibleQueryBuilder($viewer)
+            ->orderBy('a.title', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 
-        // 1. Ajout des parenthèses indispensables autour des OR
+    /**
+     * @return Anime[]
+     */
+    public function searchVisibleTo(array $filters, User $viewer): array
+    {
+        $qb = $this->createVisibleQueryBuilder($viewer);
+
         if (!empty($filters['q'])) {
             $qb->andWhere('(LOWER(a.title) LIKE :q OR LOWER(a.synopsis) LIKE :q OR LOWER(a.author) LIKE :q)')
                 ->setParameter('q', '%' . mb_strtolower($filters['q']) . '%');
@@ -37,16 +46,35 @@ class AnimeRepository extends ServiceEntityRepository
                 ->setParameter('genre', $filters['genre']);
         }
 
-        // 2. Gestion adaptative si animeDate est un champ Date/DateTime en BDD
         if (!empty($filters['annee'])) {
             $qb->andWhere('a.animeDate = :annee')
                 ->setParameter('annee', (int) $filters['annee']);
         }
 
         return $qb
-            ->orderBy('a.title', "ASC")
+            ->orderBy('a.title', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function findOneVisibleTo(int $id, User $viewer): ?Anime
+    {
+        return $this->createVisibleQueryBuilder($viewer)
+            ->andWhere('a.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    private function createVisibleQueryBuilder(User $viewer): QueryBuilder
+    {
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.categories', 'c')
+            ->addSelect('c')
+            ->andWhere('(a.isPublic = :isPublic OR a.owner = :viewer)')
+            ->setParameter('isPublic', true)
+            ->setParameter('viewer', $viewer)
+            ->distinct();
     }
 
     /**
@@ -63,5 +91,15 @@ class AnimeRepository extends ServiceEntityRepository
             'coverAnimeUrl' => $coverUrl,
             'owner' => $owner,
         ]);
+    }
+
+    public function createOwnedPrivateQueryBuilder(User $owner): QueryBuilder
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.owner = :owner')
+            ->andWhere('a.isPublic = :isPublic')
+            ->setParameter('owner', $owner)
+            ->setParameter('isPublic', false)
+            ->orderBy('a.title', 'ASC');
     }
 }
