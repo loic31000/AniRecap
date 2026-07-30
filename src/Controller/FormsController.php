@@ -11,9 +11,11 @@ use App\Entity\User;
 use App\Form\AnimeSynopsisType;
 use App\Form\MangaSynopsisType;
 use App\Repository\AnimeRepository;
+use App\Repository\ChapitreRepository;
 use App\Repository\EpisodeRepository;
 use App\Repository\MangaRepository;
 use App\Repository\SeasonRepository;
+use App\Repository\TomeRepository;
 use App\Service\SynopsisImageUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -191,9 +193,11 @@ final class FormsController extends AbstractController
     public function synopsisImage(
         string $filename,
         AnimeRepository $animeRepository,
+        ChapitreRepository $chapitreRepository,
         EpisodeRepository $episodeRepository,
         MangaRepository $mangaRepository,
         SeasonRepository $seasonRepository,
+        TomeRepository $tomeRepository,
         SynopsisImageUploader $imageUploader,
     ): Response {
         $user = $this->getUser();
@@ -203,11 +207,13 @@ final class FormsController extends AbstractController
 
         $coverUrl = $this->generateUrl('app_forms_synopsis_image', ['filename' => $filename]);
         $anime = $animeRepository->findOneOwnedByCoverUrl($coverUrl, $user);
+        $chapitre = $chapitreRepository->findOneOwnedByCoverUrl($coverUrl, $user);
         $episode = $episodeRepository->findOneOwnedByCoverUrl($coverUrl, $user);
         $manga = $mangaRepository->findOneOwnedByCoverUrl($coverUrl, $user);
         $season = $seasonRepository->findOneOwnedByCoverUrl($coverUrl, $user);
+        $tome = $tomeRepository->findOneOwnedByCoverUrl($coverUrl, $user);
 
-        if ($anime === null && $episode === null && $manga === null && $season === null) {
+        if ($anime === null && $chapitre === null && $episode === null && $manga === null && $season === null && $tome === null) {
             throw $this->createNotFoundException();
         }
 

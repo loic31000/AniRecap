@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\MangaRepository;
+use App\Repository\TomeRepository;
+use App\Repository\ChapitreRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -13,7 +15,12 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class MangaController extends AbstractController
 {
     #[Route('/manga/{id}', name: 'app_manga_show', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function show(int $id, MangaRepository $mangaRepository): Response
+    public function show(
+        int $id,
+        MangaRepository $mangaRepository,
+        TomeRepository $tomeRepository,
+        ChapitreRepository $chapitreRepository,
+    ): Response
     {
         $user = $this->getUser();
         if (!$user instanceof User) {
@@ -25,8 +32,14 @@ final class MangaController extends AbstractController
             throw $this->createNotFoundException();
         }
 
+        $isOwnerPrivate = !$manga->isPublic() && $manga->getOwner()?->getId() === $user->getId();
+
         return $this->render('manga/index.html.twig', [
             'manga' => $manga,
+            'is_owner_private' => $isOwnerPrivate,
+            'tomes' => $isOwnerPrivate ? $tomeRepository->findOwnedByManga($manga, $user) : [],
+            'chapitres' => $isOwnerPrivate ? $chapitreRepository->findOwnedByManga($manga, $user) : [],
+            'characters' => $manga->getCharacters()->toArray(),
         ]);
     }
 }

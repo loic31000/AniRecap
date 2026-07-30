@@ -52,18 +52,151 @@
                 </div>
             </section>
 
-            <section class="panel panel--chapters" aria-labelledby="manga-structure-title">
-                <h2 id="manga-structure-title" class="section-title">Structure</h2>
-                <p>
-                    Tomes :
-                    {{ manga.tomeStart ?: 'non renseigné' }}
-                    {% if manga.tomeEnd and manga.tomeEnd != manga.tomeStart %} à {{ manga.tomeEnd }}{% endif %}
-                </p>
-                <p>
-                    Chapitres :
-                    {{ manga.chapterStart ?: 'non renseigné' }}
-                    {% if manga.chapterEnd and manga.chapterEnd != manga.chapterStart %} à {{ manga.chapterEnd }}{% endif %}
-                </p>
+            {% if is_owner_private %}
+                <section class="manga-content-tabs" data-controller="manga-tabs">
+                    <div class="manga-tabs-toolbar">
+                        <div class="tabs-row" role="tablist" aria-label="Contenus du manga">
+                            <button
+                                type="button"
+                                id="chapitres-tab"
+                                class="tab-btn is-active"
+                                role="tab"
+                                aria-selected="true"
+                                aria-controls="chapitres-panel"
+                                tabindex="0"
+                                data-manga-tabs-target="tab"
+                                data-panel="chapitres"
+                                data-action="click->manga-tabs#select keydown->manga-tabs#navigate"
+                            >Chapitres</button>
+                            <button
+                                type="button"
+                                id="tomes-tab"
+                                class="tab-btn"
+                                role="tab"
+                                aria-selected="false"
+                                aria-controls="tomes-panel"
+                                tabindex="-1"
+                                data-manga-tabs-target="tab"
+                                data-panel="tomes"
+                                data-action="click->manga-tabs#select keydown->manga-tabs#navigate"
+                            >Tomes</button>
+                        </div>
+                    </div>
+
+                    <div
+                        id="chapitres-panel"
+                        class="manga-tab-panel"
+                        role="tabpanel"
+                        aria-labelledby="chapitres-tab"
+                        data-manga-tabs-target="panel"
+                        data-panel="chapitres"
+                    >
+                        <div class="manga-tab-actions">
+                            <p class="episode-count-meta">{{ chapitres|length }} chapitre{{ chapitres|length > 1 ? 's' : '' }} disponible{{ chapitres|length > 1 ? 's' : '' }}</p>
+                            <a href="{{ path('app_forms_chapitre_create', {mangaId: manga.id}) }}" class="chip-btn private-content-add">Ajouter un chapitre</a>
+                        </div>
+                        {% if chapitres is empty %}
+                            <p class="episode-count-meta manga-empty-state">Aucun chapitre n’a encore été ajouté à ce manga.</p>
+                        {% else %}
+                            <div class="episodes-timeline-list">
+                                {% for chapitre in chapitres %}
+                                    <div class="manga-timeline-entry">
+                                        <span class="manga-timeline-node" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
+                                        <article class="episode-figma-card">
+                                            <div class="card-media-wrap"><img src="{{ chapitre.coverChapitreUrl }}" alt="Miniature du chapitre {{ chapitre.number }}" class="card-banner"></div>
+                                            <div class="card-content-wrap">
+                                                <div class="card-meta-line">
+                                                    <span class="badge-episodes">CHAP {{ chapitre.number }}</span>
+                                                    <span class="content-card-status">{{ chapitre.status }}</span>
+                                                </div>
+                                                <h3 class="card-episode-title">{{ chapitre.title }}</h3>
+                                                <p class="card-episode-desc">{{ chapitre.synopsis }}</p>
+                                                <div class="content-card-footer">
+                                                    <span class="content-card-spoiler">{{ chapitre.spoilerLevel.value|upper }}</span>
+                                                    <a href="{{ path('app_forms_chapitre_edit', {id: chapitre.id}) }}" class="content-card-edit" aria-label="Modifier le chapitre {{ chapitre.number }}">
+                                                        <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                                                        <span class="visually-hidden">Modifier</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </article>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div
+                        id="tomes-panel"
+                        class="manga-tab-panel"
+                        role="tabpanel"
+                        aria-labelledby="tomes-tab"
+                        data-manga-tabs-target="panel"
+                        data-panel="tomes"
+                        hidden
+                    >
+                        <div class="manga-tab-actions">
+                            <p class="episode-count-meta">{{ tomes|length }} tome{{ tomes|length > 1 ? 's' : '' }} disponible{{ tomes|length > 1 ? 's' : '' }}</p>
+                            <a href="{{ path('app_forms_tome_create', {mangaId: manga.id}) }}" class="chip-btn private-content-add">Ajouter un tome</a>
+                        </div>
+                        {% if tomes is empty %}
+                            <p class="episode-count-meta manga-empty-state">Aucun tome n’a encore été ajouté à ce manga.</p>
+                        {% else %}
+                            <div class="episodes-timeline-list">
+                                {% for tome in tomes %}
+                                    <div class="manga-timeline-entry">
+                                        <span class="manga-timeline-node" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
+                                        <article class="episode-figma-card">
+                                            <div class="card-media-wrap"><img src="{{ tome.coverTomeUrl }}" alt="Miniature du tome {{ tome.number }}" class="card-banner"></div>
+                                            <div class="card-content-wrap">
+                                                <div class="card-meta-line">
+                                                    <span class="badge-episodes">TOME {{ tome.number }}</span>
+                                                    <span class="content-card-status">{{ tome.status }}</span>
+                                                </div>
+                                                <h3 class="card-episode-title">{{ tome.title }}</h3>
+                                                <p class="card-episode-desc">{{ tome.synopsis }}</p>
+                                                <div class="content-card-footer">
+                                                    <span class="content-card-spoiler">{{ tome.spoilerLevel.value|upper }}</span>
+                                                    <a href="{{ path('app_forms_tome_edit', {id: tome.id}) }}" class="content-card-edit" aria-label="Modifier le tome {{ tome.number }}">
+                                                        <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                                                        <span class="visually-hidden">Modifier</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </article>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </section>
+            {% endif %}
+
+            <section class="manga-characters" aria-labelledby="manga-characters-title">
+                <h2 id="manga-characters-title" class="section-title">Personnages</h2>
+                {% if characters is empty %}
+                    <p class="manga-characters-empty">Aucun personnage n'a encore été ajouté à ce manga.</p>
+                {% else %}
+                    <div class="manga-characters-grid">
+                        {% for character in characters %}
+                            <article class="manga-character-card">
+                                {% if character.imageUrl %}
+                                    <img
+                                        src="{{ asset(character.imageUrl) }}"
+                                        alt="Portrait de {{ character.name }}"
+                                        class="manga-character-portrait"
+                                        loading="lazy"
+                                    >
+                                {% else %}
+                                    <span class="manga-character-portrait manga-character-placeholder" role="img" aria-label="Portrait non disponible pour {{ character.name }}">
+                                        <i class="fa-solid fa-user" aria-hidden="true"></i>
+                                    </span>
+                                {% endif %}
+                                <h3 class="manga-character-name">{{ character.name }}</h3>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </section>
         </div>
     </main>

@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ is_edit ? 'Modifier un chapitre' : 'Ajouter un chapitre' }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+{% endblock %}
+
+{% block body %}
+    <header class="synopsis-editor-hero">
+        <a href="{{ path('app_manga_show', {id: manga.id}) }}" aria-label="Retour au manga">←</a>
+        <h1>{{ is_edit ? 'Modifier un Chapitre' : 'Ajouter un Chapitre' }}</h1>
+    </header>
+
+    <main class="forms-page forms-page--editor">
+        <div class="forms-shell synopsis-editor">
+            <header class="synopsis-editor__intro">
+                <h2>{{ is_edit ? 'MODIFIER LE CHAPITRE' : 'NOUVEAU CHAPITRE' }}</h2>
+                <p>{{ manga.title }} — contenu privé</p>
+            </header>
+
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="flash-{{ label }}" role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</div>
+                {% endfor %}
+            {% endfor %}
+
+            {{ form_start(form, {attr: {enctype: 'multipart/form-data', class: 'synopsis-form'}}) }}
+                {% if form.vars.submitted and not form.vars.valid %}
+                    <section class="form-error-summary" role="alert" aria-labelledby="chapitre-errors">
+                        <h2 id="chapitre-errors">Vérifiez les informations suivantes :</h2>
+                        <ul>
+                            {% for error in form.vars.errors %}<li>{{ error.message }}</li>{% endfor %}
+                            {% for field in form %}
+                                {% for error in field.vars.errors %}<li><a href="#{{ field.vars.id }}">{{ field.vars.label }} : {{ error.message }}</a></li>{% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
+
+                {% if current_cover_url %}<img src="{{ current_cover_url }}" alt="Miniature actuelle du chapitre" class="synopsis-current-cover">{% endif %}
+                <div class="synopsis-upload-field">
+                    {{ form_label(form.image) }}
+                    <label class="synopsis-upload-zone" for="{{ form.image.vars.id }}">
+                        <strong>{{ is_edit ? 'Remplacer la miniature' : 'Importer une miniature' }}</strong>
+                        <small>PNG ou JPG, 2 Mio maximum</small>
+                    </label>
+                    {{ form_widget(form.image, {attr: {class: 'synopsis-upload-input'}}) }}
+                    {{ form_help(form.image) }}
+                    {{ form_errors(form.image) }}
+                </div>
+
+                {{ form_row(form.title) }}
+                {{ form_row(form.number) }}
+                {{ form_row(form.categories) }}
+                {{ form_row(form.description) }}
+                <fieldset class="synopsis-fieldset synopsis-fieldset--plain">
+                    {{ form_row(form.type) }}
+                    {{ form_row(form.status) }}
+                    {{ form_row(form.author) }}
+                    {{ form_row(form.releaseYear) }}
+                    {{ form_row(form.spoilerLevel) }}
+                </fieldset>
+                <div class="synopsis-save-bar">{{ form_widget(form.save) }}</div>
+            {{ form_end(form) }}
+        </div>
+    </main>
+
+    {{ component('Navbar', {active: 'forms'}) }}
+{% endblock %}
