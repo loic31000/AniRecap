@@ -5,36 +5,35 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/catalogue.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/searchCard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/oeuvreCard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 {% endblock %}
 
 {% block body %}
-    <div class="catalogue-page">
+    <div class="catalogue-page home-page" id="home-top">
         {{ component('Header', { backRoute: null }) }}
 
         <main class="catalogue-shell">
             <div class="catalogue-content">
-                <h1 class="page-title"><span>ホーム Accueil</span></h1>
-                <p>
-                    Retrouvez les œuvres publiques et les créations privées de votre espace.
-                </p>
-                <p>
-                    <a href="{{ path('app_catalogue') }}" class="retour-link">
-                        Rechercher dans le catalogue
-                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                    </a>
-                </p>
+                <h1 class="page-title"><span>ホーム Home</span></h1>
 
-                <section aria-labelledby="popular-title">
-                    <h2 id="popular-title" class="section-title"><span>Populaire</span></h2>
+                <twig:SearchCard :genres="genres" :filters="filters" actionRoute="app_home"/>
+
+                <section class="home-section" aria-labelledby="popular-title">
+                    <h2 id="popular-title" class="section-title"><span>人気 Populaire</span></h2>
                     <twig:OeuvreCard :results="popular"/>
                 </section>
 
-                <section aria-labelledby="latest-title">
-                    <h2 id="latest-title" class="section-title"><span>Dernière modification</span></h2>
+                <section class="home-section" aria-labelledby="latest-title">
+                    <h2 id="latest-title" class="section-title"><span>最終更新日 Derniere Modification</span></h2>
                     <twig:OeuvreCard :results="latest"/>
                 </section>
+
+                <a class="home-scroll-top" href="#home-top" aria-label="Retour en haut de la page">
+                    <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+                </a>
             </div>
         </main>
 

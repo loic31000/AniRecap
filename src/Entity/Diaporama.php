@@ -12,6 +12,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: DiaporamaRepository::class)]
 class Diaporama implements Ownable
 {
+    public const SOURCE_ANIME = 'anime';
+    public const SOURCE_MANGA = 'manga';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -27,20 +30,18 @@ class Diaporama implements Ownable
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(inversedBy: 'diaporamas')]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Episode $episode = null;
+    #[ORM\Column(length: 10)]
+    private ?string $sourceType = null;
 
-    #[ORM\ManyToOne(inversedBy: 'diaporamas')]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Tome $tome = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $coverImageFilename = null;
 
-    #[ORM\ManyToOne(inversedBy: 'diaporamas')]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Chapitre $chapitre = null;
-
-    #[ORM\Column(length: 20, nullable: true)]
-    private ?string $spoilerLevel = null;
+    /**
+     * @var Collection<int, Slide>
+     */
+    #[ORM\OneToMany(targetEntity: Slide::class, mappedBy: 'diaporama', cascade: ['persist'])]
+    #[ORM\OrderBy(['position' => 'ASC'])]
+    private Collection $slides;
 
     /**
      * @var Collection<int, Categorie>
@@ -51,6 +52,7 @@ class Diaporama implements Ownable
     public function __construct()
     {
         $this->categorie = new ArrayCollection();
+        $this->slides = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -99,50 +101,57 @@ class Diaporama implements Ownable
         return $this;
     }
 
-    public function getEpisode(): ?Episode
+    public function getSourceType(): ?string
     {
-        return $this->episode;
+        return $this->sourceType;
     }
 
-    public function setEpisode(?Episode $episode): static
+    public function setSourceType(string $sourceType): static
     {
-        $this->episode = $episode;
+        if (!in_array($sourceType, [self::SOURCE_ANIME, self::SOURCE_MANGA], true)) {
+            throw new \InvalidArgumentException('Le type de source du diaporama est invalide.');
+        }
+
+        $this->sourceType = $sourceType;
 
         return $this;
     }
 
-    public function getTome(): ?Tome
+    public function getCoverImageFilename(): ?string
     {
-        return $this->tome;
+        return $this->coverImageFilename;
     }
 
-    public function setTome(?Tome $tome): static
+    public function setCoverImageFilename(?string $coverImageFilename): static
     {
-        $this->tome = $tome;
+        $this->coverImageFilename = $coverImageFilename;
 
         return $this;
     }
 
-    public function getChapitre(): ?Chapitre
+    /**
+     * @return Collection<int, Slide>
+     */
+    public function getSlides(): Collection
     {
-        return $this->chapitre;
+        return $this->slides;
     }
 
-    public function setChapitre(?Chapitre $chapitre): static
+    public function addSlide(Slide $slide): static
     {
-        $this->chapitre = $chapitre;
+        if (!$this->slides->contains($slide)) {
+            $this->slides->add($slide);
+            $slide->setDiaporama($this);
+        }
 
         return $this;
     }
 
-    public function getSpoilerLevel(): ?string
+    public function removeSlide(Slide $slide): static
     {
-        return $this->spoilerLevel;
-    }
-
-    public function setSpoilerLevel(?string $spoilerLevel): static
-    {
-        $this->spoilerLevel = $spoilerLevel;
+        if ($this->slides->removeElement($slide) && $slide->getDiaporama() === $this) {
+            $slide->setDiaporama(null);
+        }
 
         return $this;
     }

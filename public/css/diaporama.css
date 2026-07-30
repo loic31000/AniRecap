@@ -14,18 +14,23 @@ body {
     margin: 0;
     background: #000;
     font-family: 'Helvetica Neue', Arial, sans-serif;
+    overflow: hidden;
+    overscroll-behavior: none;
 }
 
 .story {
     position: fixed;
     inset: 0;
+    isolation: isolate;
     z-index: 1000;
     width: 100%;
     max-width: 480px;
-    height: 100vh;
+    height: 100dvh;
+    min-height: 100dvh;
     margin: 0 auto;
     background: #000;
     overflow: hidden;
+    overscroll-behavior: none;
 }
 
 .story__slide {
@@ -34,9 +39,6 @@ body {
     display: none;
     flex-direction: column;
     justify-content: flex-end;
-    background-size: cover;
-    background-position: center top;
-    background-repeat: no-repeat;
     color: var(--story-text);
 }
 
@@ -56,61 +58,75 @@ body {
         rgba(13, 21, 38, 0.65) 85%
     );
     pointer-events: none;
+    z-index: 1;
 }
 
-.story__tap {
+.story__background {
     position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 50%;
-    background: transparent;
-    border: none;
-    padding: 0;
-    margin: 0;
-    z-index: 2;
-    cursor: pointer;
-}
-
-.story__tap--prev {
-    left: 0;
-}
-
-.story__tap--next {
-    right: 0;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
 }
 
 .story__progress {
-    position: fixed;
-    z-index: 5;
-    top: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 480px;
-    display: flex;
-    gap: 6px;
-    padding: 0 14px;
+    position: absolute;
+    z-index: 100;
+    top: 6px;
+    top: calc(6px + env(safe-area-inset-top));
+    right: 14px;
+    left: 14px;
+    width: auto;
+    min-height: 5px;
+    display: grid;
+    grid-template-columns: repeat(var(--story-slide-count), minmax(0, 1fr));
+    gap: 5px;
+    pointer-events: none;
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 .story__progress-bar {
-    flex: 1;
-    height: 3px;
-    border-radius: 3px;
-    background: rgba(255, 255, 255, 0.3);
+    display: block;
+    width: 100%;
+    min-width: 1px;
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.82);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.45),
+        0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .story__progress-bar.is-done {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--story-gold);
 }
 
 .story__progress-bar.is-active {
-    background: var(--story-gold-light);
+    background: #fff;
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.7),
+        0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+.story__progress-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 .story__close {
     position: absolute;
     z-index: 3;
-    top: 26px;
+    top: calc(22px + env(safe-area-inset-top, 0px));
     left: 14px;
     width: 34px;
     height: 34px;
@@ -123,12 +139,50 @@ body {
     text-decoration: none;
 }
 
+.story__close:focus-visible,
+.story__control:focus-visible,
+.story__actions a:focus-visible {
+    outline: 3px solid var(--story-gold-light);
+    outline-offset: 3px;
+}
+
+.story__controls {
+    position: fixed;
+    z-index: 10;
+    inset: 50% 10px auto;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
+.story__control {
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--story-gold);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.62);
+    color: #fff;
+    font-size: 30px;
+    line-height: 1;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.story__control:disabled {
+    visibility: hidden;
+    pointer-events: none;
+}
+
 .story__series-title {
-    position: relative;
-    z-index: 2;
-    margin: 24px 60px 0;
+    position: absolute;
+    z-index: 3;
+    top: calc(28px + env(safe-area-inset-top, 0px));
+    right: 64px;
+    left: 64px;
+    margin: 0;
     text-align: center;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -140,31 +194,64 @@ body {
 .story__card {
     position: relative;
     z-index: 2;
-    margin-top: auto;
-    padding: 28px 24px 34px;
-    background: var(--story-dark);
-    border: 1px solid rgba(217, 164, 65, 0.35);
-    border-radius: var(--story-radius) var(--story-radius) 0 0;
+    width: calc(100% - 28px);
+    max-height: min(62dvh, calc(100dvh - 150px - env(safe-area-inset-bottom, 0px)));
+    margin: auto 14px calc(14px + env(safe-area-inset-bottom, 0px));
+    padding: 24px 20px;
+    background: rgba(7, 17, 31, 0.96);
+    border: 1px solid var(--story-gold);
+    border-radius: 14px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    -webkit-overflow-scrolling: touch;
+}
+
+.story__categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
 }
 
 .story__badge {
-    display: inline-block;
+    display: inline-flex;
     padding: 4px 14px;
-    margin: 0 8px 14px 0;
     border: 1px solid var(--story-gold);
-    border-radius: 20px;
+    border-radius: 5px;
     color: var(--story-gold-light);
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
     letter-spacing: 0.08em;
 }
 
-.story__title-jp {
-    margin: 0 0 12px;
+.story__work-title {
+    margin: 0 0 4px;
     color: var(--story-gold-light);
-    font-size: 26px;
-    line-height: 1.3;
+    font-size: 19px;
+    line-height: 1.25;
     font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.story__slide-title {
+    margin: 0 0 10px;
+    color: var(--story-gold);
+    font-size: 25px;
+    line-height: 1.18;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.story__link {
+    display: block;
+    margin: 0 0 10px;
+    color: var(--story-text);
+    font-size: 15px;
+    line-height: 1.35;
+    text-decoration: underline;
+    overflow-wrap: anywhere;
 }
 
 .story__description {
@@ -172,6 +259,8 @@ body {
     color: var(--story-text);
     font-size: 15px;
     line-height: 1.55;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
 }
 
 .story__description a {
@@ -199,4 +288,95 @@ body {
     .story {
         box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
     }
+}
+
+@media (max-height: 700px) {
+    .story__card {
+        max-height: calc(100dvh - 120px - env(safe-area-inset-bottom, 0px));
+        margin-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+        padding-block: 18px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .story__slide,
+    .story__control {
+        transition: none;
+    }
+}
+/* Actions du conteneur et état vide US 5.4 */
+.story__actions {
+    position: fixed;
+    z-index: 20;
+    top: calc(68px + env(safe-area-inset-top, 0px));
+    right: 14px;
+}
+
+.story__actions a,
+.story__empty a {
+    display: inline-flex;
+    padding: 10px 14px;
+    border: 1px solid #e8a53f;
+    border-radius: 999px;
+    background: rgba(3, 7, 13, 0.82);
+    color: #e8a53f;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.story__actions a {
+    padding: 8px 11px;
+    font-size: 11px;
+}
+
+.story__empty {
+    min-height: 100dvh;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 18px;
+    padding: 24px;
+    background: #061426;
+    color: #fff;
+    text-align: center;
+}
+
+@media (max-width: 390px) {
+    .story__actions {
+        right: 10px;
+    }
+
+    .story__actions a {
+        padding: 7px 9px;
+        font-size: 10px;
+    }
+
+    .story__card {
+        width: calc(100% - 24px);
+        margin-inline: 12px;
+        padding-inline: 16px;
+    }
+}
+
+.story__timecode {
+    margin: 12px 0 0;
+    color: #e8a53f;
+    font-variant-numeric: tabular-nums;
+}
+
+.story__spoiler {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 16px 0 0;
+    padding-top: 10px;
+    border-top: 1px solid rgba(217, 164, 65, 0.4);
+    color: var(--story-text);
+    font-size: 12px;
+}
+
+.story__spoiler strong {
+    color: var(--story-gold-light);
+    letter-spacing: 0.06em;
 }

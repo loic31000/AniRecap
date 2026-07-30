@@ -78,10 +78,10 @@ class Chapitre implements Ownable
     private Collection $favorites;
 
     /**
-     * @var Collection<int, Diaporama>
+     * @var Collection<int, Slide>
      */
-    #[ORM\OneToMany(targetEntity: Diaporama::class, mappedBy: 'chapitre', orphanRemoval: true)]
-    private Collection $diaporamas;
+    #[ORM\OneToMany(targetEntity: Slide::class, mappedBy: 'chapitre')]
+    private Collection $slides;
 
     /**
      * @var Collection<int, SpoilerPreference>
@@ -96,7 +96,7 @@ class Chapitre implements Ownable
         $this->summaries = new ArrayCollection();
         $this->favorites = new ArrayCollection();
         $this->spoilerPreferences = new ArrayCollection();
-        $this->diaporamas = new ArrayCollection();
+        $this->slides = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -330,28 +330,28 @@ class Chapitre implements Ownable
     }
 
     /**
-     * @return Collection<int, Diaporama>
+     * @return Collection<int, Slide>
      */
-    public function getDiaporamas(): Collection
+    public function getSlides(): Collection
     {
-        return $this->diaporamas;
+        return $this->slides;
     }
 
-    public function addDiaporama(Diaporama $diaporama): static
+    public function addSlide(Slide $slide): static
     {
-        if (!$this->diaporamas->contains($diaporama)) {
-            $this->diaporamas->add($diaporama);
-            $diaporama->setChapitre($this);
+        if (!$this->slides->contains($slide)) {
+            $this->slides->add($slide);
+            $slide->setChapitre($this);
         }
 
         return $this;
     }
 
-    public function removeDiaporama(Diaporama $diaporama): static
+    public function removeSlide(Slide $slide): static
     {
-        if ($this->diaporamas->removeElement($diaporama)) {
-            if ($diaporama->getChapitre() === $this) {
-                $diaporama->setChapitre(null);
+        if ($this->slides->removeElement($slide)) {
+            if ($slide->getChapitre() === $this) {
+                $slide->setChapitre(null);
             }
         }
 

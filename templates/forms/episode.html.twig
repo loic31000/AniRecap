@@ -57,7 +57,7 @@
                             <i class="fa-regular fa-image"></i>
                             <i class="fa-solid fa-plus"></i>
                         </span>
-                        <strong>{{ is_edit ? 'Remplacer la miniature' : 'Cliquez pour importer' }}</strong>
+                        <strong>{{ is_edit ? 'Remplacer la miniature' : 'Importer l’image de la première scène' }}</strong>
                         <small>PNG ou JPG, 2 Mio maximum</small>
                     </label>
                     {{ form_widget(form.image, {attr: {class: 'synopsis-upload-input'}}) }}
@@ -77,6 +77,14 @@
                     {{ form_row(form.releaseYear) }}
                     {{ form_row(form.spoilerLevel) }}
                 </fieldset>
+
+                {% if not is_edit %}
+                    <fieldset class="synopsis-fieldset synopsis-fieldset--plain">
+                        <legend>Chronologie de la première scène</legend>
+                        {{ form_row(form.startTimecode) }}
+                        {{ form_row(form.endTimecode) }}
+                    </fieldset>
+                {% endif %}
 
                 <div class="synopsis-save-bar">
                     {{ form_widget(form.save) }}

@@ -1,35 +1,66 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Éditeur de scène saison{% endblock %}
+{% block title %}Ajouter une scène Anime{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 {% endblock %}
 
 {% block body %}
-    {{ component('Header', { backRoute: 'app_forms_index' }) }}
+    <header class="synopsis-editor-hero">
+        <a href="{{ diaporama ? path('app_diaporama_show', {id: diaporama.id}) : path('app_forms_index') }}" aria-label="Retour">‹</a>
+        <h1>Ajouter une Scène Saison</h1>
+    </header>
 
-    <main class="forms-page forms-page--orientation">
-        <article class="orientation-card">
-            <span class="orientation-card__icon" aria-hidden="true">
-                <i class="fa-solid fa-film"></i>
-            </span>
-            <p class="orientation-card__eyebrow">Formulaire spécialisé</p>
-            <h1>Éditeur de scène saison</h1>
-            <p>
-                Cet écran permettra de créer ou de modifier une scène de récap associée à une saison.
-            </p>
-            <p class="orientation-card__notice">
-                La création et l'enregistrement seront ajoutés dans une prochaine user story.
-            </p>
-            <a class="orientation-card__back" href="{{ path('app_forms_index') }}">
-                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-                Retour aux formulaires
-            </a>
-        </article>
+    <main class="forms-page forms-page--editor">
+        <div class="forms-shell synopsis-editor">
+            <header class="synopsis-editor__intro">
+                <h2>ÉDITER LA SCÈNE</h2>
+                <p>{{ diaporama ? diaporama.title ~ ' — ajoutez une nouvelle scène.' : 'Choisissez l’épisode parent de la première scène.' }}</p>
+            </header>
+
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="flash-{{ label }}" role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</div>
+                {% endfor %}
+            {% endfor %}
+
+            {{ form_start(form, {attr: {enctype: 'multipart/form-data', class: 'synopsis-form'}}) }}
+                {% if form.vars.submitted and not form.vars.valid %}
+                    <section class="form-error-summary" role="alert">
+                        <h2>Vérifiez les informations suivantes :</h2>
+                        <ul>
+                            {% for field in form %}
+                                {% for error in field.vars.errors %}
+                                    <li><a href="#{{ field.vars.id }}">{{ field.vars.label }} : {{ error.message }}</a></li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
+
+                <div class="synopsis-upload-field">
+                    {{ form_label(form.image) }}
+                    <label class="synopsis-upload-zone" for="{{ form.image.vars.id }}">
+                        <strong>Cliquez pour importer</strong>
+                        <small>PNG ou JPG, format 16:9 recommandé</small>
+                    </label>
+                    {{ form_widget(form.image, {attr: {class: 'synopsis-upload-input'}}) }}
+                    {{ form_errors(form.image) }}
+                </div>
+                {{ form_row(form.episodeId) }}
+                <div class="scene-timecodes">
+                    {{ form_row(form.startTimecode) }}
+                    {{ form_row(form.endTimecode) }}
+                </div>
+                {{ form_row(form.title) }}
+                {{ form_row(form.content) }}
+                {{ form_row(form.spoilerLevel) }}
+                <div class="synopsis-save-bar">{{ form_widget(form.save) }}</div>
+            {{ form_end(form) }}
+        </div>
     </main>
 
-    {{ component('Navbar', { active: 'forms' }) }}
+    {{ component('Navbar', {active: 'forms'}) }}
 {% endblock %}

@@ -6,8 +6,10 @@ use App\Entity\Anime;
 use App\Entity\Manga;
 use App\Entity\User;
 use App\Repository\AnimeRepository;
+use App\Repository\CategorieRepository;
 use App\Repository\MangaRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -16,17 +18,37 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class HomeController extends AbstractController
 {
     #[Route('/home', name: 'app_home', methods: ['GET'])]
-    public function index(AnimeRepository $animeRepository, MangaRepository $mangaRepository): Response
-    {
+    public function index(
+        Request $request,
+        AnimeRepository $animeRepository,
+        MangaRepository $mangaRepository,
+        CategorieRepository $categorieRepository,
+    ): Response {
         $user = $this->getUser();
         if (!$user instanceof User) {
             throw $this->createAccessDeniedException();
         }
 
-        $items = [
-            ...array_map($this->mapAnime(...), $animeRepository->findVisibleTo($user)),
-            ...array_map($this->mapManga(...), $mangaRepository->findVisibleTo($user)),
+        $filters = [
+            'q' => trim((string) $request->query->get('q', '')),
+            'type' => (string) $request->query->get('type', 'all'),
+            'genre' => $request->query->get('genre') ?: null,
+            'annee' => $request->query->get('annee') ?: null,
         ];
+
+        $items = [];
+        if ($filters['type'] === 'all' || $filters['type'] === 'anime') {
+            $items = [
+                ...$items,
+                ...array_map($this->mapAnime(...), $animeRepository->searchVisibleTo($filters, $user)),
+            ];
+        }
+        if ($filters['type'] === 'all' || $filters['type'] === 'manga') {
+            $items = [
+                ...$items,
+                ...array_map($this->mapManga(...), $mangaRepository->searchVisibleTo($filters, $user)),
+            ];
+        }
 
         $popular = $items;
         usort($popular, static fn (array $left, array $right): int =>
@@ -39,9 +61,19 @@ final class HomeController extends AbstractController
             [$right['id'], $right['type']] <=> [$left['id'], $left['type']]
         );
 
+        $genres = array_map(
+            static fn ($category): array => [
+                'slug' => $category->getSlug(),
+                'name' => $category->getName(),
+            ],
+            $categorieRepository->findBy([], ['name' => 'ASC']),
+        );
+
         return $this->render('home/index.html.twig', [
-            'popular' => $popular,
-            'latest' => $latest,
+            'popular' => array_slice($popular, 0, 5),
+            'latest' => array_slice($latest, 0, 4),
+            'genres' => $genres,
+            'filters' => $filters,
         ]);
     }
 

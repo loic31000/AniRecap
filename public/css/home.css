@@ -1,20 +1,101 @@
-body {
-    background-color: red !important;
+.home-page .catalogue-content {
+    width: min(100%, 430px);
+    padding: 28px 22px 20px;
 }
 
-
-
-.example-wrapper {
-    margin: 1em auto;
-    max-width: 800px;
-    width: 95%;
-    font: 18px/1.5 sans-serif;
-    background-color: red;
+.home-page .page-title {
+    margin-bottom: 28px;
+    text-align: center;
 }
 
-.example-wrapper code {
-    background: #F5F5F5;
-    padding: 2px 6px;
+.home-page .search-card {
+    margin-bottom: 26px;
+    border-radius: 8px;
 }
 
+.home-page .home-section {
+    margin-top: 48px;
+}
 
+.home-page .section-title {
+    margin-bottom: 20px;
+    padding-bottom: 7px;
+    font-size: 18px;
+    border-color: var(--gold);
+}
+
+.home-page .oeuvre-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+    padding-inline: 16px;
+}
+
+.home-page .oeuvre-card {
+    border-radius: 12px;
+}
+
+.home-page .oeuvre-thumb {
+    height: auto;
+    aspect-ratio: 16 / 7;
+}
+
+.home-page .oeuvre-body {
+    padding: 10px 10px 12px;
+}
+
+.home-page .oeuvre-meta {
+    margin-bottom: 8px;
+}
+
+.home-page .badge-type {
+    min-height: 18px;
+    padding: 2px 7px;
+    font-size: 9px;
+}
+
+.home-page .oeuvre-title {
+    font-size: 15px;
+}
+
+.home-page .oeuvre-subtitle {
+    margin-bottom: 10px;
+    font-size: 12px;
+}
+
+.home-page .oeuvre-date,
+.home-page .oeuvre-votes {
+    font-size: 9px;
+}
+
+.home-page .oeuvre-votes {
+    padding: 2px 8px;
+}
+
+.home-scroll-top {
+    width: 32px;
+    height: 32px;
+    margin: 34px auto 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    color: var(--gold);
+    background: rgba(10, 18, 32, 0.9);
+    box-shadow: 0 4px 12px #000;
+}
+
+.home-scroll-top:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 3px;
+}
+
+@media (max-width: 389px) {
+    .home-page .catalogue-content {
+        padding-inline: 14px;
+    }
+
+    .home-page .oeuvre-list {
+        padding-inline: 10px;
+    }
+}

@@ -100,9 +100,17 @@
                         {% else %}
                             <div class="episodes-timeline-list">
                                 {% for chapitre in chapitres %}
+                                    {% set linkedDiaporamas = chapitre_diaporamas[chapitre.id]|default([]) %}
                                     <div class="manga-timeline-entry">
                                         <span class="manga-timeline-node" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
-                                        <article class="episode-figma-card">
+                                        <article class="episode-figma-card{{ linkedDiaporamas|length == 1 ? ' has-diaporama-link' : '' }}">
+                                            {% if linkedDiaporamas|length == 1 %}
+                                                <a
+                                                    href="{{ path('app_diaporama_show', {id: linkedDiaporamas[0].id}) }}"
+                                                    class="card-diaporama-overlay"
+                                                    aria-label="Voir le diaporama {{ linkedDiaporamas[0].title }} lié au chapitre {{ chapitre.number }}"
+                                                ></a>
+                                            {% endif %}
                                             <div class="card-media-wrap"><img src="{{ chapitre.coverChapitreUrl }}" alt="Miniature du chapitre {{ chapitre.number }}" class="card-banner"></div>
                                             <div class="card-content-wrap">
                                                 <div class="card-meta-line">
@@ -113,6 +121,18 @@
                                                 <p class="card-episode-desc">{{ chapitre.synopsis }}</p>
                                                 <div class="content-card-footer">
                                                     <span class="content-card-spoiler">{{ chapitre.spoilerLevel.value|upper }}</span>
+                                                    {% if linkedDiaporamas|length == 1 %}
+                                                        <span class="card-diaporama-hint" aria-hidden="true">Voir le diaporama</span>
+                                                    {% elseif linkedDiaporamas|length > 1 %}
+                                                        <details class="card-diaporama-list">
+                                                            <summary>Voir les diaporamas ({{ linkedDiaporamas|length }})</summary>
+                                                            <ul>
+                                                                {% for diaporama in linkedDiaporamas %}
+                                                                    <li><a href="{{ path('app_diaporama_show', {id: diaporama.id}) }}">{{ diaporama.title }}</a></li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                        </details>
+                                                    {% endif %}
                                                     <a href="{{ path('app_forms_chapitre_edit', {id: chapitre.id}) }}" class="content-card-edit" aria-label="Modifier le chapitre {{ chapitre.number }}">
                                                         <i class="fa-solid fa-pen" aria-hidden="true"></i>
                                                         <span class="visually-hidden">Modifier</span>
@@ -144,9 +164,17 @@
                         {% else %}
                             <div class="episodes-timeline-list">
                                 {% for tome in tomes %}
+                                    {% set linkedDiaporamas = tome_diaporamas[tome.id]|default([]) %}
                                     <div class="manga-timeline-entry">
                                         <span class="manga-timeline-node" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
-                                        <article class="episode-figma-card">
+                                        <article class="episode-figma-card{{ linkedDiaporamas|length == 1 ? ' has-diaporama-link' : '' }}">
+                                            {% if linkedDiaporamas|length == 1 %}
+                                                <a
+                                                    href="{{ path('app_diaporama_show', {id: linkedDiaporamas[0].id}) }}"
+                                                    class="card-diaporama-overlay"
+                                                    aria-label="Voir le diaporama {{ linkedDiaporamas[0].title }} lié au tome {{ tome.number }}"
+                                                ></a>
+                                            {% endif %}
                                             <div class="card-media-wrap"><img src="{{ tome.coverTomeUrl }}" alt="Miniature du tome {{ tome.number }}" class="card-banner"></div>
                                             <div class="card-content-wrap">
                                                 <div class="card-meta-line">
@@ -157,6 +185,18 @@
                                                 <p class="card-episode-desc">{{ tome.synopsis }}</p>
                                                 <div class="content-card-footer">
                                                     <span class="content-card-spoiler">{{ tome.spoilerLevel.value|upper }}</span>
+                                                    {% if linkedDiaporamas|length == 1 %}
+                                                        <span class="card-diaporama-hint" aria-hidden="true">Voir le diaporama</span>
+                                                    {% elseif linkedDiaporamas|length > 1 %}
+                                                        <details class="card-diaporama-list">
+                                                            <summary>Voir les diaporamas ({{ linkedDiaporamas|length }})</summary>
+                                                            <ul>
+                                                                {% for diaporama in linkedDiaporamas %}
+                                                                    <li><a href="{{ path('app_diaporama_show', {id: diaporama.id}) }}">{{ diaporama.title }}</a></li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                        </details>
+                                                    {% endif %}
                                                     <a href="{{ path('app_forms_tome_edit', {id: tome.id}) }}" class="content-card-edit" aria-label="Modifier le tome {{ tome.number }}">
                                                         <i class="fa-solid fa-pen" aria-hidden="true"></i>
                                                         <span class="visually-hidden">Modifier</span>

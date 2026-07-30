@@ -367,6 +367,22 @@ body {
 	position: relative;
 }
 
+.episode-figma-card.has-diaporama-link {
+	cursor: pointer;
+}
+
+.card-diaporama-overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	border-radius: inherit;
+}
+
+.card-diaporama-overlay:focus-visible {
+	outline: 3px solid var(--manga-gold);
+	outline-offset: -3px;
+}
+
 .card-media-wrap {
 	width: 100%;
 	height: 100%;
@@ -471,10 +487,50 @@ body {
 }
 
 .content-card-edit {
+	position: relative;
+	z-index: 2;
 	color: var(--manga-gold);
 	font-size: 12px;
 	font-weight: 700;
 	text-decoration: none;
+}
+
+.card-diaporama-hint,
+.card-diaporama-list {
+	position: relative;
+	z-index: 2;
+	color: var(--manga-gold);
+	font-size: 10px;
+	font-weight: 700;
+}
+
+.card-diaporama-hint {
+	pointer-events: none;
+}
+
+.card-diaporama-list summary {
+	cursor: pointer;
+	overflow-wrap: anywhere;
+}
+
+.card-diaporama-list ul {
+	margin: 6px 0 0;
+	padding-left: 16px;
+}
+
+.card-diaporama-list li + li {
+	margin-top: 4px;
+}
+
+.card-diaporama-list a {
+	color: var(--manga-gold);
+	text-decoration: none;
+	overflow-wrap: anywhere;
+}
+
+.card-diaporama-list a:hover,
+.card-diaporama-list a:focus-visible {
+	text-decoration: underline;
 }
 
 .content-card-edit:hover,

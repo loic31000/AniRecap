@@ -234,6 +234,74 @@ body {
     flex-direction: column;
 }
 
+.episode-figma-card.has-diaporama-link {
+    cursor: pointer;
+}
+
+.card-diaporama-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+}
+
+.card-diaporama-overlay:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: -3px;
+}
+
+.card-actions {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+    pointer-events: none;
+}
+
+.card-edit-link,
+.card-diaporama-list {
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
+}
+
+.card-edit-link,
+.card-diaporama-list a,
+.card-diaporama-list summary,
+.card-diaporama-hint {
+    color: var(--gold);
+    font-size: 0.75rem;
+}
+
+.card-edit-link,
+.card-diaporama-list a {
+    text-decoration: none;
+}
+
+.card-edit-link:hover,
+.card-edit-link:focus-visible,
+.card-diaporama-list a:hover,
+.card-diaporama-list a:focus-visible {
+    text-decoration: underline;
+}
+
+.card-diaporama-list summary {
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.card-diaporama-list ul {
+    margin: 6px 0 0;
+    padding-left: 18px;
+}
+
+.card-diaporama-list li + li {
+    margin-top: 4px;
+}
+
 .card-media-wrap {
     width: 100%;
     aspect-ratio: 16 / 7;
