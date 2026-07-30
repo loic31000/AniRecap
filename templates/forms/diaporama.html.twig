@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ajouter une scène Manga{% endblock %}
+{% block title %}Ajouter un diaporama{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -9,15 +9,15 @@
 
 {% block body %}
     <header class="synopsis-editor-hero">
-        <a href="{{ diaporama ? path('app_diaporama_show', {id: diaporama.id}) : path('app_forms_index') }}" aria-label="Retour">‹</a>
-        <h1>Ajouter une Scène Manga</h1>
+        <a href="{{ path('app_forms_index') }}" aria-label="Retour aux formulaires">‹</a>
+        <h1>Ajouter un Diaporama</h1>
     </header>
 
     <main class="forms-page forms-page--editor">
         <div class="forms-shell synopsis-editor">
             <header class="synopsis-editor__intro">
-                <h2>ÉDITER LA SCÈNE</h2>
-                <p>{{ diaporama ? diaporama.title ~ ' — ajoutez une nouvelle scène.' : 'Choisissez exclusivement le tome ou le chapitre parent de la première scène.' }}</p>
+                <h2>CHRONOLOGIE DES SLIDES</h2>
+                <p>Créez un diaporama immersif. Le type choisi sera définitif.</p>
             </header>
 
             {% for label, messages in app.flashes %}
@@ -26,7 +26,7 @@
                 {% endfor %}
             {% endfor %}
 
-            {{ form_start(form, {attr: {enctype: 'multipart/form-data', class: 'synopsis-form', 'data-controller': 'manga-scene-target'}}) }}
+            {{ form_start(form, {attr: {enctype: 'multipart/form-data', class: 'synopsis-form'}}) }}
                 {% if form.vars.submitted and not form.vars.valid %}
                     <section class="form-error-summary" role="alert">
                         <h2>Vérifiez les informations suivantes :</h2>
@@ -40,23 +40,19 @@
                     </section>
                 {% endif %}
 
+                {{ form_row(form.sourceType) }}
+                {{ form_row(form.title) }}
                 <div class="synopsis-upload-field">
                     {{ form_label(form.image) }}
                     <label class="synopsis-upload-zone" for="{{ form.image.vars.id }}">
                         <strong>Cliquez pour importer</strong>
-                        <small>PNG ou JPG, format 16:9 recommandé</small>
+                        <small>PNG ou JPG, 2 Mo maximum</small>
                     </label>
                     {{ form_widget(form.image, {attr: {class: 'synopsis-upload-input'}}) }}
                     {{ form_errors(form.image) }}
                 </div>
-                {{ form_row(form.targetType) }}
-                <div class="scene-manga-targets">
-                    <div data-manga-scene-target-target="tome">{{ form_row(form.tomeId) }}</div>
-                    <div data-manga-scene-target-target="chapitre">{{ form_row(form.chapitreId) }}</div>
-                </div>
-                {{ form_row(form.title) }}
                 {{ form_row(form.content) }}
-                {{ form_row(form.spoilerLevel) }}
+                {{ form_row(form.categories) }}
                 <div class="synopsis-save-bar">{{ form_widget(form.save) }}</div>
             {{ form_end(form) }}
         </div>

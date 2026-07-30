@@ -50,6 +50,18 @@ class ChapitreRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * @return Chapitre[]
+     */
+    public function findOwnedForSceneSelection(User $owner): array
+    {
+        return $this->createOwnedQueryBuilder($owner)
+            ->orderBy('m.title', 'ASC')
+            ->addOrderBy('c.number', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function numberExistsForManga(Manga $manga, int $number, ?int $excludedId = null): bool
     {
         $queryBuilder = $this->createQueryBuilder('c')

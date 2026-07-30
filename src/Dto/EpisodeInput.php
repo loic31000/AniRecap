@@ -79,4 +79,19 @@ final class EpisodeInput
 
     #[Assert\NotNull(message: 'Choisissez un niveau de spoiler.')]
     public ?SpoilerLevel $spoilerLevel = SpoilerLevel::Aucun;
+
+    #[Assert\NotBlank(message: 'Saisissez le timecode de début.', groups: ['create'])]
+    #[Assert\Regex(
+        pattern: '/\A(?:\d{1,2}:)?[0-5]\d:[0-5]\d\z/',
+        message: 'Utilisez le format MM:SS ou HH:MM:SS.',
+        groups: ['create'],
+    )]
+    public ?string $startTimecode = null;
+
+    #[Assert\Regex(
+        pattern: '/\A(?:\d{1,2}:)?[0-5]\d:[0-5]\d\z/',
+        message: 'Utilisez le format MM:SS ou HH:MM:SS.',
+        groups: ['create'],
+    )]
+    public ?string $endTimecode = null;
 }

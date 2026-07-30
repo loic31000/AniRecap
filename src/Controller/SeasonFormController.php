@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Form\SeasonType;
 use App\Repository\SeasonRepository;
 use App\Repository\EpisodeRepository;
+use App\Repository\DiaporamaRepository;
 use App\Service\SynopsisImageUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -160,6 +161,7 @@ final class SeasonFormController extends AbstractController
         int $id,
         SeasonRepository $seasonRepository,
         EpisodeRepository $episodeRepository,
+        DiaporamaRepository $diaporamaRepository,
     ): Response
     {
         $user = $this->requireUser();
@@ -168,9 +170,16 @@ final class SeasonFormController extends AbstractController
             throw $this->createNotFoundException();
         }
 
+        $episodes = $episodeRepository->findOwnedBySeason($season, $user);
+        $episodeIds = array_map(
+            static fn ($episode): int => (int) $episode->getId(),
+            $episodes,
+        );
+
         return $this->render('season/private_show.html.twig', [
             'season' => $season,
-            'episodes' => $episodeRepository->findOwnedBySeason($season, $user),
+            'episodes' => $episodes,
+            'episode_diaporamas' => $diaporamaRepository->findOwnedLinksForEpisodes($episodeIds, $user),
         ]);
     }
 

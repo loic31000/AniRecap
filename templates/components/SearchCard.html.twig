@@ -2,6 +2,7 @@
 {% set currentType = filters is defined ? filters.type|default('all') : app.request.query.get('type', 'all') %}
 {% set currentGenre = filters is defined ? filters.genre|default('') : app.request.query.get('genre', '') %}
 {% set currentYear = filters is defined ? filters.annee|default('') : app.request.query.get('annee', '') %}
+{% set searchActionRoute = actionRoute|default('app_catalogue') %}
 
 {# Trouver le nom du genre sélectionné pour l'afficher sur le bouton et le badge #}
 {% set activeGenreName = 'Genre' %}
@@ -13,7 +14,7 @@
 
 <section class="search-card">
     {# Formulaire principal contenant tous les filtres sous forme de champs cachés #}
-    <form class="search-form" method="get" action="{{ path('app_catalogue') }}" id="catalogue-filters-form">
+    <form class="search-form" method="get" action="{{ path(searchActionRoute) }}" id="catalogue-filters-form">
         <input type="hidden" name="type" id="filter-type" value="{{ currentType }}">
         <input type="hidden" name="genre" id="filter-genre" value="{{ currentGenre }}">
         <input type="hidden" name="annee" id="filter-annee" value="{{ currentYear }}">

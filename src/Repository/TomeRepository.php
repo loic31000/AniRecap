@@ -50,6 +50,18 @@ class TomeRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * @return Tome[]
+     */
+    public function findOwnedForSceneSelection(User $owner): array
+    {
+        return $this->createOwnedQueryBuilder($owner)
+            ->orderBy('m.title', 'ASC')
+            ->addOrderBy('t.number', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function numberExistsForManga(Manga $manga, int $number, ?int $excludedId = null): bool
     {
         $queryBuilder = $this->createQueryBuilder('t')

@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Dto\EpisodeInput;
+use App\Entity\Diaporama;
 use App\Entity\Episode;
 use App\Entity\Season;
+use App\Entity\Slide;
 use App\Entity\User;
 use App\Form\EpisodeType;
 use App\Repository\EpisodeRepository;
@@ -53,40 +55,24 @@ final class EpisodeFormController extends AbstractController
             if ($episodeRepository->numberExistsForSeason($season, $input->number)) {
                 $form->get('number')->addError(new FormError('Ce numéro d’épisode existe déjà dans cette saison.'));
             } else {
-                $filename = null;
-                $episode = new Episode();
+                $start = $this->parseTimecode($input->startTimecode);
+                $end = $input->endTimecode !== null && $input->endTimecode !== ''
+                    ? $this->parseTimecode($input->endTimecode)
+                    : null;
 
-                try {
-                    if (!$input->image instanceof UploadedFile) {
-                        throw new \RuntimeException('La miniature est obligatoire.');
-                    }
-
-                    $filename = $imageUploader->store($input->image);
-                    $coverUrl = $this->generateUrl('app_forms_synopsis_image', ['filename' => $filename]);
-
-                    $entityManager->wrapInTransaction(function (EntityManagerInterface $entityManager) use ($episode, $season, $user, $input, $coverUrl): void {
-                        $episode
-                            ->setSeason($season)
-                            ->setUser($user);
-                        $this->applyInput($episode, $input, $coverUrl);
-                        $entityManager->persist($episode);
-                    });
-                } catch (\Throwable) {
-                    if ($filename !== null) {
-                        $imageUploader->remove($filename);
-                    }
-
-                    $this->addFlash('error', 'L’épisode n’a pas pu être enregistré. Veuillez réessayer.');
-
-                    return $this->redirectToRoute('app_forms_episode_create', ['seasonId' => $season->getId()]);
+                if ($end !== null && $end < $start) {
+                    $form->get('endTimecode')->addError(new FormError('Le timecode de fin doit être supérieur ou égal au début.'));
+                } else {
+                    return $this->createEpisodeWithDiaporama(
+                        $season,
+                        $user,
+                        $input,
+                        $start,
+                        $end,
+                        $entityManager,
+                        $imageUploader,
+                    );
                 }
-
-                $this->addFlash('success', 'L’épisode a été créé avec succès.');
-
-                return $this->redirectToRoute('app_private_season_show', [
-                    'id' => $season->getId(),
-                    '_fragment' => 'episodes',
-                ]);
             }
         }
 
@@ -96,6 +82,84 @@ final class EpisodeFormController extends AbstractController
             'is_edit' => false,
             'current_cover_url' => null,
         ]);
+    }
+
+    private function createEpisodeWithDiaporama(
+        Season $season,
+        User $user,
+        EpisodeInput $input,
+        int $start,
+        ?int $end,
+        EntityManagerInterface $entityManager,
+        SynopsisImageUploader $imageUploader,
+    ): Response {
+        $filename = null;
+        $episode = new Episode();
+        $diaporama = new Diaporama();
+        $slide = new Slide();
+
+        try {
+            if (!$input->image instanceof UploadedFile) {
+                throw new \RuntimeException('L’image de la première scène est obligatoire.');
+            }
+
+            $filename = $imageUploader->store($input->image);
+            $entityManager->wrapInTransaction(function (EntityManagerInterface $entityManager) use (
+                $episode,
+                $diaporama,
+                $slide,
+                $season,
+                $user,
+                $input,
+                $filename,
+                $start,
+                $end,
+            ): void {
+                $episode
+                    ->setSeason($season)
+                    ->setUser($user);
+                $this->applyInput($episode, $input, null);
+
+                $diaporama
+                    ->setTitle($input->title)
+                    ->setContent($input->description)
+                    ->setSourceType(Diaporama::SOURCE_ANIME)
+                    ->setUser($user);
+
+                $slide
+                    ->setDiaporama($diaporama)
+                    ->setEpisode($episode)
+                    ->setTitle($input->title)
+                    ->setContent($input->description)
+                    ->setImageFilename($filename)
+                    ->setPosition(1)
+                    ->setSpoilerLevel($input->spoilerLevel)
+                    ->setStartTimecodeSeconds($start)
+                    ->setEndTimecodeSeconds($end);
+
+                $entityManager->persist($episode);
+                $entityManager->persist($diaporama);
+                $entityManager->persist($slide);
+                $entityManager->flush();
+
+                $episode->setCoverEpisodeUrl($this->generateUrl('app_diaporama_slide_image', [
+                    'diaporamaId' => $diaporama->getId(),
+                    'slideId' => $slide->getId(),
+                ]));
+            });
+        } catch (\Throwable) {
+            if ($filename !== null) {
+                $imageUploader->remove($filename);
+            }
+
+            $this->addFlash('error', 'L’épisode et son diaporama n’ont pas pu être enregistrés. Veuillez réessayer.');
+
+            return $this->redirectToRoute('app_forms_episode_create', ['seasonId' => $season->getId()]);
+        }
+
+        $this->addFlash('success', 'L’épisode et son diaporama ont été créés avec succès.');
+
+        return $this->redirectToRoute('app_diaporama_show', ['id' => $diaporama->getId()]);
     }
 
     #[Route(
@@ -225,5 +289,14 @@ final class EpisodeFormController extends AbstractController
         $input->categories = $episode->getCategorie()->toArray();
 
         return $input;
+    }
+
+    private function parseTimecode(string $timecode): int
+    {
+        $parts = array_map('intval', explode(':', $timecode));
+
+        return count($parts) === 2
+            ? ($parts[0] * 60) + $parts[1]
+            : ($parts[0] * 3600) + ($parts[1] * 60) + $parts[2];
     }
 }

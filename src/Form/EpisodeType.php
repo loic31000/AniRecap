@@ -75,10 +75,24 @@ final class EpisodeType extends AbstractType
                 'choice_value' => static fn (?SpoilerLevel $level): string => $level?->value ?? '',
                 'expanded' => true,
                 'invalid_message' => 'Choisissez un niveau de spoiler valide.',
-            ])
-            ->add('save', SubmitType::class, [
-                'label' => 'Sauvegarder',
             ]);
+
+        if (!$options['is_edit']) {
+            $builder
+                ->add('startTimecode', TextType::class, [
+                    'label' => 'Timecode de début',
+                    'attr' => ['placeholder' => '04:20 ou 01:04:20'],
+                ])
+                ->add('endTimecode', TextType::class, [
+                    'label' => 'Timecode de fin',
+                    'required' => false,
+                    'attr' => ['placeholder' => '22:01 ou 01:22:01'],
+                ]);
+        }
+
+        $builder->add('save', SubmitType::class, [
+            'label' => 'Sauvegarder',
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -105,12 +105,6 @@ final class FormsController extends AbstractController
         ]);
     }
 
-    #[Route('/formulaires/scene-saison', name: 'app_forms_season_scene', methods: ['GET'])]
-    public function seasonScene(): Response
-    {
-        return $this->render('forms/season_scene.html.twig');
-    }
-
     #[Route('/formulaires/synopsis-manga', name: 'app_forms_manga_synopsis', methods: ['GET', 'POST'])]
     public function mangaSynopsis(
         Request $request,
@@ -223,12 +217,6 @@ final class FormsController extends AbstractController
         }
 
         return $this->file($path, null, ResponseHeaderBag::DISPOSITION_INLINE);
-    }
-
-    #[Route('/formulaires/scene-manga', name: 'app_forms_manga_scene', methods: ['GET'])]
-    public function mangaScene(): Response
-    {
-        return $this->render('forms/manga_scene.html.twig');
     }
 
     #[Route('/formulaires/personnage', name: 'app_forms_character', methods: ['GET'])]

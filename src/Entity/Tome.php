@@ -66,10 +66,10 @@ class Tome implements Ownable
     private Collection $character;
 
     /**
-     * @var Collection<int, Diaporama>
+     * @var Collection<int, Slide>
      */
-    #[ORM\OneToMany(targetEntity: Diaporama::class, mappedBy: 'tome', orphanRemoval: true)]
-    private Collection $diaporamas;
+    #[ORM\OneToMany(targetEntity: Slide::class, mappedBy: 'tome')]
+    private Collection $slides;
 
     /**
      * @var Collection<int, Summary>
@@ -96,7 +96,7 @@ class Tome implements Ownable
         $this->summaries = new ArrayCollection();
         $this->favorites = new ArrayCollection();
         $this->spoilerPreferences = new ArrayCollection();
-        $this->diaporamas = new ArrayCollection();
+        $this->slides = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -290,28 +290,28 @@ class Tome implements Ownable
     }
 
     /**
-     * @return Collection<int, Diaporama>
+     * @return Collection<int, Slide>
      */
-    public function getDiaporamas(): Collection
+    public function getSlides(): Collection
     {
-        return $this->diaporamas;
+        return $this->slides;
     }
 
-    public function addDiaporama(Diaporama $diaporama): static
+    public function addSlide(Slide $slide): static
     {
-        if (!$this->diaporamas->contains($diaporama)) {
-            $this->diaporamas->add($diaporama);
-            $diaporama->setTome($this);
+        if (!$this->slides->contains($slide)) {
+            $this->slides->add($slide);
+            $slide->setTome($this);
         }
 
         return $this;
     }
 
-    public function removeDiaporama(Diaporama $diaporama): static
+    public function removeSlide(Slide $slide): static
     {
-        if ($this->diaporamas->removeElement($diaporama)) {
-            if ($diaporama->getTome() === $this) {
-                $diaporama->setTome(null);
+        if ($this->slides->removeElement($slide)) {
+            if ($slide->getTome() === $this) {
+                $slide->setTome(null);
             }
         }
 

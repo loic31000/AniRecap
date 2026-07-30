@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Repository\MangaRepository;
 use App\Repository\TomeRepository;
 use App\Repository\ChapitreRepository;
+use App\Repository\DiaporamaRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -20,6 +21,7 @@ final class MangaController extends AbstractController
         MangaRepository $mangaRepository,
         TomeRepository $tomeRepository,
         ChapitreRepository $chapitreRepository,
+        DiaporamaRepository $diaporamaRepository,
     ): Response
     {
         $user = $this->getUser();
@@ -33,12 +35,18 @@ final class MangaController extends AbstractController
         }
 
         $isOwnerPrivate = !$manga->isPublic() && $manga->getOwner()?->getId() === $user->getId();
+        $tomes = $isOwnerPrivate ? $tomeRepository->findOwnedByManga($manga, $user) : [];
+        $chapitres = $isOwnerPrivate ? $chapitreRepository->findOwnedByManga($manga, $user) : [];
+        $tomeIds = array_map(static fn ($tome): int => (int) $tome->getId(), $tomes);
+        $chapitreIds = array_map(static fn ($chapitre): int => (int) $chapitre->getId(), $chapitres);
 
         return $this->render('manga/index.html.twig', [
             'manga' => $manga,
             'is_owner_private' => $isOwnerPrivate,
-            'tomes' => $isOwnerPrivate ? $tomeRepository->findOwnedByManga($manga, $user) : [],
-            'chapitres' => $isOwnerPrivate ? $chapitreRepository->findOwnedByManga($manga, $user) : [],
+            'tomes' => $tomes,
+            'chapitres' => $chapitres,
+            'tome_diaporamas' => $diaporamaRepository->findOwnedLinksForTomes($tomeIds, $user),
+            'chapitre_diaporamas' => $diaporamaRepository->findOwnedLinksForChapitres($chapitreIds, $user),
             'characters' => $manga->getCharacters()->toArray(),
         ]);
     }

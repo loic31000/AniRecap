@@ -5,6 +5,7 @@
 
 {% block stylesheets %}
 	{{ parent() }}
+	<meta name="turbo-cache-control" content="no-cache">
 	<link rel="stylesheet" href="{{ asset('css/catalogue.css') }}">
 	<link rel="stylesheet" href="{{ asset('css/searchCard.css') }}">
 	<link rel="stylesheet" href="{{ asset('css/oeuvreCard.css') }}">
@@ -12,9 +13,7 @@
 {% endblock %}
 
 {% block body %}
-
-
-	<div class="catalogue-page">
+	<div class="catalogue-page catalogue-page--global" id="catalogue-top">
 		{{ component('Header', { backRoute: 'app_home' }) }}
 
 		<main class="catalogue-shell">
@@ -22,50 +21,27 @@
 
 				<a href="{{ path('app_home') }}" class="retour-link">
 					<i class="fa-solid fa-arrow-left"></i>
-					Retour home
+					Retour à l’accueil
 				</a>
 
 				<h1 class="page-title">
 					<span>カタログ Catalogue</span>
 				</h1>
 
-				<twig:SearchCard genres="{{ genres }}" filters="{{ filters }}" />
+				<twig:SearchCard :genres="genres" :filters="filters"/>
 
 				<h2 class="section-title">
 					<span>カタログ Catalogue</span>
 				</h2>
 
 				<twig:OeuvreCard :results="results"/>
-			</main>
 
+				<a class="catalogue-scroll-top" href="#catalogue-top" aria-label="Retour en haut de la page">
+					<i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+				</a>
+			</div>
+		</main>
 
-			{{ component('Navbar', { active: 'catalogue' }) }}
-		</div>
-	{% endblock %}
-
-	{% block javascripts %}
-		{{ parent() }}
-		 <script>
-						        document.addEventListener('DOMContentLoaded', () => {
-						            const btn = document.getElementById('scrollTopBtn');
-						
-						            const toggleButton = () => {
-						                if (window.scrollY > 300) {
-						                    btn.classList.add('is-visible');
-						                } else {
-						                    btn.classList.remove('is-visible');
-						                }
-						            };
-						
-						            window.addEventListener('scroll', toggleButton);
-						            toggleButton();
-						
-						            btn.addEventListener('click', () => {
-						                window.scrollTo({
-						                    top: 0,
-						                    behavior: 'smooth'
-						                });
-						            });
-						        });
-						    </script>
-	{% endblock %}
+		{{ component('Navbar', { active: 'catalogue' }) }}
+	</div>
+{% endblock %}

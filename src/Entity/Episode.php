@@ -66,10 +66,10 @@ class Episode implements Ownable
     private Collection $character;
 
     /**
-     * @var Collection<int, Diaporama>
+     * @var Collection<int, Slide>
      */
-    #[ORM\OneToMany(targetEntity: Diaporama::class, mappedBy: 'episode', orphanRemoval: true)]
-    private Collection $diaporamas;
+    #[ORM\OneToMany(targetEntity: Slide::class, mappedBy: 'episode')]
+    private Collection $slides;
 
     /**
      * @var Collection<int, Summary>
@@ -93,7 +93,7 @@ class Episode implements Ownable
     {
         $this->categorie = new ArrayCollection();
         $this->character = new ArrayCollection();
-        $this->diaporamas = new ArrayCollection();
+        $this->slides = new ArrayCollection();
         $this->summaries = new ArrayCollection();
         $this->favorites = new ArrayCollection();
         $this->spoilerPreferences = new ArrayCollection();
@@ -282,29 +282,28 @@ class Episode implements Ownable
     }
 
     /**
-     * @return Collection<int, Diaporama>
+     * @return Collection<int, Slide>
      */
-    public function getDiaporamas(): Collection
+    public function getSlides(): Collection
     {
-        return $this->diaporamas;
+        return $this->slides;
     }
 
-    public function addDiaporama(Diaporama $diaporama): static
+    public function addSlide(Slide $slide): static
     {
-        if (!$this->diaporamas->contains($diaporama)) {
-            $this->diaporamas->add($diaporama);
-            $diaporama->setEpisode($this);
+        if (!$this->slides->contains($slide)) {
+            $this->slides->add($slide);
+            $slide->setEpisode($this);
         }
 
         return $this;
     }
 
-    public function removeDiaporama(Diaporama $diaporama): static
+    public function removeSlide(Slide $slide): static
     {
-        if ($this->diaporamas->removeElement($diaporama)) {
-            // set the owning side to null (unless already changed)
-            if ($diaporama->getEpisode() === $this) {
-                $diaporama->setEpisode(null);
+        if ($this->slides->removeElement($slide)) {
+            if ($slide->getEpisode() === $this) {
+                $slide->setEpisode(null);
             }
         }
 

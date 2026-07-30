@@ -133,3 +133,111 @@ button {
     text-shadow: 0px 8px 8px #000;
   }
 }
+
+/* Présentation du Catalogue global, fidèle à la maquette mobile. */
+.catalogue-page--global .catalogue-content {
+  width: min(100%, 430px);
+  padding: 10px 16px 20px;
+}
+
+.catalogue-page--global .retour-link {
+  margin: 0 0 30px;
+  color: var(--gold);
+  font-size: 12px;
+}
+
+.catalogue-page--global .page-title {
+  margin-bottom: 28px;
+  font-size: clamp(28px, 8vw, 36px);
+}
+
+.catalogue-page--global .search-card {
+  margin-bottom: 12px;
+  border-radius: 8px;
+}
+
+.catalogue-page--global .active-filters {
+  margin-bottom: 48px;
+}
+
+.catalogue-page--global .section-title {
+  margin-bottom: 18px;
+  padding-bottom: 7px;
+  border-color: var(--gold);
+}
+
+.catalogue-page--global .oeuvre-list {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 22px;
+  padding-inline: 12px;
+}
+
+.catalogue-page--global .oeuvre-card {
+  border-radius: 12px;
+}
+
+.catalogue-page--global .oeuvre-thumb {
+  height: auto;
+  aspect-ratio: 16 / 7;
+}
+
+.catalogue-page--global .oeuvre-body {
+  padding: 10px 10px 12px;
+}
+
+.catalogue-page--global .oeuvre-meta {
+  margin-bottom: 8px;
+}
+
+.catalogue-page--global .badge-type {
+  min-height: 18px;
+  padding: 2px 7px;
+  font-size: 9px;
+}
+
+.catalogue-page--global .oeuvre-title {
+  font-size: 15px;
+}
+
+.catalogue-page--global .oeuvre-subtitle {
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+
+.catalogue-page--global .oeuvre-date,
+.catalogue-page--global .oeuvre-votes {
+  font-size: 9px;
+}
+
+.catalogue-page--global .oeuvre-votes {
+  padding: 2px 8px;
+}
+
+.catalogue-scroll-top {
+  width: 32px;
+  height: 32px;
+  margin: 34px auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  color: var(--gold);
+  background: rgba(10, 18, 32, 0.9);
+  box-shadow: 0 4px 12px #000;
+}
+
+.catalogue-scroll-top:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+
+@media (max-width: 389px) {
+  .catalogue-page--global .catalogue-content {
+    padding-inline: 12px;
+  }
+
+  .catalogue-page--global .oeuvre-list {
+    padding-inline: 8px;
+  }
+}

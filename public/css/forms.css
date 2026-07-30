@@ -198,6 +198,20 @@
     text-decoration: none;
 }
 
+.scene-timecodes,
+.scene-manga-targets {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+@media (max-width: 560px) {
+    .scene-timecodes,
+    .scene-manga-targets {
+        grid-template-columns: 1fr;
+    }
+}
+
 .synopsis-editor-hero {
     position: sticky;
     top: 0;

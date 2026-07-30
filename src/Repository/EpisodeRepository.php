@@ -49,6 +49,19 @@ class EpisodeRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * @return Episode[]
+     */
+    public function findOwnedForSceneSelection(User $owner): array
+    {
+        return $this->createOwnedQueryBuilder($owner)
+            ->orderBy('a.title', 'ASC')
+            ->addOrderBy('s.number', 'ASC')
+            ->addOrderBy('e.number', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function numberExistsForSeason(Season $season, int $number, ?int $excludedEpisodeId = null): bool
     {
         $queryBuilder = $this->createQueryBuilder('e')

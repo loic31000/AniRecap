@@ -5,6 +5,7 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/season.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 {% endblock %}
 
 {% block body %}
@@ -62,7 +63,15 @@
                 {% else %}
                     <div class="episodes-timeline-list">
                         {% for episode in episodes %}
-                            <article class="episode-figma-card">
+                            {% set linkedDiaporamas = episode_diaporamas[episode.id]|default([]) %}
+                            <article class="episode-figma-card{{ linkedDiaporamas|length == 1 ? ' has-diaporama-link' : '' }}">
+                                {% if linkedDiaporamas|length == 1 %}
+                                    <a
+                                        href="{{ path('app_diaporama_show', {id: linkedDiaporamas[0].id}) }}"
+                                        class="card-diaporama-overlay"
+                                        aria-label="Voir le diaporama {{ linkedDiaporamas[0].title }} lié à l’épisode {{ episode.number }}"
+                                    ></a>
+                                {% endif %}
                                 <div class="card-media-wrap">
                                     <img src="{{ episode.coverEpisodeUrl }}" alt="Miniature de l’épisode {{ episode.number }}" class="card-banner">
                                 </div>
@@ -73,7 +82,23 @@
                                     </div>
                                     <h3 class="card-episode-title">{{ episode.title }}</h3>
                                     <p class="card-episode-desc">{{ episode.synopsis }}</p>
-                                    <a href="{{ path('app_forms_episode_edit', {id: episode.id}) }}">Modifier</a>
+                                    <div class="card-actions">
+                                        {% if linkedDiaporamas|length == 1 %}
+                                            <span class="card-diaporama-hint" aria-hidden="true">Voir le diaporama</span>
+                                        {% elseif linkedDiaporamas|length > 1 %}
+                                            <details class="card-diaporama-list">
+                                                <summary>Voir les diaporamas ({{ linkedDiaporamas|length }})</summary>
+                                                <ul>
+                                                    {% for diaporama in linkedDiaporamas %}
+                                                        <li>
+                                                            <a href="{{ path('app_diaporama_show', {id: diaporama.id}) }}">{{ diaporama.title }}</a>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </details>
+                                        {% endif %}
+                                        <a href="{{ path('app_forms_episode_edit', {id: episode.id}) }}" class="card-edit-link">Modifier</a>
+                                    </div>
                                 </div>
                             </article>
                         {% endfor %}
