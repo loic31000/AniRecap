@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[Assert\Callback('validateRanges')]
 final class MangaSynopsisInput
 {
-    #[Assert\NotNull(message: 'Veuillez sélectionner une miniature.')]
+    #[Assert\NotNull(message: 'Veuillez sélectionner une miniature.', groups: ['create'])]
     #[Assert\Image(
         maxSize: '2M',
         mimeTypes: ['image/png', 'image/jpeg'],

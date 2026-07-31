@@ -7,6 +7,7 @@ use App\Entity\Anime;
 use App\Entity\Categorie;
 use App\Entity\User;
 use App\Repository\AnimeRepository;
+use App\Repository\CategorieRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -52,7 +53,14 @@ final class SeasonType extends AbstractType
                 'choice_label' => 'name',
                 'label' => 'Catégories',
                 'multiple' => true,
+                'expanded' => true,
+                'query_builder' => static fn (CategorieRepository $repository) => $repository->createAlphabeticalQueryBuilder(),
+                'help' => 'Choisissez entre une et cinq catégories.',
                 'invalid_message' => 'Une catégorie sélectionnée n’existe pas.',
+                'choice_attr' => static fn () => [
+                    'data-category-selector-target' => 'checkbox',
+                    'data-action' => 'change->category-selector#change',
+                ],
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description de la saison',

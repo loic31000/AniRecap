@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Dto\MangaSynopsisInput;
 use App\Entity\Categorie;
+use App\Repository\CategorieRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -23,7 +24,10 @@ final class MangaSynopsisType extends AbstractType
         $builder
             ->add('image', FileType::class, [
                 'label' => 'Miniature du synopsis',
-                'help' => 'PNG ou JPG, 2 Mio maximum. Format 9:16 recommandé.',
+                'required' => !$options['is_edit'],
+                'help' => $options['is_edit']
+                    ? 'Laissez vide pour conserver la miniature actuelle.'
+                    : 'PNG ou JPG, 2 Mio maximum. Format 9:16 recommandé.',
             ])
             ->add('title', TextType::class, [
                 'label' => 'Titre du manga',
@@ -34,8 +38,15 @@ final class MangaSynopsisType extends AbstractType
                 'choice_label' => 'name',
                 'label' => 'Catégories',
                 'multiple' => true,
-                'placeholder' => 'Choisissez une ou plusieurs catégories',
+                'expanded' => true,
+                'query_builder' => static fn (CategorieRepository $repository) => $repository->createAlphabeticalQueryBuilder(),
+                'help' => 'Choisissez entre une et cinq catégories.',
                 'invalid_message' => 'Une catégorie sélectionnée n’existe pas.',
+                'row_attr' => ['class' => 'synopsis-category-field'],
+                'choice_attr' => static fn () => [
+                    'data-category-selector-target' => 'checkbox',
+                    'data-action' => 'change->category-selector#change',
+                ],
             ])
             ->add('synopsis', TextareaType::class, [
                 'label' => 'Synopsis',
@@ -95,6 +106,8 @@ final class MangaSynopsisType extends AbstractType
             'data_class' => MangaSynopsisInput::class,
             'csrf_token_id' => 'manga_synopsis_create',
             'csrf_message' => 'Votre session a expiré. Rechargez la page puis réessayez.',
+            'is_edit' => false,
         ]);
+        $resolver->setAllowedTypes('is_edit', 'bool');
     }
 }

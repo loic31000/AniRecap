@@ -475,6 +475,187 @@
     background: #071526;
 }
 
+.category-selector {
+    position: relative;
+    margin-bottom: 28px;
+}
+
+.category-selector > label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.category-selector__trigger {
+    display: none;
+    width: 100%;
+    min-height: 58px;
+    padding: 14px 18px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    border: 1px solid #e8a226;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #000;
+    color: #efa92f;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 600;
+    text-align: left;
+    text-shadow: none;
+    box-shadow:
+        0 4px 7px rgba(0, 0, 0, 0.75),
+        0 0 0 1px rgba(27, 73, 116, 0.4);
+}
+
+.category-selector__trigger > span:first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.category-selector__chevron {
+    flex: 0 0 auto;
+    font-size: 1.25rem;
+    line-height: 1;
+    transition: transform 0.18s ease;
+}
+
+.category-selector--open .category-selector__chevron {
+    transform: rotate(180deg);
+}
+
+.category-selector__trigger:focus-visible {
+    outline: 3px solid rgba(239, 169, 47, 0.48);
+    outline-offset: 3px;
+}
+
+.category-selector__panel {
+    display: block;
+    width: 100%;
+    max-height: min(55dvh, 312px);
+    padding: 0;
+    border: 1px solid #e8a226;
+    border-radius: 7px;
+    overflow: hidden;
+    background: #06101d;
+    color-scheme: dark;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.72);
+}
+
+.category-selector--enhanced {
+    z-index: 1;
+}
+
+.category-selector--enhanced .category-selector__trigger {
+    display: flex;
+}
+
+.category-selector--enhanced .category-selector__panel {
+    position: absolute;
+    z-index: 100;
+    top: calc(100% - 18px);
+    left: 0;
+    display: none;
+    max-height: var(--category-panel-max-height, min(55dvh, 312px));
+}
+
+.category-selector--enhanced.category-selector--open {
+    z-index: 110;
+}
+
+.category-selector--enhanced.category-selector--open .category-selector__panel {
+    display: block;
+}
+
+.category-selector--enhanced.category-selector--up .category-selector__panel {
+    top: auto;
+    bottom: calc(100% - 18px);
+}
+
+.category-selector__options {
+    max-height: inherit;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    scrollbar-color: #efa92f #07111f;
+}
+
+.category-selector__option {
+    position: relative;
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    border-bottom: 1px solid rgba(239, 169, 47, 0.2);
+    background: #07111f;
+    color: #fff0c9;
+}
+
+.category-selector__option:last-child {
+    border-bottom: 0;
+}
+
+.category-selector__option:hover,
+.category-selector__option:focus-within {
+    background: #173758;
+}
+
+.category-selector__option:has(input:checked) {
+    background: #102b49;
+}
+
+.category-selector__option > label {
+    display: flex;
+    min-width: 0;
+    min-height: 48px;
+    margin: 0;
+    padding: 12px 48px 12px 16px;
+    align-items: center;
+    flex: 1;
+    overflow-wrap: anywhere;
+    color: #fff0c9;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 500;
+    line-height: 1.35;
+    text-transform: none;
+    text-shadow: none;
+}
+
+.category-selector__option input[type="checkbox"] {
+    position: absolute;
+    right: 16px;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: #efa92f;
+    color-scheme: dark;
+    cursor: pointer;
+}
+
+.category-selector__option:has(input:disabled) {
+    background: #07111f;
+    opacity: 0.46;
+    cursor: not-allowed;
+}
+
+.category-selector__option input[type="checkbox"]:focus-visible {
+    outline: 3px solid #efa92f;
+    outline-offset: 2px;
+}
+
+.synopsis-current-cover {
+    display: block;
+    width: min(100%, 210px);
+    max-height: 300px;
+    margin: 0 auto 14px;
+    border: 2px solid #efa92f;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
 .synopsis-form ul {
     margin: 8px 0 0;
     padding-left: 20px;

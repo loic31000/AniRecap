@@ -69,7 +69,7 @@
 
                 {{ form_row(form.title) }}
                 {{ form_row(form.number) }}
-                {{ form_row(form.categories) }}
+                {{ include('forms/_category_selector.html.twig', { field: form.categories }) }}
                 {{ form_row(form.description) }}
 
                 <fieldset class="synopsis-fieldset synopsis-fieldset--plain">

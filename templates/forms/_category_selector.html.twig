@@ -1,0 +1,42 @@
+{% set selectedCount = field.vars.data|length %}
+
+<div
+    class="category-selector"
+    data-controller="category-selector"
+    data-category-selector-max-value="5"
+    data-action="click@window->category-selector#closeFromOutside keydown.esc@window->category-selector#closeFromEscape resize@window->category-selector#reposition"
+>
+    {{ form_label(field) }}
+    <button
+        type="button"
+        class="category-selector__trigger"
+        aria-expanded="false"
+        aria-controls="{{ field.vars.id }}_menu"
+        data-category-selector-target="trigger"
+        data-action="category-selector#toggle"
+    >
+        <span data-category-selector-target="summary">
+            {{ selectedCount > 0
+                ? selectedCount ~ ' catégorie' ~ (selectedCount > 1 ? 's' : '') ~ ' sélectionnée' ~ (selectedCount > 1 ? 's' : '') ~ ' sur 5'
+                : 'Choisir jusqu’à 5 catégories' }}
+        </span>
+        <span class="category-selector__chevron" aria-hidden="true">⌄</span>
+    </button>
+
+    <div
+        id="{{ field.vars.id }}_menu"
+        class="category-selector__panel"
+        data-category-selector-target="panel"
+    >
+        <div class="category-selector__options" data-category-selector-target="options">
+            {% for choice in field %}
+                <div class="category-selector__option">
+                    {{ form_label(choice) }}
+                    {{ form_widget(choice) }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {{ form_help(field) }}
+    {{ form_errors(field) }}
+</div>
