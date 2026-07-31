@@ -6,8 +6,12 @@ use App\Entity\Anime;
 use App\Entity\Favorite;
 use App\Entity\Manga;
 use App\Entity\User;
+use App\Repository\AnimeRepository;
 use App\Repository\CategorieRepository;
 use App\Repository\FavoriteRepository;
+use App\Repository\MangaRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,16 +21,78 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 final class FavoriteController extends AbstractController
 {
+    #[Route('/favoris/{type}/{id}/ajouter', name: 'app_favorite_add', methods: ['POST'], requirements: ['type' => 'anime|manga', 'id' => '\\d+'])]
+    public function add(
+        string $type,
+        int $id,
+        Request $request,
+        FavoriteRepository $favoriteRepository,
+        AnimeRepository $animeRepository,
+        MangaRepository $mangaRepository,
+        EntityManagerInterface $entityManager,
+    ): Response {
+        $user = $this->requireUser();
+        if (!$this->isCsrfTokenValid(sprintf('favorite_add_%s_%d', $type, $id), (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $work = $type === 'anime'
+            ? $animeRepository->findOneVisibleTo($id, $user)
+            : $mangaRepository->findOneVisibleTo($id, $user);
+        if ($work === null) {
+            throw $this->createNotFoundException('Œuvre introuvable.');
+        }
+
+        if (!$favoriteRepository->rootFavoriteExists($user, $type, $id)) {
+            $favorite = (new Favorite())->setUser($user)->setCreatedAt(new \DateTime());
+            $type === 'anime' ? $favorite->setAnime($work) : $favorite->setManga($work);
+            try {
+                $entityManager->persist($favorite);
+                $entityManager->flush();
+            } catch (UniqueConstraintViolationException) {
+                // Une requête concurrente a déjà créé le même favori : succès idempotent.
+            }
+        }
+
+        $this->addFlash('success', sprintf('« %s » a été ajouté à vos favoris.', $work->getTitle()));
+
+        return $this->redirectSafely($request);
+    }
+
+    #[Route('/favoris/{type}/{id}/retirer', name: 'app_favorite_remove', methods: ['POST'], requirements: ['type' => 'anime|manga', 'id' => '\\d+'])]
+    public function remove(
+        string $type,
+        int $id,
+        Request $request,
+        FavoriteRepository $favoriteRepository,
+        AnimeRepository $animeRepository,
+        MangaRepository $mangaRepository,
+    ): Response {
+        $user = $this->requireUser();
+        if (!$this->isCsrfTokenValid(sprintf('favorite_remove_%s_%d', $type, $id), (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $work = $type === 'anime'
+            ? $animeRepository->findOneVisibleTo($id, $user)
+            : $mangaRepository->findOneVisibleTo($id, $user);
+        if ($work === null) {
+            throw $this->createNotFoundException('Œuvre introuvable.');
+        }
+
+        $favoriteRepository->removeRootFavorites($user, $type, $id);
+        $this->addFlash('success', sprintf('« %s » a été retiré de vos favoris.', $work->getTitle()));
+
+        return $this->redirectSafely($request);
+    }
+
     #[Route('/favoris', name: 'app_favorites', methods: ['GET'])]
     public function index(
         Request $request,
         FavoriteRepository $favoriteRepository,
         CategorieRepository $categorieRepository,
     ): Response {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
+        $user = $this->requireUser();
 
         $filters = [
             'q' => trim((string) $request->query->get('q', '')),
@@ -50,6 +116,16 @@ final class FavoriteController extends AbstractController
                 $cards[$card['type'] . ':' . $card['id']] = $card;
             }
         }
+
+        $states = $favoriteRepository->findRootFavoriteStates(
+            $user,
+            array_column(array_filter($cards, static fn (array $card): bool => $card['type'] === 'anime'), 'id'),
+            array_column(array_filter($cards, static fn (array $card): bool => $card['type'] === 'manga'), 'id'),
+        );
+        foreach ($cards as &$card) {
+            $card['isFavorite'] = $states[$card['type']][$card['id']] ?? false;
+        }
+        unset($card);
 
         $availableGenres = array_map(static fn ($category): array => [
             'slug' => $category->getSlug(),
@@ -85,7 +161,7 @@ final class FavoriteController extends AbstractController
                 'cover' => $anime->getCoverAnimeUrl(),
                 'votesCount' => $anime->getVotes()->count(),
                 'isPrivate' => !$anime->isPublic(),
-                'isFavorite' => true,
+                'isFavorite' => false,
                 'category' => $categories[0]->getName() ?? null,
                 'categorySlugs' => array_map(static fn ($category): ?string => $category->getSlug(), $categories),
                 'categories' => array_map(static fn ($category): array => [
@@ -115,7 +191,7 @@ final class FavoriteController extends AbstractController
             'cover' => $manga->getCoverMangaUrl(),
             'votesCount' => $manga->getVotes()->count(),
             'isPrivate' => !$manga->isPublic(),
-            'isFavorite' => true,
+            'isFavorite' => false,
             'category' => $categories[0]->getName() ?? null,
             'categorySlugs' => array_map(static fn ($category): ?string => $category->getSlug(), $categories),
             'categories' => array_map(static fn ($category): array => [
@@ -183,5 +259,30 @@ final class FavoriteController extends AbstractController
         }
 
         return $filters['annee'] === '' || (string) $card['year'] === $filters['annee'];
+    }
+
+    private function requireUser(): User
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        return $user;
+    }
+
+    private function redirectSafely(Request $request): Response
+    {
+        $target = (string) $request->request->get('return_to', '');
+        if ($target === '' || !str_starts_with($target, '/') || str_starts_with($target, '//')) {
+            return $this->redirectToRoute('app_home');
+        }
+
+        $parts = parse_url($target);
+        if ($parts === false || isset($parts['scheme'], $parts['host'])) {
+            return $this->redirectToRoute('app_home');
+        }
+
+        return $this->redirect($target);
     }
 }

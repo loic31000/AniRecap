@@ -17,6 +17,7 @@
 
         <main class="catalogue-shell">
             <div class="catalogue-content">
+                {% include 'components/_flash_messages.html.twig' %}
                 <h1 class="page-title"><span>ホーム Home</span></h1>
 
                 <twig:SearchCard :genres="genres" :filters="filters" actionRoute="app_home"/>

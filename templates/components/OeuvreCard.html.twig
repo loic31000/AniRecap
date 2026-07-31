@@ -23,11 +23,7 @@
                         class="oeuvre-thumb-image"
                     >
                 </div>
-                {% if oeuvre.isFavorite|default(false) %}
-                    <span class="oeuvre-favorite-icon" aria-label="Œuvre favorite">
-                        <i class="fa-solid fa-star" aria-hidden="true"></i>
-                    </span>
-                {% endif %}
+                {% include 'components/_favorite_toggle.html.twig' with {oeuvre: oeuvre} only %}
 
                 <div class="oeuvre-body">
                     <div class="oeuvre-meta">

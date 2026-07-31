@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Favorite;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -110,5 +111,122 @@ class FavoriteRepository extends ServiceEntityRepository
             ->distinct()
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @param int[] $animeIds
+     * @param int[] $mangaIds
+     *
+     * @return array{anime: array<int, bool>, manga: array<int, bool>}
+     */
+    public function findRootFavoriteStates(User $user, array $animeIds, array $mangaIds): array
+    {
+        $animeIds = array_values(array_unique(array_map('intval', $animeIds)));
+        $mangaIds = array_values(array_unique(array_map('intval', $mangaIds)));
+        $states = ['anime' => [], 'manga' => []];
+
+        if ($animeIds === [] && $mangaIds === []) {
+            return $states;
+        }
+
+        $qb = $this->createRootResolutionQueryBuilder($user);
+        $conditions = $qb->expr()->orX();
+
+        if ($animeIds !== []) {
+            $conditions->add('a.id IN (:animeIds)');
+            $conditions->add('sa.id IN (:animeIds)');
+            $conditions->add('ea.id IN (:animeIds)');
+            $qb->setParameter('animeIds', $animeIds);
+        }
+
+        if ($mangaIds !== []) {
+            $conditions->add('m.id IN (:mangaIds)');
+            $conditions->add('tm.id IN (:mangaIds)');
+            $conditions->add('cm.id IN (:mangaIds)');
+            $qb->setParameter('mangaIds', $mangaIds);
+        }
+
+        /** @var Favorite[] $favorites */
+        $favorites = $qb
+            ->andWhere($conditions)
+            ->getQuery()
+            ->getResult();
+
+        foreach ($favorites as $favorite) {
+            $animeId = $favorite->getAnime()?->getId()
+                ?? $favorite->getSeason()?->getAnime()?->getId()
+                ?? $favorite->getEpisode()?->getSeason()?->getAnime()?->getId();
+            if ($animeId !== null && in_array($animeId, $animeIds, true)) {
+                $states['anime'][$animeId] = true;
+            }
+
+            $mangaId = $favorite->getManga()?->getId()
+                ?? $favorite->getTome()?->getManga()?->getId()
+                ?? $favorite->getChapitre()?->getManga()?->getId();
+            if ($mangaId !== null && in_array($mangaId, $mangaIds, true)) {
+                $states['manga'][$mangaId] = true;
+            }
+        }
+
+        return $states;
+    }
+
+    public function rootFavoriteExists(User $user, string $type, int $id): bool
+    {
+        $states = $this->findRootFavoriteStates(
+            $user,
+            $type === 'anime' ? [$id] : [],
+            $type === 'manga' ? [$id] : [],
+        );
+
+        return $states[$type][$id] ?? false;
+    }
+
+    public function removeRootFavorites(User $user, string $type, int $id): int
+    {
+        $qb = $this->createRootResolutionQueryBuilder($user)
+            ->select('f.id');
+
+        if ($type === 'anime') {
+            $qb->andWhere('(a.id = :rootId OR sa.id = :rootId OR ea.id = :rootId)');
+        } else {
+            $qb->andWhere('(m.id = :rootId OR tm.id = :rootId OR cm.id = :rootId)');
+        }
+
+        $rows = $qb
+            ->setParameter('rootId', $id)
+            ->getQuery()
+            ->getScalarResult();
+        $favoriteIds = array_map(static fn (array $row): int => (int) $row['id'], $rows);
+
+        if ($favoriteIds === []) {
+            return 0;
+        }
+
+        return $this->createQueryBuilder('favoriteToDelete')
+            ->delete()
+            ->andWhere('favoriteToDelete.id IN (:favoriteIds)')
+            ->setParameter('favoriteIds', $favoriteIds)
+            ->getQuery()
+            ->execute();
+    }
+
+    private function createRootResolutionQueryBuilder(User $user): QueryBuilder
+    {
+        return $this->createQueryBuilder('f')
+            ->leftJoin('f.anime', 'a')->addSelect('a')
+            ->leftJoin('f.season', 's')->addSelect('s')
+            ->leftJoin('s.anime', 'sa')->addSelect('sa')
+            ->leftJoin('f.episode', 'e')->addSelect('e')
+            ->leftJoin('e.season', 'es')->addSelect('es')
+            ->leftJoin('es.anime', 'ea')->addSelect('ea')
+            ->leftJoin('f.manga', 'm')->addSelect('m')
+            ->leftJoin('f.tome', 't')->addSelect('t')
+            ->leftJoin('t.manga', 'tm')->addSelect('tm')
+            ->leftJoin('f.chapitre', 'c')->addSelect('c')
+            ->leftJoin('c.manga', 'cm')->addSelect('cm')
+            ->andWhere('f.user = :favoriteOwner')
+            ->setParameter('favoriteOwner', $user)
+            ->distinct();
     }
 }

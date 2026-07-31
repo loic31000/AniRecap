@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\AnimeRepository;
 use App\Repository\MangaRepository;
 use App\Repository\CategorieRepository;
+use App\Repository\FavoriteRepository;
 use App\Entity\Anime;
 use App\Entity\Manga;
 use App\Entity\User;
@@ -20,7 +21,8 @@ final class CatalogueController extends AbstractController
         Request $request,
         AnimeRepository $animeRepository,
         MangaRepository $mangaRepository,
-        CategorieRepository $categorieRepository
+        CategorieRepository $categorieRepository,
+        FavoriteRepository $favoriteRepository,
     ): Response {
         $user = $this->getUser();
         if (!$user instanceof User) {
@@ -59,6 +61,16 @@ final class CatalogueController extends AbstractController
                 $catalogueItems[] = $this->mapManga($manga);
             }
         }
+
+        $states = $favoriteRepository->findRootFavoriteStates(
+            $user,
+            array_column(array_filter($catalogueItems, static fn (array $item): bool => $item['type'] === 'anime'), 'id'),
+            array_column(array_filter($catalogueItems, static fn (array $item): bool => $item['type'] === 'manga'), 'id'),
+        );
+        foreach ($catalogueItems as &$item) {
+            $item['isFavorite'] = $states[$item['type']][$item['id']] ?? false;
+        }
+        unset($item);
 
         return $this->render('catalogue/index.html.twig', [
             'results' => $catalogueItems,

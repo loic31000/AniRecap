@@ -16,6 +16,7 @@
         {{ component('Header', { backRoute: 'app_catalogue' }) }}
 
         <main class="favorite-shell">
+            {% include 'components/_flash_messages.html.twig' %}
             <a href="{{ path('app_catalogue') }}" class="retour-link">
                 <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
                 Retour au Catalogue
