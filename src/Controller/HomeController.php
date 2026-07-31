@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Repository\AnimeRepository;
 use App\Repository\CategorieRepository;
 use App\Repository\MangaRepository;
+use App\Repository\FavoriteRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,6 +24,7 @@ final class HomeController extends AbstractController
         AnimeRepository $animeRepository,
         MangaRepository $mangaRepository,
         CategorieRepository $categorieRepository,
+        FavoriteRepository $favoriteRepository,
     ): Response {
         $user = $this->getUser();
         if (!$user instanceof User) {
@@ -49,6 +51,8 @@ final class HomeController extends AbstractController
                 ...array_map($this->mapManga(...), $mangaRepository->searchVisibleTo($filters, $user)),
             ];
         }
+
+        $items = $this->applyFavoriteStates($items, $favoriteRepository, $user);
 
         $popular = $items;
         usort($popular, static fn (array $left, array $right): int =>
@@ -105,5 +109,20 @@ final class HomeController extends AbstractController
             'votesCount' => $manga->getVotes()->count(),
             'isPrivate' => !$manga->isPublic(),
         ];
+    }
+
+    private function applyFavoriteStates(array $items, FavoriteRepository $repository, User $user): array
+    {
+        $states = $repository->findRootFavoriteStates(
+            $user,
+            array_column(array_filter($items, static fn (array $item): bool => $item['type'] === 'anime'), 'id'),
+            array_column(array_filter($items, static fn (array $item): bool => $item['type'] === 'manga'), 'id'),
+        );
+        foreach ($items as &$item) {
+            $item['isFavorite'] = $states[$item['type']][$item['id']] ?? false;
+        }
+        unset($item);
+
+        return $items;
     }
 }

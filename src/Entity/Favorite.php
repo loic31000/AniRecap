@@ -7,6 +7,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FavoriteRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_FAVORITE_USER_ANIME', columns: ['user_id', 'anime_id'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_FAVORITE_USER_MANGA', columns: ['user_id', 'manga_id'])]
 class Favorite
 {
     #[ORM\Id]

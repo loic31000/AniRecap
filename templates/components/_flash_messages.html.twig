@@ -1,0 +1,5 @@
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="flash-message flash-{{ label }}" role="{{ label == 'error' ? 'alert' : 'status' }}">{{ message }}</div>
+    {% endfor %}
+{% endfor %}

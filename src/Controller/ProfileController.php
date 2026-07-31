@@ -32,14 +32,30 @@ final class ProfileController extends AbstractController
         }
 
         $favoritesEntities = $favoriteRepository->findByUser($current);
+        $favoriteCards = [];
+        foreach ($favoritesEntities as $favorite) {
+            $card = $this->buildFavoriteCard($favorite);
+            if ($card !== null) {
+                $favoriteCards[$card['type'] . ':' . $card['id']] = $card;
+            }
+        }
+        $states = $favoriteRepository->findRootFavoriteStates(
+            $current,
+            array_column(array_filter($favoriteCards, static fn (array $card): bool => $card['type'] === 'anime'), 'id'),
+            array_column(array_filter($favoriteCards, static fn (array $card): bool => $card['type'] === 'manga'), 'id'),
+        );
+        foreach ($favoriteCards as &$card) {
+            $card['isFavorite'] = $states[$card['type']][$card['id']] ?? false;
+        }
+        unset($card);
         $summaryEntities = $summaryRepository->findByUser($current);
         $user = [
             'avatar' => $current->getAvatarUrl() ?: '/images/Icon.svg',
             'username' => $current->getusername() ?: $current->getUserIdentifier(),
             'email' => $current->getEmail(),
-            'favorites' => array_map(fn (Favorite $favorite) => $this->buildFavoriteCard($favorite), $favoritesEntities),
+            'favorites' => array_values($favoriteCards),
             'summaries' => array_map(fn (Summary $summary) => $this->buildSummaryCard($summary), $summaryEntities),
-            'favoritesCount' => count($favoritesEntities),
+            'favoritesCount' => count($favoriteCards),
             'synopsisCount' => count($summaryEntities),
         ];
 
@@ -48,30 +64,26 @@ final class ProfileController extends AbstractController
         ]);
     }
 
-    private function buildFavoriteCard(Favorite $favorite): array
+    private function buildFavoriteCard(Favorite $favorite): ?array
     {
-        $title = $favorite->getAnime()?->getTitle()
-            ?? $favorite->getSeason()?->getTitle()
-            ?? $favorite->getManga()?->getTitle()
-            ?? 'Œuvre';
-        $type = $favorite->getAnime() ? 'Anime' : ($favorite->getSeason() ? 'Saison' : ($favorite->getManga() ? 'Manga' : 'Autre'));
-        $image = $favorite->getAnime()?->getCoverAnimeUrl()
-            ?? $favorite->getSeason()?->getCoverSeasonUrl()
-            ?? $favorite->getManga()?->getCoverMangaUrl()
-            ?? '/images/coverCardSeason.png';
+        $anime = $favorite->getAnime() ?? $favorite->getSeason()?->getAnime() ?? $favorite->getEpisode()?->getSeason()?->getAnime();
+        $manga = $favorite->getManga() ?? $favorite->getTome()?->getManga() ?? $favorite->getChapitre()?->getManga();
+        if ($anime === null && $manga === null) {
+            return null;
+        }
+        $type = $anime !== null ? 'anime' : 'manga';
+        $work = $anime ?? $manga;
 
         return [
+            'id' => $work->getId(),
             'type' => $type,
-            'title' => $title,
-            'range' => $favorite->getSeason()?->getTitle() ?? 'Favori enregistré',
+            'typeLabel' => ucfirst($type),
+            'title' => $work->getTitle(),
+            'range' => $work->getStatus() ?: 'Favori enregistré',
             'modifiedDate' => $favorite->getCreatedAt()?->format('d.m.Y') ?? '—',
-            'image' => $image,
-            'isFavorite' => true,
-            'url' => $favorite->getAnime() !== null
-                ? $this->generateUrl('app_anime_show', ['id' => $favorite->getAnime()->getId()])
-                : ($favorite->getManga() !== null
-                    ? $this->generateUrl('app_manga_show', ['id' => $favorite->getManga()->getId()])
-                    : null),
+            'image' => $anime?->getCoverAnimeUrl() ?? $manga?->getCoverMangaUrl() ?? '/images/coverCardSeason.png',
+            'isFavorite' => false,
+            'url' => $this->generateUrl($type === 'anime' ? 'app_anime_show' : 'app_manga_show', ['id' => $work->getId()]),
         ];
     }
 

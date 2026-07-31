@@ -8,6 +8,7 @@
 {% block stylesheets %}
 	{{ parent() }}
 	<link rel="stylesheet" href="{{ asset('css/profile.css') }}">
+	<link rel="stylesheet" href="{{ asset('css/oeuvreCard.css') }}">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 {% endblock %}
 
@@ -25,12 +26,7 @@
 	<main class="page-profile">
 		<div class="profile-inner">
 
-			{# Flash messages #}
-			{% for label, messages in app.flashes %}
-				{% for message in messages %}
-					<div class="flash-{{ label }}">{{ message }}</div>
-				{% endfor %}
-			{% endfor %}
+			{% include 'components/_flash_messages.html.twig' %}
 
 			<h1 class="profile-page-title">
 				<span class="jp">プロフィール</span>
@@ -83,8 +79,8 @@
 						<article class="profile-card">
 							<div class="card-media-wrap">
 								<img src="{{ item.image }}" alt="" class="card-banner">
-								<span class="type-badge">{{ item.type }}</span>
-								<i class="fa-solid fa-star icon-star" aria-label="Favori"></i>
+								<span class="type-badge">{{ item.typeLabel }}</span>
+								{% include 'components/_favorite_toggle.html.twig' with {oeuvre: item, modifier: 'favorite-toggle-form--profile'} only %}
 							</div>
 							<div class="card-content-wrap">
 								<h3 class="card-item-title">{{ item.title }}</h3>
