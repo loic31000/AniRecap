@@ -10,6 +10,7 @@ use App\Repository\AnimeRepository;
 use App\Repository\CategorieRepository;
 use App\Repository\FavoriteRepository;
 use App\Repository\MangaRepository;
+use App\Repository\SummaryRepository;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -91,6 +92,7 @@ final class FavoriteController extends AbstractController
         Request $request,
         FavoriteRepository $favoriteRepository,
         CategorieRepository $categorieRepository,
+        SummaryRepository $summaryRepository,
     ): Response {
         $user = $this->requireUser();
 
@@ -124,6 +126,16 @@ final class FavoriteController extends AbstractController
         );
         foreach ($cards as &$card) {
             $card['isFavorite'] = $states[$card['type']][$card['id']] ?? false;
+        }
+        unset($card);
+
+        $summaryStates = $summaryRepository->findRootManagementStates(
+            $user,
+            array_column(array_filter($cards, static fn (array $card): bool => $card['type'] === 'anime'), 'id'),
+            array_column(array_filter($cards, static fn (array $card): bool => $card['type'] === 'manga'), 'id'),
+        );
+        foreach ($cards as &$card) {
+            $card['summaryManagement'] = $summaryStates[$card['type']][$card['id']] ?? null;
         }
         unset($card);
 

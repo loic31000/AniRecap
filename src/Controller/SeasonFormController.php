@@ -8,6 +8,7 @@ use App\Entity\Season;
 use App\Entity\User;
 use App\Form\SeasonType;
 use App\Repository\SeasonRepository;
+use App\Repository\SummaryRepository;
 use App\Repository\EpisodeRepository;
 use App\Repository\DiaporamaRepository;
 use App\Service\SynopsisImageUploader;
@@ -90,6 +91,7 @@ final class SeasonFormController extends AbstractController
         int $id,
         Request $request,
         SeasonRepository $seasonRepository,
+        SummaryRepository $summaryRepository,
         EntityManagerInterface $entityManager,
         SynopsisImageUploader $imageUploader,
     ): Response {
@@ -125,8 +127,9 @@ final class SeasonFormController extends AbstractController
                         $coverUrl = $this->generateUrl('app_forms_synopsis_image', ['filename' => $newFilename]);
                     }
 
-                    $entityManager->wrapInTransaction(function () use ($season, $input, $coverUrl): void {
+                    $entityManager->wrapInTransaction(function () use ($season, $input, $coverUrl, $summaryRepository, $user): void {
                         $this->applyInput($season, $input, $coverUrl);
+                        $summaryRepository->synchronizeOwnedForParent('season', $season, $user, $input->description);
                     });
                 } catch (\Throwable) {
                     if ($newFilename !== null) {

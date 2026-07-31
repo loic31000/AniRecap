@@ -27,28 +27,27 @@
 
                 <div class="oeuvre-body">
                     <div class="oeuvre-meta">
-                        <span class="badge-type badge-type--{{ oeuvre.type }}">{{ oeuvre.type }}</span>
-                        {% if oeuvre.category|default(null) %}
-                            <span class="badge-type">{{ oeuvre.category }}</span>
-                        {% endif %}
-                        {% if oeuvre.isPrivate %}
-                            <span class="badge-type">Privé</span>
-                        {% endif %}
+                        <div class="oeuvre-meta__badges">
+                            <span class="badge-type badge-type--{{ oeuvre.type }}">{{ oeuvre.type }}</span>
+                            {% set categoryLabel = oeuvre.category|default('')|trim %}
+                            {% if categoryLabel is not empty %}
+                                <span class="badge-type">{{ categoryLabel }}</span>
+                            {% endif %}
+                        </div>
+                        {% include 'components/_summary_management.html.twig' with {oeuvre: oeuvre} only %}
                     </div>
 
                     <h3 class="oeuvre-title">{{ oeuvre.title }}</h3>
-                    <p class="oeuvre-subtitle">{{ oeuvre.subtitle }}</p>
+                    {% if oeuvre.subtitle|default('')|trim is not empty %}
+                        <p class="oeuvre-subtitle">{{ oeuvre.subtitle }}</p>
+                    {% endif %}
 
                     <div class="oeuvre-footer">
-                        <span class="oeuvre-date">
-                            {% if oeuvre.date %}
+                        {% if oeuvre.date|default('')|trim is not empty %}<span class="oeuvre-date">
                                 <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
                                 {{ oeuvre.dateLabel|default('') }} {{ oeuvre.date }}
-                            {% else %}
-                                Date non renseignée
-                            {% endif %}
-                        </span>
-                        <span class="oeuvre-votes">{{ oeuvre.votesCount }} vote{{ oeuvre.votesCount > 1 ? 's' : '' }}</span>
+                        </span>{% endif %}
+                        {% if oeuvre.votesCount|default(null) is not null %}<span class="oeuvre-votes">{{ oeuvre.votesCount }} vote{{ oeuvre.votesCount > 1 ? 's' : '' }}</span>{% endif %}
                     </div>
                 </div>
             </article>

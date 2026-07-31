@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Form\ChapitreType;
 use App\Repository\ChapitreRepository;
 use App\Repository\MangaRepository;
+use App\Repository\SummaryRepository;
 use App\Service\SynopsisImageUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -81,6 +82,7 @@ final class ChapitreFormController extends AbstractController
         int $id,
         Request $request,
         ChapitreRepository $chapitreRepository,
+        SummaryRepository $summaryRepository,
         EntityManagerInterface $entityManager,
         SynopsisImageUploader $imageUploader,
     ): Response {
@@ -108,9 +110,16 @@ final class ChapitreFormController extends AbstractController
                         $newFilename = $imageUploader->store($input->image);
                         $coverUrl = $this->generateUrl('app_forms_synopsis_image', ['filename' => $newFilename]);
                     }
-                    $entityManager->wrapInTransaction(function () use ($chapitre, $manga, $user, $input, $coverUrl): void {
+                    $entityManager->wrapInTransaction(function () use ($chapitre, $manga, $user, $input, $coverUrl, $summaryRepository): void {
                         $chapitre->setManga($manga)->setUser($user);
                         $this->applyInput($chapitre, $input, $coverUrl);
+                        $summaryRepository->synchronizeOwnedForParent(
+                            'chapitre',
+                            $chapitre,
+                            $user,
+                            $input->description,
+                            spoilerLevel: $input->spoilerLevel->value,
+                        );
                     });
                 } catch (\Throwable) {
                     if ($newFilename !== null) {

@@ -44,4 +44,14 @@ final class SlideRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function countFilenameReferences(string $filename): int
+    {
+        return (int) $this->createQueryBuilder('s')
+            ->select('COUNT(s.id)')
+            ->andWhere('s.imageFilename = :filename')
+            ->setParameter('filename', $filename)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

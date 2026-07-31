@@ -9,6 +9,7 @@ use App\Repository\AnimeRepository;
 use App\Repository\CategorieRepository;
 use App\Repository\MangaRepository;
 use App\Repository\FavoriteRepository;
+use App\Repository\SummaryRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,6 +26,7 @@ final class HomeController extends AbstractController
         MangaRepository $mangaRepository,
         CategorieRepository $categorieRepository,
         FavoriteRepository $favoriteRepository,
+        SummaryRepository $summaryRepository,
     ): Response {
         $user = $this->getUser();
         if (!$user instanceof User) {
@@ -53,6 +55,7 @@ final class HomeController extends AbstractController
         }
 
         $items = $this->applyFavoriteStates($items, $favoriteRepository, $user);
+        $items = $this->applySummaryManagement($items, $summaryRepository, $user);
 
         $popular = $items;
         usort($popular, static fn (array $left, array $right): int =>
@@ -120,6 +123,21 @@ final class HomeController extends AbstractController
         );
         foreach ($items as &$item) {
             $item['isFavorite'] = $states[$item['type']][$item['id']] ?? false;
+        }
+        unset($item);
+
+        return $items;
+    }
+
+    private function applySummaryManagement(array $items, SummaryRepository $repository, User $user): array
+    {
+        $states = $repository->findRootManagementStates(
+            $user,
+            array_column(array_filter($items, static fn (array $item): bool => $item['type'] === 'anime'), 'id'),
+            array_column(array_filter($items, static fn (array $item): bool => $item['type'] === 'manga'), 'id'),
+        );
+        foreach ($items as &$item) {
+            $item['summaryManagement'] = $states[$item['type']][$item['id']] ?? null;
         }
         unset($item);
 

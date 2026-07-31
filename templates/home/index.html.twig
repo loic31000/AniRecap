@@ -32,9 +32,7 @@
                     <twig:OeuvreCard :results="latest"/>
                 </section>
 
-                <a class="home-scroll-top" href="#home-top" aria-label="Retour en haut de la page">
-                    <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
-                </a>
+                {% include 'components/_scroll_top.html.twig' with {target: 'home-top'} only %}
             </div>
         </main>
 

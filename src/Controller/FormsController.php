@@ -15,6 +15,7 @@ use App\Repository\ChapitreRepository;
 use App\Repository\EpisodeRepository;
 use App\Repository\MangaRepository;
 use App\Repository\SeasonRepository;
+use App\Repository\SummaryRepository;
 use App\Repository\TomeRepository;
 use App\Service\SynopsisImageUploader;
 use Doctrine\ORM\EntityManagerInterface;
@@ -120,6 +121,7 @@ final class FormsController extends AbstractController
         int $id,
         Request $request,
         AnimeRepository $animeRepository,
+        SummaryRepository $summaryRepository,
         EntityManagerInterface $entityManager,
         SynopsisImageUploader $imageUploader,
     ): Response {
@@ -147,8 +149,9 @@ final class FormsController extends AbstractController
                     $coverUrl = $this->generateUrl('app_forms_synopsis_image', ['filename' => $newFilename]);
                 }
 
-                $entityManager->wrapInTransaction(function () use ($anime, $input, $coverUrl): void {
+                $entityManager->wrapInTransaction(function () use ($anime, $input, $coverUrl, $summaryRepository, $user): void {
                     $this->applyAnimeInput($anime, $input, $coverUrl);
+                    $summaryRepository->synchronizeOwnedForParent('anime', $anime, $user, $input->synopsis, $input->title);
                 });
             } catch (\Throwable) {
                 if ($newFilename !== null) {
@@ -263,6 +266,7 @@ final class FormsController extends AbstractController
         int $id,
         Request $request,
         MangaRepository $mangaRepository,
+        SummaryRepository $summaryRepository,
         EntityManagerInterface $entityManager,
         SynopsisImageUploader $imageUploader,
     ): Response {
@@ -290,8 +294,9 @@ final class FormsController extends AbstractController
                     $coverUrl = $this->generateUrl('app_forms_synopsis_image', ['filename' => $newFilename]);
                 }
 
-                $entityManager->wrapInTransaction(function () use ($manga, $input, $coverUrl): void {
+                $entityManager->wrapInTransaction(function () use ($manga, $input, $coverUrl, $summaryRepository, $user): void {
                     $this->applyMangaInput($manga, $input, $coverUrl);
+                    $summaryRepository->synchronizeOwnedForParent('manga', $manga, $user, $input->synopsis, $input->title);
                 });
             } catch (\Throwable) {
                 if ($newFilename !== null) {

@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Form\TomeType;
 use App\Repository\MangaRepository;
 use App\Repository\TomeRepository;
+use App\Repository\SummaryRepository;
 use App\Service\SynopsisImageUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -85,6 +86,7 @@ final class TomeFormController extends AbstractController
         int $id,
         Request $request,
         TomeRepository $tomeRepository,
+        SummaryRepository $summaryRepository,
         EntityManagerInterface $entityManager,
         SynopsisImageUploader $imageUploader,
     ): Response {
@@ -112,9 +114,16 @@ final class TomeFormController extends AbstractController
                         $newFilename = $imageUploader->store($input->image);
                         $coverUrl = $this->generateUrl('app_forms_synopsis_image', ['filename' => $newFilename]);
                     }
-                    $entityManager->wrapInTransaction(function () use ($tome, $manga, $user, $input, $coverUrl): void {
+                    $entityManager->wrapInTransaction(function () use ($tome, $manga, $user, $input, $coverUrl, $summaryRepository): void {
                         $tome->setManga($manga)->setUser($user);
                         $this->applyInput($tome, $input, $coverUrl);
+                        $summaryRepository->synchronizeOwnedForParent(
+                            'tome',
+                            $tome,
+                            $user,
+                            $input->description,
+                            spoilerLevel: $input->spoilerLevel->value,
+                        );
                     });
                 } catch (\Throwable) {
                     if ($newFilename !== null) {
