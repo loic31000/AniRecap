@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Favoris{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/catalogue.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/searchCard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/oeuvreCard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/favorite.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+    <div class="catalogue-page favorite-page" id="favorites-top">
+        {{ component('Header', { backRoute: 'app_catalogue' }) }}
+
+        <main class="favorite-shell">
+            <a href="{{ path('app_catalogue') }}" class="retour-link">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                Retour au Catalogue
+            </a>
+
+            <h1 class="favorite-title">
+                <span>お気に入り</span>
+                Mes Favoris
+            </h1>
+            <p class="favorite-intro">Gérez vos Œuvres Favorites.</p>
+
+            <twig:SearchCard :genres="genres" :filters="filters" actionRoute="app_favorites"/>
+
+            {% if favorites is empty %}
+                <section class="favorite-empty" role="status">
+                    <i class="fa-regular fa-star" aria-hidden="true"></i>
+                    <h2>Aucune œuvre favorite</h2>
+                    <p>Vous n’avez encore ajouté aucune œuvre à vos favoris.</p>
+                    <a href="{{ path('app_catalogue') }}">Découvrir le Catalogue</a>
+                </section>
+            {% else %}
+                <twig:OeuvreCard :results="favorites"/>
+            {% endif %}
+
+            <a class="favorite-scroll-top" href="#favorites-top" aria-label="Retour en haut de la page">
+                <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+            </a>
+        </main>
+
+        {{ component('Navbar', { active: 'favorites' }) }}
+    </div>
+{% endblock %}

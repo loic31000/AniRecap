@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ajouter un synopsis animé{% endblock %}
+{% block title %}{{ is_edit ? 'Modifier un animé' : 'Ajouter un synopsis animé' }}{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -13,14 +13,14 @@
         <a href="{{ path('app_forms_index') }}" aria-label="Retour aux formulaires">
             <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
         </a>
-        <h1>Ajouter un Synopsis</h1>
+        <h1>{{ is_edit ? 'Modifier un Animé' : 'Ajouter un Synopsis' }}</h1>
     </header>
 
     <main class="forms-page forms-page--editor">
         <div class="forms-shell synopsis-editor">
             <header class="synopsis-editor__intro">
-                <h2>NOUVEAUX SYNOPSIS</h2>
-                <p>Créez un récapitulatif immersif.</p>
+                <h2>{{ is_edit ? 'MODIFIER L’ANIMÉ' : 'NOUVEAU SYNOPSIS' }}</h2>
+                <p>{{ is_edit ? 'Mettez à jour votre œuvre et ses catégories.' : 'Créez un récapitulatif immersif.' }}</p>
             </header>
 
             {% for label, messages in app.flashes %}
@@ -52,19 +52,22 @@
 
                 <div class="synopsis-upload-field">
                     {{ form_label(form.image) }}
+                    {% if current_cover_url %}
+                        <img src="{{ current_cover_url }}" alt="Miniature actuelle de l’animé" class="synopsis-current-cover">
+                    {% endif %}
                     <label class="synopsis-upload-zone" for="{{ form.image.vars.id }}">
                         <span class="synopsis-upload-zone__icon" aria-hidden="true">
                             <i class="fa-regular fa-image"></i>
                             <i class="fa-solid fa-plus"></i>
                         </span>
-                        <strong>Cliquez pour importer</strong>
+                        <strong>{{ is_edit ? 'Remplacer la miniature' : 'Cliquez pour importer' }}</strong>
                         <small>PNG, JPG (9:16 recommandé)</small>
                     </label>
                     {{ form_widget(form.image, { attr: { class: 'synopsis-upload-input' } }) }}
                     {{ form_errors(form.image) }}
                 </div>
                 {{ form_row(form.title) }}
-                {{ form_row(form.categories) }}
+                {{ include('forms/_category_selector.html.twig', { field: form.categories }) }}
                 {{ form_row(form.synopsis) }}
 
                 <fieldset class="synopsis-fieldset synopsis-fieldset--plain">

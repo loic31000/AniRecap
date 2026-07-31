@@ -19,6 +19,7 @@ use App\Repository\TomeRepository;
 use App\Service\SynopsisImageUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,7 +48,9 @@ final class FormsController extends AbstractController
         }
 
         $input = new AnimeSynopsisInput();
-        $form = $this->createForm(AnimeSynopsisType::class, $input);
+        $form = $this->createForm(AnimeSynopsisType::class, $input, [
+            'validation_groups' => ['Default', 'create'],
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -102,6 +105,74 @@ final class FormsController extends AbstractController
 
         return $this->render('forms/anime_synopsis.html.twig', [
             'form' => $form,
+            'is_edit' => false,
+            'current_cover_url' => null,
+        ]);
+    }
+
+    #[Route(
+        '/formulaires/animes/{id}/modifier',
+        name: 'app_forms_anime_edit',
+        methods: ['GET', 'POST'],
+        requirements: ['id' => '\d+'],
+    )]
+    public function editAnime(
+        int $id,
+        Request $request,
+        AnimeRepository $animeRepository,
+        EntityManagerInterface $entityManager,
+        SynopsisImageUploader $imageUploader,
+    ): Response {
+        $user = $this->requireUser();
+        $anime = $animeRepository->findOneVisibleTo($id, $user);
+        if ($anime === null || $anime->getOwner() !== $user) {
+            throw $this->createNotFoundException();
+        }
+
+        $input = $this->animeInputFromEntity($anime);
+        $form = $this->createForm(AnimeSynopsisType::class, $input, [
+            'is_edit' => true,
+            'csrf_token_id' => 'anime_synopsis_edit_' . $anime->getId(),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $newFilename = null;
+            $oldCoverUrl = $anime->getCoverAnimeUrl();
+            $coverUrl = $oldCoverUrl;
+
+            try {
+                if ($input->image instanceof UploadedFile) {
+                    $newFilename = $imageUploader->store($input->image);
+                    $coverUrl = $this->generateUrl('app_forms_synopsis_image', ['filename' => $newFilename]);
+                }
+
+                $entityManager->wrapInTransaction(function () use ($anime, $input, $coverUrl): void {
+                    $this->applyAnimeInput($anime, $input, $coverUrl);
+                });
+            } catch (\Throwable) {
+                if ($newFilename !== null) {
+                    $imageUploader->remove($newFilename);
+                }
+
+                $this->addFlash('error', 'L’animé n’a pas pu être modifié. Veuillez réessayer.');
+
+                return $this->redirectToRoute('app_forms_anime_edit', ['id' => $anime->getId()]);
+            }
+
+            if ($newFilename !== null && $oldCoverUrl !== null) {
+                $imageUploader->remove(basename((string) parse_url($oldCoverUrl, PHP_URL_PATH)));
+            }
+
+            $this->addFlash('success', 'L’animé a été modifié avec succès.');
+
+            return $this->redirectToRoute('app_anime_show', ['id' => $anime->getId()]);
+        }
+
+        return $this->render('forms/anime_synopsis.html.twig', [
+            'form' => $form,
+            'is_edit' => true,
+            'current_cover_url' => $anime->getCoverAnimeUrl(),
         ]);
     }
 
@@ -118,7 +189,9 @@ final class FormsController extends AbstractController
         }
 
         $input = new MangaSynopsisInput();
-        $form = $this->createForm(MangaSynopsisType::class, $input);
+        $form = $this->createForm(MangaSynopsisType::class, $input, [
+            'validation_groups' => ['Default', 'create'],
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -175,6 +248,74 @@ final class FormsController extends AbstractController
 
         return $this->render('forms/manga_synopsis.html.twig', [
             'form' => $form,
+            'is_edit' => false,
+            'current_cover_url' => null,
+        ]);
+    }
+
+    #[Route(
+        '/formulaires/mangas/{id}/modifier',
+        name: 'app_forms_manga_edit',
+        methods: ['GET', 'POST'],
+        requirements: ['id' => '\d+'],
+    )]
+    public function editManga(
+        int $id,
+        Request $request,
+        MangaRepository $mangaRepository,
+        EntityManagerInterface $entityManager,
+        SynopsisImageUploader $imageUploader,
+    ): Response {
+        $user = $this->requireUser();
+        $manga = $mangaRepository->findOneVisibleTo($id, $user);
+        if ($manga === null || $manga->getOwner() !== $user) {
+            throw $this->createNotFoundException();
+        }
+
+        $input = $this->mangaInputFromEntity($manga);
+        $form = $this->createForm(MangaSynopsisType::class, $input, [
+            'is_edit' => true,
+            'csrf_token_id' => 'manga_synopsis_edit_' . $manga->getId(),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $newFilename = null;
+            $oldCoverUrl = $manga->getCoverMangaUrl();
+            $coverUrl = $oldCoverUrl;
+
+            try {
+                if ($input->image instanceof UploadedFile) {
+                    $newFilename = $imageUploader->store($input->image);
+                    $coverUrl = $this->generateUrl('app_forms_synopsis_image', ['filename' => $newFilename]);
+                }
+
+                $entityManager->wrapInTransaction(function () use ($manga, $input, $coverUrl): void {
+                    $this->applyMangaInput($manga, $input, $coverUrl);
+                });
+            } catch (\Throwable) {
+                if ($newFilename !== null) {
+                    $imageUploader->remove($newFilename);
+                }
+
+                $this->addFlash('error', 'Le manga n’a pas pu être modifié. Veuillez réessayer.');
+
+                return $this->redirectToRoute('app_forms_manga_edit', ['id' => $manga->getId()]);
+            }
+
+            if ($newFilename !== null && $oldCoverUrl !== null) {
+                $imageUploader->remove(basename((string) parse_url($oldCoverUrl, PHP_URL_PATH)));
+            }
+
+            $this->addFlash('success', 'Le manga a été modifié avec succès.');
+
+            return $this->redirectToRoute('app_manga_show', ['id' => $manga->getId()]);
+        }
+
+        return $this->render('forms/manga_synopsis.html.twig', [
+            'form' => $form,
+            'is_edit' => true,
+            'current_cover_url' => $manga->getCoverMangaUrl(),
         ]);
     }
 
@@ -217,6 +358,98 @@ final class FormsController extends AbstractController
         }
 
         return $this->file($path, null, ResponseHeaderBag::DISPOSITION_INLINE);
+    }
+
+    private function animeInputFromEntity(Anime $anime): AnimeSynopsisInput
+    {
+        $input = new AnimeSynopsisInput();
+        $input->title = $anime->getTitle();
+        $input->categories = $anime->getCategories()->toArray();
+        $input->synopsis = $anime->getSynopsis();
+        $input->status = $anime->getStatus();
+        $input->author = $anime->getAuthor();
+        $input->releaseDate = $anime->getReleaseDate();
+        $input->initialSeasonNumber = $anime->getInitialSeasonNumber();
+        $input->episodeCount = $anime->getEpisodeCount();
+
+        return $input;
+    }
+
+    private function applyAnimeInput(Anime $anime, AnimeSynopsisInput $input, ?string $coverUrl): void
+    {
+        $anime
+            ->setTitle($input->title)
+            ->setSynopsis($input->synopsis)
+            ->setCoverAnimeUrl($coverUrl)
+            ->setStatus($input->status)
+            ->setAuthor($input->author)
+            ->setAnimeDate((int) $input->releaseDate->format('Y'))
+            ->setReleaseDate($input->releaseDate)
+            ->setInitialSeasonNumber($input->initialSeasonNumber)
+            ->setEpisodeCount($input->episodeCount);
+
+        foreach ($anime->getCategories()->toArray() as $category) {
+            if (!in_array($category, $input->categories, true)) {
+                $anime->removeCategorie($category);
+            }
+        }
+
+        foreach ($input->categories as $category) {
+            $anime->addCategorie($category);
+        }
+    }
+
+    private function mangaInputFromEntity(Manga $manga): MangaSynopsisInput
+    {
+        $input = new MangaSynopsisInput();
+        $input->title = $manga->getTitle();
+        $input->categories = $manga->getCategorie()->toArray();
+        $input->synopsis = $manga->getSynopsis();
+        $input->status = $manga->getStatus();
+        $input->author = $manga->getAuthor();
+        $input->releaseDate = $manga->getReleaseDate();
+        $input->tomeStart = $manga->getTomeStart();
+        $input->tomeEnd = $manga->getTomeEnd();
+        $input->chapterStart = $manga->getChapterStart();
+        $input->chapterEnd = $manga->getChapterEnd();
+
+        return $input;
+    }
+
+    private function applyMangaInput(Manga $manga, MangaSynopsisInput $input, ?string $coverUrl): void
+    {
+        $manga
+            ->setTitle($input->title)
+            ->setSynopsis($input->synopsis)
+            ->setCoverMangaUrl($coverUrl)
+            ->setStatus($input->status)
+            ->setAuthor($input->author)
+            ->setMangaDate((int) $input->releaseDate->format('Y'))
+            ->setReleaseDate($input->releaseDate)
+            ->setTomeStart($input->tomeStart)
+            ->setTomeEnd($input->tomeEnd)
+            ->setChapterStart($input->chapterStart)
+            ->setChapterEnd($input->chapterEnd);
+
+        foreach ($manga->getCategorie()->toArray() as $category) {
+            if (!in_array($category, $input->categories, true)) {
+                $manga->removeCategorie($category);
+            }
+        }
+
+        foreach ($input->categories as $category) {
+            $manga->addCategorie($category);
+        }
+    }
+
+    private function requireUser(): User
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        return $user;
     }
 
     #[Route('/formulaires/personnage', name: 'app_forms_character', methods: ['GET'])]

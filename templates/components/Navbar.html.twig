@@ -28,13 +28,14 @@
         </div>
     {% endif %}
 
-    <span
+    <a
+        href="{{ path('app_favorites') }}"
         class="nav-item {{ active is defined and active == 'favorites' ? 'is-active' : '' }}"
-        aria-disabled="true"
+        {% if active is defined and active == 'favorites' %}aria-current="page"{% endif %}
     >
         <i class="fa-solid fa-heart"></i>
         <span>Favoris</span>
-    </span>
+    </a>
 
     <a
         href="{{ path('app_profile') }}"
