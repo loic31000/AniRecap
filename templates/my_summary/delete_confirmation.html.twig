@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Supprimer {{ content_type|lower }}{% endblock %}
+{% block stylesheets %}{{ parent() }}<link rel="stylesheet" href="{{ asset('css/my-summaries.css') }}">{% endblock %}
+
+{% block body %}
+    {{ component('Header', {backRoute: 'app_my_summaries'}) }}
+    <main class="my-summaries-shell delete-confirmation">
+        <section role="alertdialog" aria-labelledby="delete-title" aria-describedby="delete-warning">
+            <span>{{ content_type }}</span>
+            <h1 id="delete-title">
+                {% if content_type == 'Résumé' %}Supprimer ce résumé personnel ?{% else %}Supprimer « {{ content_title }} » ?{% endif %}
+            </h1>
+            <p id="delete-warning">
+                {% if content_type == 'Résumé' %}
+                    L’œuvre Anime/Manga et ses contenus ne seront pas supprimés.
+                {% else %}
+                    Cette action est irréversible.
+                {% endif %}
+            </p>
+            <div class="delete-confirmation__actions">
+                <a href="{{ path('app_my_summaries') }}">Annuler</a>
+                <form method="post" action="{{ path(delete_route, {id: content_id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token(csrf_id) }}">
+                    {% if return_to|default(null) %}<input type="hidden" name="return_to" value="{{ return_to }}">{% endif %}
+                    <button type="submit">Supprimer définitivement</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    {{ component('Navbar', {active: 'profile'}) }}
+{% endblock %}

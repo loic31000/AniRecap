@@ -1,0 +1,27 @@
+<article class="management-card">
+    <a class="management-card__open" href="{{ path(card.openRoute, {id: card.id}) }}" aria-label="Ouvrir {{ card.title }}">
+        <span class="management-card__media">
+            {% if card.image|default(null) %}
+                <img src="{{ card.image }}" alt="Miniature de {{ card.title }}">
+            {% elseif card.imageRouteParameters|default(null) %}
+                <img src="{{ path('app_diaporama_slide_image', card.imageRouteParameters) }}" alt="Aperçu du diaporama {{ card.title }}">
+            {% else %}
+                <span class="management-card__placeholder" aria-hidden="true"><i class="fa-regular fa-image"></i></span>
+            {% endif %}
+        </span>
+        <span class="management-card__body">
+            <span class="management-card__type">{{ card.type }}</span>
+            <strong>{{ card.title }}</strong>
+            {% if card.description|default('')|striptags|trim is not empty %}<span class="management-card__description">{{ card.description|striptags }}</span>{% endif %}
+            {% if card.meta|default('')|trim is not empty %}<span class="management-card__meta">{{ card.meta }}</span>{% endif %}
+        </span>
+    </a>
+
+    <details class="management-actions" data-controller="management-menu">
+        <summary class="card-action-hitbox card-action-trigger" aria-label="Gérer {{ card.title }}" data-management-menu-target="trigger"><i class="fa-solid fa-pencil" aria-hidden="true"></i></summary>
+        <div class="management-actions__menu">
+            <a href="{{ path(card.editRoute, {id: card.editId}) }}"><i class="fa-solid fa-pencil" aria-hidden="true"></i> Éditer</a>
+            <a href="{{ path(card.deleteRoute, {id: card.id}) }}"><i class="fa-solid fa-trash-can" aria-hidden="true"></i> Effacer</a>
+        </div>
+    </details>
+</article>

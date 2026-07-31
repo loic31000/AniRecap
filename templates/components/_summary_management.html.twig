@@ -1,0 +1,29 @@
+{% set management = oeuvre.summaryManagement|default(null) %}
+{% if management %}
+    <details class="summary-management {{ modifier|default('') }}" data-controller="management-menu">
+        <summary
+            class="card-action-hitbox card-action-trigger"
+            aria-label="Gérer les résumés de {{ oeuvre.title }}"
+            data-management-menu-target="trigger"
+        >
+            <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+        </summary>
+        <div class="summary-management__menu">
+            {% if management.count == 1 %}
+                <a href="{{ path(management.editRoute, {id: management.editId}) }}">
+                    <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+                    Éditer le résumé
+                </a>
+                <a href="{{ path('app_summary_delete_confirm', {id: management.summaryId, return_to: app.request.requestUri}) }}">
+                    <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                    Effacer le résumé
+                </a>
+            {% else %}
+                <a href="{{ path('app_my_summaries', management.manageUrlParameters) }}">
+                    <i class="fa-solid fa-list" aria-hidden="true"></i>
+                    Gérer mes résumés ({{ management.count }})
+                </a>
+            {% endif %}
+        </div>
+    </details>
+{% endif %}

@@ -11,6 +11,7 @@ use App\Entity\User;
 use App\Form\EpisodeType;
 use App\Repository\EpisodeRepository;
 use App\Repository\SeasonRepository;
+use App\Repository\SummaryRepository;
 use App\Service\SynopsisImageUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -172,6 +173,7 @@ final class EpisodeFormController extends AbstractController
         int $id,
         Request $request,
         EpisodeRepository $episodeRepository,
+        SummaryRepository $summaryRepository,
         EntityManagerInterface $entityManager,
         SynopsisImageUploader $imageUploader,
     ): Response {
@@ -203,11 +205,18 @@ final class EpisodeFormController extends AbstractController
                         $coverUrl = $this->generateUrl('app_forms_synopsis_image', ['filename' => $newFilename]);
                     }
 
-                    $entityManager->wrapInTransaction(function () use ($episode, $season, $user, $input, $coverUrl): void {
+                    $entityManager->wrapInTransaction(function () use ($episode, $season, $user, $input, $coverUrl, $summaryRepository): void {
                         $episode
                             ->setSeason($season)
                             ->setUser($user);
                         $this->applyInput($episode, $input, $coverUrl);
+                        $summaryRepository->synchronizeOwnedForParent(
+                            'episode',
+                            $episode,
+                            $user,
+                            $input->description,
+                            spoilerLevel: $input->spoilerLevel->value,
+                        );
                     });
                 } catch (\Throwable) {
                     if ($newFilename !== null) {

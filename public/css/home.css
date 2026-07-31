@@ -71,25 +71,6 @@
     padding: 2px 8px;
 }
 
-.home-scroll-top {
-    width: 32px;
-    height: 32px;
-    margin: 34px auto 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--gold);
-    border-radius: 50%;
-    color: var(--gold);
-    background: rgba(10, 18, 32, 0.9);
-    box-shadow: 0 4px 12px #000;
-}
-
-.home-scroll-top:focus-visible {
-    outline: 3px solid var(--gold);
-    outline-offset: 3px;
-}
-
 @media (max-width: 389px) {
     .home-page .catalogue-content {
         padding-inline: 14px;

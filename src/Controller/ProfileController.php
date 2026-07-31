@@ -48,19 +48,32 @@ final class ProfileController extends AbstractController
             $card['isFavorite'] = $states[$card['type']][$card['id']] ?? false;
         }
         unset($card);
-        $summaryEntities = $summaryRepository->findByUser($current);
+        $summaryStates = $summaryRepository->findRootManagementStates(
+            $current,
+            array_column(array_filter($favoriteCards, static fn (array $card): bool => $card['type'] === 'anime'), 'id'),
+            array_column(array_filter($favoriteCards, static fn (array $card): bool => $card['type'] === 'manga'), 'id'),
+        );
+        foreach ($favoriteCards as &$card) {
+            $card['summaryManagement'] = $summaryStates[$card['type']][$card['id']] ?? null;
+        }
+        unset($card);
+        $summaryCount = $summaryRepository->count(['user' => $current]);
+        $summaryCards = array_map(
+            fn (Summary $summary): array => $this->buildSummaryCard($summary, $current),
+            $summaryRepository->findPreviewByUser($current, 4),
+        );
         $user = [
             'avatar' => $current->getAvatarUrl() ?: '/images/Icon.svg',
             'username' => $current->getusername() ?: $current->getUserIdentifier(),
             'email' => $current->getEmail(),
-            'favorites' => array_values($favoriteCards),
-            'summaries' => array_map(fn (Summary $summary) => $this->buildSummaryCard($summary), $summaryEntities),
+            'favorites' => array_slice(array_values($favoriteCards), 0, 2),
             'favoritesCount' => count($favoriteCards),
-            'synopsisCount' => count($summaryEntities),
+            'synopsisCount' => $summaryCount,
         ];
 
         return $this->render('profile/index.html.twig', [
             'user' => $user,
+            'summary_cards' => $summaryCards,
         ]);
     }
 
@@ -77,40 +90,65 @@ final class ProfileController extends AbstractController
         return [
             'id' => $work->getId(),
             'type' => $type,
-            'typeLabel' => ucfirst($type),
             'title' => $work->getTitle(),
-            'range' => $work->getStatus() ?: 'Favori enregistré',
-            'modifiedDate' => $favorite->getCreatedAt()?->format('d.m.Y') ?? '—',
-            'image' => $anime?->getCoverAnimeUrl() ?? $manga?->getCoverMangaUrl() ?? '/images/coverCardSeason.png',
+            'subtitle' => $work->getStatus() ?: 'Favori enregistré',
+            'date' => $favorite->getCreatedAt()?->format('d.m.Y') ?? '',
+            'dateLabel' => 'Ajouté le',
+            'cover' => $anime?->getCoverAnimeUrl() ?? $manga?->getCoverMangaUrl() ?? '/images/coverCardSeason.png',
+            'votesCount' => $work->getVotes()->count(),
+            'isPrivate' => !$work->isPublic(),
             'isFavorite' => false,
-            'url' => $this->generateUrl($type === 'anime' ? 'app_anime_show' : 'app_manga_show', ['id' => $work->getId()]),
         ];
     }
 
-    private function buildSummaryCard(Summary $summary): array
+    /** @return array<string, mixed> */
+    private function buildSummaryCard(Summary $summary, User $owner): array
     {
-        $title = $summary->getTitle()
-            ?? $summary->getAnime()?->getTitle()
-            ?? $summary->getSeason()?->getTitle()
-            ?? $summary->getManga()?->getTitle()
-            ?? 'Résumé';
+        $parent = $summary->getAnime() ?? $summary->getManga() ?? $summary->getSeason()
+            ?? $summary->getEpisode() ?? $summary->getTome() ?? $summary->getChapitre();
+        $directUserMatches = !is_object($parent)
+            || !method_exists($parent, 'getUser')
+            || $parent->getUser()?->getId() === $owner->getId();
+        $parentIsOwned = $parent?->getOwner()?->getId() === $owner->getId() && $directUserMatches;
+
+        [$editRoute, $editId] = $parentIsOwned ? match (true) {
+            $summary->getAnime() !== null => ['app_forms_anime_edit', $summary->getAnime()->getId()],
+            $summary->getManga() !== null => ['app_forms_manga_edit', $summary->getManga()->getId()],
+            $summary->getSeason() !== null => ['app_forms_season_edit', $summary->getSeason()->getId()],
+            $summary->getEpisode() !== null => ['app_forms_episode_edit', $summary->getEpisode()->getId()],
+            $summary->getTome() !== null => ['app_forms_tome_edit', $summary->getTome()->getId()],
+            $summary->getChapitre() !== null => ['app_forms_chapitre_edit', $summary->getChapitre()->getId()],
+            default => ['app_summary_edit', $summary->getId()],
+        } : ['app_summary_edit', $summary->getId()];
 
         return [
-            'type' => $summary->getManga() ? 'Manga' : ($summary->getAnime() ? 'Anime' : 'Autre'),
-            'title' => $title,
-            'range' => 'Résumé disponible',
-            'modifiedDate' => '—',
+            'id' => $summary->getId(),
+            'type' => 'Résumé',
+            'title' => $summary->getTitle(),
+            'description' => $summary->getContent(),
+            'meta' => $this->summaryParentLabel($summary),
             'image' => $summary->getAnime()?->getCoverAnimeUrl()
                 ?? $summary->getManga()?->getCoverMangaUrl()
                 ?? $summary->getSeason()?->getCoverSeasonUrl()
-                ?? '/images/coverCardSeason.png',
-            'isFavorite' => false,
-            'url' => $summary->getAnime() !== null
-                ? $this->generateUrl('app_anime_show', ['id' => $summary->getAnime()->getId()])
-                : ($summary->getManga() !== null
-                    ? $this->generateUrl('app_manga_show', ['id' => $summary->getManga()->getId()])
-                    : null),
+                ?? $summary->getEpisode()?->getCoverEpisodeUrl()
+                ?? $summary->getTome()?->getCoverTomeUrl()
+                ?? $summary->getChapitre()?->getCoverChapitreUrl(),
+            'openRoute' => 'app_summary_show',
+            'editRoute' => $editRoute,
+            'editId' => $editId,
+            'deleteRoute' => 'app_summary_delete_confirm',
         ];
+    }
+
+    private function summaryParentLabel(Summary $summary): string
+    {
+        return $summary->getAnime()?->getTitle()
+            ?? $summary->getManga()?->getTitle()
+            ?? $summary->getSeason()?->getTitle()
+            ?? $summary->getEpisode()?->getTitle()
+            ?? $summary->getTome()?->getTitle()
+            ?? $summary->getChapitre()?->getTitle()
+            ?? 'Aucun parent renseigné';
     }
 
     #[Route('/profile/upload', name: 'app_profile_upload', methods: ['POST'])]

@@ -6,6 +6,7 @@ use App\Repository\AnimeRepository;
 use App\Repository\MangaRepository;
 use App\Repository\CategorieRepository;
 use App\Repository\FavoriteRepository;
+use App\Repository\SummaryRepository;
 use App\Entity\Anime;
 use App\Entity\Manga;
 use App\Entity\User;
@@ -23,6 +24,7 @@ final class CatalogueController extends AbstractController
         MangaRepository $mangaRepository,
         CategorieRepository $categorieRepository,
         FavoriteRepository $favoriteRepository,
+        SummaryRepository $summaryRepository,
     ): Response {
         $user = $this->getUser();
         if (!$user instanceof User) {
@@ -69,6 +71,16 @@ final class CatalogueController extends AbstractController
         );
         foreach ($catalogueItems as &$item) {
             $item['isFavorite'] = $states[$item['type']][$item['id']] ?? false;
+        }
+        unset($item);
+
+        $summaryStates = $summaryRepository->findRootManagementStates(
+            $user,
+            array_column(array_filter($catalogueItems, static fn (array $item): bool => $item['type'] === 'anime'), 'id'),
+            array_column(array_filter($catalogueItems, static fn (array $item): bool => $item['type'] === 'manga'), 'id'),
+        );
+        foreach ($catalogueItems as &$item) {
+            $item['summaryManagement'] = $summaryStates[$item['type']][$item['id']] ?? null;
         }
         unset($item);
 

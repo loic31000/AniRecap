@@ -9,6 +9,7 @@
 	{{ parent() }}
 	<link rel="stylesheet" href="{{ asset('css/profile.css') }}">
 	<link rel="stylesheet" href="{{ asset('css/oeuvreCard.css') }}">
+	<link rel="stylesheet" href="{{ asset('css/my-summaries.css') }}">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 {% endblock %}
 
@@ -19,11 +20,10 @@
 	{% set synopsisCount = user.synopsisCount %}
 	{% set favoritesCount = user.favoritesCount %}
 	{% set favoritesList = user.favorites %}
-	{% set summariesList = user.summaries %}
 
 	{{ component('Header', { backRoute: null }) }}
 
-	<main class="page-profile">
+	<main class="page-profile" id="profile-top">
 		<div class="profile-inner">
 
 			{% include 'components/_flash_messages.html.twig' %}
@@ -33,7 +33,7 @@
 				<span>Profil</span>
 			</h1>
 
-			<section class="profile-identity">
+			<section class="profile-identity" aria-label="Identité du compte">
 				<div class="profile-avatar-wrap">
 					<img src="{{ avatar }}" alt="Avatar de {{ username }}" class="profile-avatar">
 
@@ -62,79 +62,39 @@
 				</div>
 			</section>
 
-			{# Section Favoris #}
 			<section class="panel panel--profile-list" aria-labelledby="favorites-title">
 				<div class="panel-header-row">
 					<h2 id="favorites-title" class="section-title section-title--inline">
 						<span class="jp">お気に入り</span>
 						<span>Mes Favoris</span>
 					</h2>
+					<a class="see-all-link" href="{{ path('app_favorites') }}">Voir tout →</a>
 				</div>
 
-				<div class="profile-card-list">
-					{% if favoritesList is empty %}
-						<p class="profile-empty-state">Vous n’avez encore aucun favori.</p>
-					{% endif %}
-					{% for item in favoritesList %}
-						<article class="profile-card">
-							<div class="card-media-wrap">
-								<img src="{{ item.image }}" alt="" class="card-banner">
-								<span class="type-badge">{{ item.typeLabel }}</span>
-								{% include 'components/_favorite_toggle.html.twig' with {oeuvre: item, modifier: 'favorite-toggle-form--profile'} only %}
-							</div>
-							<div class="card-content-wrap">
-								<h3 class="card-item-title">{{ item.title }}</h3>
-								<p class="card-item-range">{{ item.range }}</p>
-								<div class="card-meta-row">
-									<span class="card-modified">
-										<i class="fa-solid fa-arrows-rotate"></i>
-										Modifié le {{ item.modifiedDate }}
-									</span>
-								</div>
-								{% if item.url %}
-									<a href="{{ item.url }}">Voir la fiche</a>
-								{% endif %}
-							</div>
-						</article>
-					{% endfor %}
-				</div>
+				{% if favoritesList is empty %}
+					<p class="profile-empty-state">Vous n’avez encore aucun favori.</p>
+				{% else %}
+					<twig:OeuvreCard :results="favoritesList"/>
+				{% endif %}
 			</section>
 
-			{# Section Mes Résumés #}
 			<section class="panel panel--profile-list" aria-labelledby="summaries-title">
 				<div class="panel-header-row">
 					<h2 id="summaries-title" class="section-title section-title--inline">
 						<span class="jp">私の要約</span>
 						<span>Mes Résumés</span>
 					</h2>
+					<a class="see-all-link" href="{{ path('app_my_summaries') }}">Voir tout →</a>
 				</div>
-
-				<div class="profile-card-list">
-					{% if summariesList is empty %}
-						<p class="profile-empty-state">Vous n’avez encore rédigé aucun résumé.</p>
-					{% endif %}
-					{% for item in summariesList %}
-						<article class="profile-card">
-							<div class="card-media-wrap">
-								<img src="{{ item.image }}" alt="" class="card-banner">
-								<span class="type-badge">{{ item.type }}</span>
-							</div>
-							<div class="card-content-wrap">
-								<h3 class="card-item-title">{{ item.title }}</h3>
-								<p class="card-item-range">{{ item.range }}</p>
-								<div class="card-meta-row">
-									<span class="card-modified">
-										<i class="fa-solid fa-arrows-rotate"></i>
-										Modifié le {{ item.modifiedDate }}
-									</span>
-								</div>
-								{% if item.url %}
-									<a href="{{ item.url }}">Voir la fiche</a>
-								{% endif %}
-							</div>
-						</article>
-					{% endfor %}
-				</div>
+				{% if summary_cards is empty %}
+					<p class="profile-empty-state">Vous n’avez encore créé aucun résumé.</p>
+				{% else %}
+					<div class="management-grid profile-summary-grid">
+						{% for card in summary_cards %}
+							{% include 'my_summary/_management_card.html.twig' with {card: card} only %}
+						{% endfor %}
+					</div>
+				{% endif %}
 			</section>
 
 			<form action="{{ path('app_logout') }}" method="post" class="logout-form">
@@ -144,9 +104,7 @@
 				</button>
 			</form>
 
-			<button type="button" class="btn-scroll-top" aria-label="Retour en haut de page">
-				<i class="fa-solid fa-chevron-up"></i>
-			</button>
+			{% include 'components/_scroll_top.html.twig' with {target: 'profile-top'} only %}
 		</div>
 	</main>
 
