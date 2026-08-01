@@ -457,9 +457,4 @@ final class FormsController extends AbstractController
         return $user;
     }
 
-    #[Route('/formulaires/personnage', name: 'app_forms_character', methods: ['GET'])]
-    public function character(): Response
-    {
-        return $this->render('forms/character.html.twig');
-    }
 }

@@ -34,6 +34,17 @@ class SeasonRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /** @return Season[] */
+    public function findOwnedForCharacterSelection(User $owner): array
+    {
+        return $this->createQueryBuilder('s')
+            ->innerJoin('s.anime', 'a')->addSelect('a')
+            ->andWhere('a.owner = :owner')->andWhere('a.isPublic = false')
+            ->setParameter('owner', $owner)
+            ->orderBy('a.title', 'ASC')->addOrderBy('s.number', 'ASC')
+            ->getQuery()->getResult();
+    }
+
     public function findFirstPublic(): ?Season
     {
         return $this->createQueryBuilder('s')

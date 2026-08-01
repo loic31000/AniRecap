@@ -9,6 +9,14 @@
     --forms-border: rgba(232, 165, 63, 0.45);
 }
 
+.character-upload-zone { display:flex; min-height:100px; align-items:center; justify-content:center; flex-direction:column; gap:14px; border:1px solid #d9a323; border-radius:8px; background:#000; color:#d9a323; cursor:pointer; text-align:center; }
+.character-upload-zone i { font-size:1.6rem; }
+.character-current-image { display:block; width:100px; aspect-ratio:1; margin:0 auto 16px; border:2px solid #d9a323; border-radius:8px; object-fit:cover; }
+.character-links { display:grid; gap:12px; margin:20px 0 0; padding:16px; border:1px solid rgba(217,163,35,.35); border-radius:10px; }
+.character-links legend { padding:0 8px; color:#d9a323; font-weight:800; }
+.character-links > p { margin:0 0 4px; color:#c7cbd3; font-size:.8rem; }
+.character-links select[multiple] { min-height:104px; }
+
 .forms-page {
     min-height: 100vh;
     box-sizing: border-box;

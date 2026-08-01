@@ -102,4 +102,10 @@ class AnimeRepository extends ServiceEntityRepository
             ->setParameter('isPublic', false)
             ->orderBy('a.title', 'ASC');
     }
+
+    /** @return Anime[] */
+    public function findOwnedPrivate(User $owner): array
+    {
+        return $this->createOwnedPrivateQueryBuilder($owner)->getQuery()->getResult();
+    }
 }

@@ -9,6 +9,7 @@ use App\Repository\ChapitreRepository;
 use App\Repository\DiaporamaRepository;
 use App\Repository\SlideRepository;
 use App\Repository\FavoriteRepository;
+use App\Repository\CharacterRepository;
 use App\Enum\SpoilerLevel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,6 +28,7 @@ final class MangaController extends AbstractController
         DiaporamaRepository $diaporamaRepository,
         SlideRepository $slideRepository,
         FavoriteRepository $favoriteRepository,
+        CharacterRepository $characterRepository,
     ): Response
     {
         $user = $this->getUser();
@@ -63,7 +65,7 @@ final class MangaController extends AbstractController
             'chapitres' => $chapitres,
             'tome_diaporamas' => $diaporamaRepository->findOwnedLinksForTomes($tomeIds, $user),
             'chapitre_diaporamas' => $diaporamaRepository->findOwnedLinksForChapitres($chapitreIds, $user),
-            'characters' => $manga->getCharacters()->toArray(),
+            'characters' => $characterRepository->findOwnedByManga($manga, $user),
             'tome_spoiler_levels' => $tomeLevels,
             'chapitre_spoiler_levels' => $chapitreLevels,
             'favorite_oeuvre' => ['id' => $manga->getId(), 'type' => 'manga', 'title' => $manga->getTitle(), 'isFavorite' => $favoriteState['manga'][$manga->getId()] ?? false],

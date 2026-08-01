@@ -12,6 +12,7 @@ use App\Repository\SummaryRepository;
 use App\Repository\EpisodeRepository;
 use App\Repository\DiaporamaRepository;
 use App\Repository\SlideRepository;
+use App\Repository\CharacterRepository;
 use App\Enum\SpoilerLevel;
 use App\Service\SynopsisImageUploader;
 use Doctrine\ORM\EntityManagerInterface;
@@ -168,6 +169,7 @@ final class SeasonFormController extends AbstractController
         EpisodeRepository $episodeRepository,
         DiaporamaRepository $diaporamaRepository,
         SlideRepository $slideRepository,
+        CharacterRepository $characterRepository,
     ): Response
     {
         $user = $this->requireUser();
@@ -195,6 +197,7 @@ final class SeasonFormController extends AbstractController
             'episodes' => $episodes,
             'episode_diaporamas' => $diaporamaRepository->findOwnedLinksForEpisodes($episodeIds, $user),
             'episode_spoiler_levels' => $effectiveLevels,
+            'characters' => $characterRepository->findOwnedBySeason($season, $user),
         ]);
     }
 

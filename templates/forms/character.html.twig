@@ -1,35 +1,25 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Éditeur de personnage{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-{% endblock %}
+{% block title %}{{ is_edit ? 'Modifier un personnage' : 'Ajouter un personnage' }}{% endblock %}
+{% block stylesheets %}{{ parent() }}<link rel="stylesheet" href="{{ asset('css/forms.css') }}"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">{% endblock %}
 
 {% block body %}
-    {{ component('Header', { backRoute: 'app_forms_index' }) }}
-
-    <main class="forms-page forms-page--orientation">
-        <article class="orientation-card">
-            <span class="orientation-card__icon" aria-hidden="true">
-                <i class="fa-solid fa-user"></i>
-            </span>
-            <p class="orientation-card__eyebrow">Formulaire spécialisé</p>
-            <h1>Éditeur de personnage</h1>
-            <p>
-                Cet écran permettra de créer ou de modifier la fiche d'un personnage lié à une œuvre.
-            </p>
-            <p class="orientation-card__notice">
-                La création et l'enregistrement seront ajoutés dans une prochaine user story.
-            </p>
-            <a class="orientation-card__back" href="{{ path('app_forms_index') }}">
-                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-                Retour aux formulaires
-            </a>
-        </article>
-    </main>
-
-    {{ component('Navbar', { active: 'forms' }) }}
+    <header class="synopsis-editor-hero"><a href="{{ character ? path('app_character_show', {id: character.id}) : path('app_forms_index') }}" aria-label="Retour">‹</a><h1>{{ is_edit ? 'Modifier un Personnage' : 'Ajouter un Personnage' }}</h1></header>
+    <main class="forms-page forms-page--editor"><div class="forms-shell synopsis-editor character-editor">
+        <header class="synopsis-editor__intro"><h2>{{ is_edit ? 'MODIFIER LE PERSONNAGE' : 'NOUVEAU PERSONNAGE' }}</h2><p>{{ is_edit ? 'Modifiez sa fiche et ses liaisons.' : 'Créez un personnage.' }}</p></header>
+        {% include 'components/_flash_messages.html.twig' %}
+        {{ form_start(form, {attr: {enctype: 'multipart/form-data', class: 'synopsis-form'}}) }}
+            {% if form.vars.submitted and not form.vars.valid %}<section class="form-error-summary" role="alert"><h2>Vérifiez les informations suivantes :</h2><ul>{% for error in form.vars.errors %}<li>{{ error.message }}</li>{% endfor %}{% for field in form %}{% for error in field.vars.errors|default([]) %}<li>{{ field.vars.label }} : {{ error.message }}</li>{% endfor %}{% endfor %}</ul></section>{% endif %}
+            {% if character and character.imageUrl %}<img class="character-current-image" src="{{ path('app_character_image', {id: character.id}) }}" alt="Image actuelle de {{ character.name }}">{% endif %}
+            <div class="synopsis-upload-field">{{ form_label(form.image) }}<label class="character-upload-zone" for="{{ form.image.vars.id }}"><i class="fa-regular fa-camera" aria-hidden="true"></i><span>Appuyez pour ajouter une image (1:1 recommandé)</span></label>{{ form_widget(form.image, {attr: {class: 'synopsis-upload-input'}}) }}{{ form_help(form.image) }}{{ form_errors(form.image) }}</div>
+            {{ form_row(form.name) }}
+            {{ form_row(form.description) }}
+            {{ form_row(form.spoilerLevel) }}
+            <fieldset class="character-links"><legend>Fiches associées</legend><p>Chaque sélection crée une liaison explicite dans votre espace privé.</p>
+                {{ form_row(form.animes) }}{{ form_row(form.seasons) }}{{ form_row(form.episodes) }}{{ form_row(form.mangas) }}{{ form_row(form.tomes) }}{{ form_row(form.chapitres) }}
+            </fieldset>
+            <div class="synopsis-save-bar">{{ form_widget(form.save) }}</div>
+        {{ form_end(form) }}
+    </div></main>
+    {{ component('Navbar', {active: 'forms'}) }}
 {% endblock %}
