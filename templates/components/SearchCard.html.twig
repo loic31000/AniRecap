@@ -1,210 +1,107 @@
-{% set currentQ = filters is defined ? filters.q|default('') : app.request.query.get('q', '') %}
-{% set currentType = filters is defined ? filters.type|default('all') : app.request.query.get('type', 'all') %}
-{% set currentGenre = filters is defined ? filters.genre|default('') : app.request.query.get('genre', '') %}
-{% set currentYear = filters is defined ? filters.annee|default('') : app.request.query.get('annee', '') %}
-{% set searchActionRoute = actionRoute|default('app_catalogue') %}
-
-{# Trouver le nom du genre sélectionné pour l'afficher sur le bouton et le badge #}
+{% set currentQ = filters.q|default('') %}
+{% set currentType = filters.type|default('all') %}
+{% set currentGenre = filters.genre|default(null) %}
+{% set currentYear = filters.annee|default(null) %}
+{% set currentDate = filters.date|default(null) %}
+{% set componentId = 'search-card-' ~ actionRoute|replace({'_': '-'}) %}
 {% set activeGenreName = 'Genre' %}
-{% for genre in genres %}
-    {% if genre.slug == currentGenre %}
-        {% set activeGenreName = genre.name %}
+{% for genre in genres %}{% if genre.slug == currentGenre %}{% set activeGenreName = genre.name %}{% endif %}{% endfor %}
+
+<div data-controller="search-card"
+     data-search-card-selected-date-value="{{ currentDate ?: '' }}"
+     data-search-card-current-year-value="{{ currentYear ?: 0 }}">
+    <section class="search-card" aria-label="Recherche et filtres">
+        <form class="search-form" method="get" action="{{ path(actionRoute) }}" data-search-card-target="form">
+            <input type="hidden" name="type" value="{{ currentType }}" data-search-card-target="type">
+            <input type="hidden" name="genre" value="{{ currentGenre ?: '' }}" data-search-card-target="genre">
+            <input type="hidden" name="annee" value="{{ currentYear ?: '' }}" data-search-card-target="year">
+            <input type="hidden" name="date" value="{{ currentDate ?: '' }}" data-search-card-target="date">
+
+            <div class="search-wrapper">
+                <label class="visually-hidden" for="{{ componentId }}-query">Rechercher une œuvre</label>
+                <input type="search" name="q" id="{{ componentId }}-query" placeholder="Rechercher une œuvre..."
+                       value="{{ currentQ }}" maxlength="120" autocomplete="off" data-search-card-target="query">
+                <button type="submit" class="search-submit" aria-label="Lancer la recherche">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div class="filter-row" aria-label="Type d’œuvre">
+                {% for value, label in {'all': 'Tous', 'anime': 'Anime', 'manga': 'Manga'} %}
+                    <button type="button" class="filter-pill {{ currentType == value ? 'is-active' : '' }}"
+                            aria-pressed="{{ currentType == value ? 'true' : 'false' }}"
+                            data-value="{{ value }}" data-action="search-card#selectType">{{ label }}</button>
+                {% endfor %}
+            </div>
+
+            <div class="filter-row">
+                <div class="custom-dropdown" data-search-card-target="genreDropdown">
+                    <button type="button" class="filter-pill filter-pill--dropdown {{ currentGenre ? 'is-active' : '' }}"
+                            aria-expanded="false" aria-controls="{{ componentId }}-genres"
+                            data-search-card-target="genreTrigger" data-action="search-card#toggleGenre">
+                        <span data-search-card-target="genreLabel">{{ activeGenreName }}</span>
+                        <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="custom-dropdown-menu" id="{{ componentId }}-genres" role="menu" hidden data-search-card-target="genreMenu">
+                        <button type="button" role="menuitem" class="custom-dropdown-item {{ currentGenre is null ? 'is-selected' : '' }}"
+                                data-value="" data-label="Genre" data-action="search-card#selectGenre">Tous les genres</button>
+                        {% for genre in genres %}
+                            <button type="button" role="menuitem" class="custom-dropdown-item {{ currentGenre == genre.slug ? 'is-selected' : '' }}"
+                                    data-value="{{ genre.slug }}" data-label="{{ genre.name }}" data-action="search-card#selectGenre">{{ genre.name }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <button type="button" class="filter-pill filter-pill--dropdown {{ currentYear ? 'is-active' : '' }}"
+                        aria-haspopup="dialog" aria-controls="{{ componentId }}-calendar"
+                        data-action="search-card#openCalendar" data-search-card-target="calendarTrigger">
+                    <span data-search-card-target="yearLabel">{{ currentYear ?: 'Date' }}</span>
+                    <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                </button>
+            </div>
+
+        </form>
+        <noscript>
+            <form class="search-card-fallback" method="get" action="{{ path(actionRoute) }}">
+                <label>Recherche <input type="search" name="q" value="{{ currentQ }}" maxlength="120"></label>
+                <label>Type <select name="type"><option value="all">Tous</option><option value="anime">Anime</option><option value="manga">Manga</option></select></label>
+                <label>Genre <select name="genre"><option value="">Tous</option>{% for genre in genres %}<option value="{{ genre.slug }}">{{ genre.name }}</option>{% endfor %}</select></label>
+                <label>Date <input type="date" name="date" value="{{ currentDate ?: '' }}"></label>
+                <button type="submit">Appliquer les filtres</button>
+            </form>
+        </noscript>
+    </section>
+
+    {% if currentQ or currentType != 'all' or currentGenre or currentYear %}
+        <div class="active-filters" aria-label="Filtres actifs">
+            <span class="active-filters-label">Filtres actifs :</span>
+            {% if currentQ %}<button type="button" class="active-chip" data-filter="q" data-action="search-card#clearFilter">« {{ currentQ }} » <i class="fa-solid fa-xmark" aria-hidden="true"></i></button>{% endif %}
+            {% if currentType != 'all' %}<button type="button" class="active-chip" data-filter="type" data-action="search-card#clearFilter">{{ currentType|capitalize }} <i class="fa-solid fa-xmark" aria-hidden="true"></i></button>{% endif %}
+            {% if currentGenre %}<button type="button" class="active-chip" data-filter="genre" data-action="search-card#clearFilter">{{ activeGenreName }} <i class="fa-solid fa-xmark" aria-hidden="true"></i></button>{% endif %}
+            {% if currentYear %}<button type="button" class="active-chip" data-filter="date" data-action="search-card#clearFilter">{{ currentDate ?: currentYear }} <i class="fa-solid fa-xmark" aria-hidden="true"></i></button>{% endif %}
+            <button type="button" class="clear-filters" data-action="search-card#clearAll">Tout effacer</button>
+        </div>
     {% endif %}
-{% endfor %}
 
-<section class="search-card">
-    {# Formulaire principal contenant tous les filtres sous forme de champs cachés #}
-    <form class="search-form" method="get" action="{{ path(searchActionRoute) }}" id="catalogue-filters-form">
-        <input type="hidden" name="type" id="filter-type" value="{{ currentType }}">
-        <input type="hidden" name="genre" id="filter-genre" value="{{ currentGenre }}">
-        <input type="hidden" name="annee" id="filter-annee" value="{{ currentYear }}">
-
-        <div class="search-wrapper">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" name="q" id="search-input" placeholder="Rechercher une œuvre..." value="{{ currentQ }}" autocomplete="off">
-        </div>
-    </form>
-
-    {# Première ligne de filtres : Types #}
-    <div class="filter-row">
-        <button type="button" class="filter-pill {{ currentType == 'all' ? 'is-active' : '' }}" data-type-btn="all">
-            Tous
-        </button>
-        <button type="button" class="filter-pill {{ currentType == 'anime' ? 'is-active' : '' }}" data-type-btn="anime">Anime</button>
-        <button type="button" class="filter-pill {{ currentType == 'manga' ? 'is-active' : '' }}" data-type-btn="manga">Manga</button>
-    </div>
-
-    {# Deuxième ligne de filtres : Dropdowns pour Genre et Année #}
-    <div class="filter-row">
-        <div class="custom-dropdown">
-            <button type="button" class="filter-pill filter-pill--dropdown {{ currentGenre ? 'is-active' : '' }}" data-dropdown-trigger="genre">
-                {{ activeGenreName }}
-                <i class="fa-solid fa-chevron-down"></i>
-            </button>
-            <div class="custom-dropdown-menu" id="menu-genre">
-                <div class="custom-dropdown-item {{ currentGenre == '' ? 'is-selected' : '' }}" data-value="">Tous les genres</div>
-                {% for genre in genres %}
-                    <div class="custom-dropdown-item {{ currentGenre == genre.slug ? 'is-selected' : '' }}" data-value="{{ genre.slug }}">
-                        {{ genre.name }}
-                    </div>
-                {% endfor %}
+    <div id="{{ componentId }}-calendar" class="calendar-overlay" role="dialog" aria-modal="true" aria-labelledby="{{ componentId }}-calendar-title"
+         hidden data-search-card-target="calendar" data-action="click->search-card#calendarBackdrop keydown@window->search-card#escape">
+        <section class="calendar-dialog">
+            <header class="calendar-header">
+                <h2 id="{{ componentId }}-calendar-title">Calendrier</h2>
+                <button type="button" class="calendar-reset" data-action="search-card#resetCalendar">Réinitialiser</button>
+            </header>
+            <div class="calendar-navigation">
+                <button type="button" class="calendar-arrow" aria-label="Mois précédent" data-action="search-card#previousMonth"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+                <div><strong data-search-card-target="monthLabel"></strong><small>SÉLECTION DE DATE</small></div>
+                <button type="button" class="calendar-arrow" aria-label="Mois suivant" data-action="search-card#nextMonth"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
             </div>
-        </div>
-
-        <div class="custom-dropdown">
-            <button type="button" class="filter-pill filter-pill--dropdown {{ currentYear ? 'is-active' : '' }}" data-dropdown-trigger="annee">
-                {{ currentYear ?: 'Année' }}
-                <i class="fa-regular fa-calendar"></i>
-            </button>
-            <div class="custom-dropdown-menu" id="menu-annee">
-                <div class="custom-dropdown-item {{ currentYear == '' ? 'is-selected' : '' }}" data-value="">Toutes les années</div>
-                {% for year in [2026, 2025, 2024, 2023, 2022, 2021, 2020] %}
-                    <div class="custom-dropdown-item {{ currentYear == year ? 'is-selected' : '' }}" data-value="{{ year }}">
-                        {{ year }}
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
+            <div class="calendar-weekdays" aria-hidden="true"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+            <div class="calendar-grid" role="grid" aria-label="Jours du mois" data-search-card-target="calendarGrid"></div>
+            <div class="calendar-selection" aria-live="polite"><span>DATE SÉLECTIONNÉE</span><strong data-search-card-target="selectedDateLabel">Aucune date</strong></div>
+            <footer class="calendar-actions">
+                <button type="button" class="calendar-confirm" data-action="search-card#confirmDate"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i> Confirmer la date</button>
+                <button type="button" class="calendar-cancel" data-action="search-card#closeCalendar">ANNULER</button>
+            </footer>
+        </section>
     </div>
-</section>
-
-{# Zone des filtres actifs #}
-{% if currentQ or currentType != 'all' or currentGenre or currentYear %}
-    <div class="active-filters">
-        <span class="active-filters-label">Filtres actifs :</span>
-        
-        {% if currentQ %}
-            <span class="active-chip" data-clear="q">
-                « {{ currentQ }} » <i class="fa-solid fa-xmark"></i>
-            </span>
-        {% endif %}
-
-        {% if currentType != 'all' %}
-            <span class="active-chip" data-clear="type">
-                {{ currentType|capitalize }} <i class="fa-solid fa-xmark"></i>
-            </span>
-        {% endif %}
-
-        {% if currentGenre %}
-            <span class="active-chip" data-clear="genre">
-                {{ activeGenreName }} <i class="fa-solid fa-xmark"></i>
-            </span>
-        {% endif %}
-
-        {% if currentYear %}
-            <span class="active-chip" data-clear="annee">
-                {{ currentYear }} <i class="fa-solid fa-xmark"></i>
-            </span>
-        {% endif %}
-
-        <button type="button" class="clear-filters">Tout effacer</button>
-    </div>
-{% endif %}
-
-{# Le JavaScript pour animer tes boutons et soumettre le formulaire automatiquement #}
-<script>
-window.initSearchCard = window.initSearchCard || (() => {
-    const form = document.getElementById('catalogue-filters-form');
-    const inputType = document.getElementById('filter-type');
-    const inputGenre = document.getElementById('filter-genre');
-    const inputAnnee = document.getElementById('filter-annee');
-    const inputQ = document.getElementById('search-input');
-
-    // 1. Gestion des boutons de Type (Tous / Anime / Manga)
-    document.querySelectorAll('[data-type-btn]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            inputType.value = btn.dataset.typeBtn;
-            form.submit();
-        });
-    });
-
-    // 2. Ouverture/Fermeture des Dropdowns (Genre / Année)
-    document.querySelectorAll('[data-dropdown-trigger]').forEach(trigger => {
-        trigger.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const parent = trigger.parentElement;
-            
-            // Fermer les autres dropdowns ouverts
-            document.querySelectorAll('.custom-dropdown').forEach(d => {
-                if (d !== parent) d.classList.remove('is-open');
-            });
-            
-            parent.classList.toggle('is-open');
-        });
-    });
-
-    // Fermer les menus si on clique n'importe où ailleurs sur la page
-    document.addEventListener('click', () => {
-        document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
-            dropdown.classList.remove('is-open');
-        });
-    });
-
-    // 3. Clic sur un élément à l'intérieur d'un dropdown
-    document.querySelectorAll('.custom-dropdown-menu').forEach(menu => {
-        menu.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-
-        const isGenreMenu = menu.id === 'menu-genre';
-        
-        menu.querySelectorAll('.custom-dropdown-item').forEach(item => {
-            item.addEventListener('click', () => {
-                if (isGenreMenu) {
-                    inputGenre.value = item.dataset.value;
-                } else {
-                    inputAnnee.value = item.dataset.value;
-                }
-                form.submit();
-            });
-        });
-    });
-
-    // 4. Suppression individuelle des filtres actifs (les puces "active-chip")
-    const activeFiltersContainer = document.querySelector('.active-filters');
-    const clearChip = (chip) => {
-        if (!chip) {
-            return;
-        }
-
-        const target = chip.dataset.clear;
-        if (target === 'q') inputQ.value = '';
-        if (target === 'type') inputType.value = 'all';
-        if (target === 'genre') inputGenre.value = '';
-        if (target === 'annee') inputAnnee.value = '';
-        form.submit();
-    };
-
-    if (activeFiltersContainer) {
-        activeFiltersContainer.addEventListener('click', (event) => {
-            const chip = event.target.closest('[data-clear]');
-            clearChip(chip);
-        });
-    }
-
-    document.querySelectorAll('[data-clear]').forEach(chip => {
-        chip.addEventListener('click', (event) => {
-            event.preventDefault();
-            clearChip(chip);
-        });
-    });
-
-    // 5. Bouton "Tout effacer"
-    const clearAllBtn = document.querySelector('.clear-filters');
-    if (clearAllBtn) {
-        clearAllBtn.addEventListener('click', () => {
-            inputQ.value = '';
-            inputType.value = 'all';
-            inputGenre.value = '';
-            inputAnnee.value = '';
-            form.submit();
-        });
-    }
-});
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', window.initSearchCard);
-} else {
-    window.initSearchCard();
-}
-</script>
+</div>

@@ -83,12 +83,6 @@ class Episode implements Ownable
     #[ORM\OneToMany(targetEntity: Favorite::class, mappedBy: 'episode')]
     private Collection $favorites;
 
-    /**
-     * @var Collection<int, SpoilerPreference>
-     */
-    #[ORM\OneToMany(targetEntity: SpoilerPreference::class, mappedBy: 'episode')]
-    private Collection $spoilerPreferences;
-
     public function __construct()
     {
         $this->categorie = new ArrayCollection();
@@ -96,7 +90,6 @@ class Episode implements Ownable
         $this->slides = new ArrayCollection();
         $this->summaries = new ArrayCollection();
         $this->favorites = new ArrayCollection();
-        $this->spoilerPreferences = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -370,33 +363,4 @@ class Episode implements Ownable
         return $this;
     }
 
-    /**
-     * @return Collection<int, SpoilerPreference>
-     */
-    public function getSpoilerPreferences(): Collection
-    {
-        return $this->spoilerPreferences;
-    }
-
-    public function addSpoilerPreference(SpoilerPreference $spoilerPreference): static
-    {
-        if (!$this->spoilerPreferences->contains($spoilerPreference)) {
-            $this->spoilerPreferences->add($spoilerPreference);
-            $spoilerPreference->setEpisode($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSpoilerPreference(SpoilerPreference $spoilerPreference): static
-    {
-        if ($this->spoilerPreferences->removeElement($spoilerPreference)) {
-            // set the owning side to null (unless already changed)
-            if ($spoilerPreference->getEpisode() === $this) {
-                $spoilerPreference->setEpisode(null);
-            }
-        }
-
-        return $this;
-    }
 }

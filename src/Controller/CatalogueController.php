@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Service\OeuvreFilterNormalizer;
 
 final class CatalogueController extends AbstractController
 {
@@ -25,30 +26,18 @@ final class CatalogueController extends AbstractController
         CategorieRepository $categorieRepository,
         FavoriteRepository $favoriteRepository,
         SummaryRepository $summaryRepository,
+        OeuvreFilterNormalizer $filterNormalizer,
     ): Response {
         $user = $this->getUser();
         if (!$user instanceof User) {
             throw $this->createAccessDeniedException();
         }
 
-        $filters = [
-            'q' => trim((string) $request->query->get('q', '')),
-            'type' => (string) $request->query->get('type', 'all'),
-            'genre' => $request->query->get('genre') ?: null,
-            'annee' => $request->query->get('annee') ?: null,
-        ];
-
         $genreOptions = array_values(array_map(
             static fn ($categorie) => ['slug' => $categorie->getSlug(), 'name' => $categorie->getName()],
-            $categorieRepository->findAll()
+            $categorieRepository->findBy([], ['name' => 'ASC'])
         ));
-
-        if ($genreOptions === []) {
-            $genreOptions = [
-                ['slug' => 'action-adventure', 'name' => 'Action / Aventure'],
-                ['slug' => 'romance', 'name' => 'Romance'],
-            ];
-        }
+        $filters = $filterNormalizer->normalize($request, $genreOptions);
 
         $catalogueItems = [];
 
@@ -99,9 +88,8 @@ final class CatalogueController extends AbstractController
             'title' => $anime->getTitle(),
             'subtitle' => sprintf('%d saison(s) • %s', $anime->getSeasons()->count(), $anime->getStatus() ?: 'Statut non renseigné'),
             'author' => $anime->getAuthor(),
-            'date' => (string) ($anime->getAnimeDate() ?? ''),
+            'date' => $anime->getReleaseDate()?->format('Y') ?? '',
             'cover' => $anime->getCoverAnimeUrl(),
-            'votesCount' => $anime->getVotes()->count(),
             'isPrivate' => !$anime->isPublic(),
         ];
     }
@@ -114,9 +102,8 @@ final class CatalogueController extends AbstractController
             'title' => $manga->getTitle(),
             'subtitle' => $manga->getStatus() ?: 'Statut non renseigné',
             'author' => $manga->getAuthor(),
-            'date' => (string) ($manga->getMangaDate() ?? ''),
+            'date' => $manga->getReleaseDate()?->format('Y') ?? '',
             'cover' => $manga->getCoverMangaUrl(),
-            'votesCount' => $manga->getVotes()->count(),
             'isPrivate' => !$manga->isPublic(),
         ];
     }

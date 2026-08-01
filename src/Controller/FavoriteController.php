@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Service\OeuvreFilterNormalizer;
 
 #[IsGranted('ROLE_USER')]
 final class FavoriteController extends AbstractController
@@ -93,15 +94,15 @@ final class FavoriteController extends AbstractController
         FavoriteRepository $favoriteRepository,
         CategorieRepository $categorieRepository,
         SummaryRepository $summaryRepository,
+        OeuvreFilterNormalizer $filterNormalizer,
     ): Response {
         $user = $this->requireUser();
 
-        $filters = [
-            'q' => trim((string) $request->query->get('q', '')),
-            'type' => (string) $request->query->get('type', 'all'),
-            'genre' => (string) $request->query->get('genre', ''),
-            'annee' => (string) $request->query->get('annee', ''),
-        ];
+        $availableGenres = array_map(static fn ($category): array => [
+            'slug' => $category->getSlug(),
+            'name' => $category->getName(),
+        ], $categorieRepository->findAllAlphabetically());
+        $filters = $filterNormalizer->normalize($request, $availableGenres);
 
         $cards = [];
         foreach ($favoriteRepository->findByUser($user) as $favorite) {
@@ -139,11 +140,6 @@ final class FavoriteController extends AbstractController
         }
         unset($card);
 
-        $availableGenres = array_map(static fn ($category): array => [
-            'slug' => $category->getSlug(),
-            'name' => $category->getName(),
-        ], $categorieRepository->findAllAlphabetically());
-
         return $this->render('favorite/index.html.twig', [
             'favorites' => array_values($cards),
             'genres' => $availableGenres,
@@ -169,9 +165,9 @@ final class FavoriteController extends AbstractController
                 'subtitle' => $this->animeProgress($anime),
                 'date' => $favorite->getCreatedAt()?->format('d.m.Y'),
                 'dateLabel' => 'Ajouté le',
-                'year' => $anime->getAnimeDate(),
+                'year' => $anime->getReleaseDate() !== null ? (int) $anime->getReleaseDate()->format('Y') : null,
+                'releaseDate' => $anime->getReleaseDate()?->format('Y-m-d'),
                 'cover' => $anime->getCoverAnimeUrl(),
-                'votesCount' => $anime->getVotes()->count(),
                 'isPrivate' => !$anime->isPublic(),
                 'isFavorite' => false,
                 'category' => $categories[0]->getName() ?? null,
@@ -199,9 +195,9 @@ final class FavoriteController extends AbstractController
             'subtitle' => $this->mangaProgress($manga),
             'date' => $favorite->getCreatedAt()?->format('d.m.Y'),
             'dateLabel' => 'Ajouté le',
-            'year' => $manga->getMangaDate(),
+            'year' => $manga->getReleaseDate() !== null ? (int) $manga->getReleaseDate()->format('Y') : null,
+            'releaseDate' => $manga->getReleaseDate()?->format('Y-m-d'),
             'cover' => $manga->getCoverMangaUrl(),
-            'votesCount' => $manga->getVotes()->count(),
             'isPrivate' => !$manga->isPublic(),
             'isFavorite' => false,
             'category' => $categories[0]->getName() ?? null,
@@ -266,11 +262,15 @@ final class FavoriteController extends AbstractController
             return false;
         }
 
-        if ($filters['genre'] !== '' && !in_array($filters['genre'], $card['categorySlugs'], true)) {
+        if ($filters['genre'] !== null && !in_array($filters['genre'], $card['categorySlugs'], true)) {
             return false;
         }
 
-        return $filters['annee'] === '' || (string) $card['year'] === $filters['annee'];
+        if ($filters['date'] !== null) {
+            return $card['releaseDate'] === $filters['date'];
+        }
+
+        return $filters['annee'] === null || (int) $card['year'] === $filters['annee'];
     }
 
     private function requireUser(): User

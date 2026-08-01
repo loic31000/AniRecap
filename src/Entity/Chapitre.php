@@ -83,19 +83,12 @@ class Chapitre implements Ownable
     #[ORM\OneToMany(targetEntity: Slide::class, mappedBy: 'chapitre')]
     private Collection $slides;
 
-    /**
-     * @var Collection<int, SpoilerPreference>
-     */
-    #[ORM\OneToMany(targetEntity: SpoilerPreference::class, mappedBy: 'chapitre')]
-    private Collection $spoilerPreferences;
-
     public function __construct()
     {
         $this->categorie = new ArrayCollection();
         $this->character = new ArrayCollection();
         $this->summaries = new ArrayCollection();
         $this->favorites = new ArrayCollection();
-        $this->spoilerPreferences = new ArrayCollection();
         $this->slides = new ArrayCollection();
     }
 
@@ -370,33 +363,4 @@ class Chapitre implements Ownable
         return $this;
     }
 
-    /**
-     * @return Collection<int, SpoilerPreference>
-     */
-    public function getSpoilerPreferences(): Collection
-    {
-        return $this->spoilerPreferences;
-    }
-
-    public function addSpoilerPreference(SpoilerPreference $spoilerPreference): static
-    {
-        if (!$this->spoilerPreferences->contains($spoilerPreference)) {
-            $this->spoilerPreferences->add($spoilerPreference);
-            $spoilerPreference->setChapitre($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSpoilerPreference(SpoilerPreference $spoilerPreference): static
-    {
-        if ($this->spoilerPreferences->removeElement($spoilerPreference)) {
-            // set the owning side to null (unless already changed)
-            if ($spoilerPreference->getChapitre() === $this) {
-                $spoilerPreference->setChapitre(null);
-            }
-        }
-
-        return $this;
-    }
 }

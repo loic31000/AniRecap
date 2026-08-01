@@ -63,14 +63,6 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
 }
 
-.forms-introduction {
-    max-width: 560px;
-    margin: 0 auto 28px;
-    color: var(--forms-muted);
-    line-height: 1.6;
-    text-align: center;
-}
-
 .forms-list {
     display: grid;
     gap: 18px;
@@ -98,14 +90,12 @@
     box-shadow: 0 16px 30px rgba(0, 0, 0, 0.4);
 }
 
-.forms-card:focus-visible,
-.orientation-card__back:focus-visible {
+.forms-card:focus-visible {
     outline: 3px solid var(--forms-gold-soft);
     outline-offset: 4px;
 }
 
-.forms-card__icon,
-.orientation-card__icon {
+.forms-card__icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -134,10 +124,6 @@
     color: var(--forms-gold-soft);
     font-size: 0.92rem;
     line-height: 1.4;
-}
-
-.forms-card__arrow {
-    font-size: 1rem;
 }
 
 /* Sélecteur de création autonome */
@@ -296,72 +282,6 @@
         border-bottom: 1px solid rgba(129, 151, 179, 0.65);
         border-radius: 32px;
     }
-}
-
-.forms-page--orientation {
-    display: grid;
-    place-items: center;
-}
-
-.orientation-card {
-    width: min(100%, 620px);
-    box-sizing: border-box;
-    padding: clamp(28px, 7vw, 52px);
-    border: 1px solid var(--forms-border);
-    border-radius: 26px;
-    background: linear-gradient(180deg, rgba(10, 26, 46, 0.98), rgba(4, 13, 24, 0.98));
-    text-align: center;
-    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.38);
-}
-
-.orientation-card__icon {
-    margin-bottom: 24px;
-}
-
-.orientation-card__eyebrow {
-    margin: 0 0 10px;
-    color: var(--forms-gold-soft);
-    font-size: 0.78rem;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-}
-
-.orientation-card h1 {
-    margin: 0 0 20px;
-    color: var(--forms-gold);
-    font-size: clamp(1.8rem, 6vw, 2.5rem);
-    line-height: 1.2;
-}
-
-.orientation-card > p:not(.orientation-card__eyebrow) {
-    margin: 0 auto 20px;
-    color: var(--forms-muted);
-    line-height: 1.7;
-}
-
-.orientation-card .orientation-card__notice {
-    padding: 16px;
-    border: 1px solid var(--forms-border);
-    border-radius: 14px;
-    background: rgba(232, 165, 63, 0.08);
-    color: var(--forms-gold-soft);
-    font-weight: 700;
-}
-
-.orientation-card__back {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    min-height: 48px;
-    margin-top: 8px;
-    padding: 0 20px;
-    border: 1px solid var(--forms-gold);
-    border-radius: 999px;
-    color: var(--forms-gold);
-    font-weight: 800;
-    text-decoration: none;
 }
 
 .scene-timecodes,
@@ -888,10 +808,6 @@
     padding-left: 20px;
     color: #ff8d8d;
     font-size: 0.9rem;
-}
-
-.synopsis-form .help-text {
-    color: #b98936;
 }
 
 .form-error-summary,

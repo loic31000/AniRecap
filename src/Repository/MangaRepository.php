@@ -21,24 +21,13 @@ class MangaRepository extends ServiceEntityRepository
     /**
      * @return Manga[]
      */
-    public function findVisibleTo(User $viewer): array
-    {
-        return $this->createVisibleQueryBuilder($viewer)
-            ->orderBy('m.title', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     * @return Manga[]
-     */
     public function searchVisibleTo(array $filters, User $viewer): array
     {
         $qb = $this->createVisibleQueryBuilder($viewer);
 
         if (!empty($filters['q'])) {
-            $qb->andWhere('(LOWER(m.title) LIKE :q OR LOWER(m.synopsis) LIKE :q OR LOWER(m.author) LIKE :q)')
-                ->setParameter('q', '%' . mb_strtolower($filters['q']) . '%');
+            $qb->andWhere("(LOWER(m.title) LIKE :q ESCAPE '!' OR LOWER(m.synopsis) LIKE :q ESCAPE '!' OR LOWER(m.author) LIKE :q ESCAPE '!')")
+                ->setParameter('q', $filters['q_pattern']);
         }
 
         if (!empty($filters['genre'])) {
@@ -46,9 +35,14 @@ class MangaRepository extends ServiceEntityRepository
                 ->setParameter('genre', $filters['genre']);
         }
 
-        if (!empty($filters['annee'])) {
-            $qb->andWhere('m.mangaDate = :annee')
-                ->setParameter('annee', (int) $filters['annee']);
+        if (!empty($filters['date'])) {
+            $qb->andWhere('m.releaseDate = :releaseDate')
+                ->setParameter('releaseDate', new \DateTimeImmutable($filters['date']));
+        } elseif (!empty($filters['annee'])) {
+            $year = (int) $filters['annee'];
+            $qb->andWhere('m.releaseDate >= :yearStart AND m.releaseDate < :yearEnd')
+                ->setParameter('yearStart', new \DateTimeImmutable(sprintf('%d-01-01', $year)))
+                ->setParameter('yearEnd', new \DateTimeImmutable(sprintf('%d-01-01', $year + 1)));
         }
 
         return $qb
@@ -64,11 +58,17 @@ class MangaRepository extends ServiceEntityRepository
             ->leftJoin('m.categorie', 'c')->addSelect('c')
             ->andWhere('m.isPublic = true')->distinct();
         if (!empty($filters['q'])) {
-            $qb->andWhere('(LOWER(m.title) LIKE :q OR LOWER(m.synopsis) LIKE :q OR LOWER(m.author) LIKE :q)')
-                ->setParameter('q', '%' . mb_strtolower($filters['q']) . '%');
+            $qb->andWhere("(LOWER(m.title) LIKE :q ESCAPE '!' OR LOWER(m.synopsis) LIKE :q ESCAPE '!' OR LOWER(m.author) LIKE :q ESCAPE '!')")
+                ->setParameter('q', $filters['q_pattern']);
         }
         if (!empty($filters['genre'])) { $qb->andWhere('c.slug = :genre')->setParameter('genre', $filters['genre']); }
-        if (!empty($filters['annee'])) { $qb->andWhere('m.mangaDate = :annee')->setParameter('annee', (int) $filters['annee']); }
+        if (!empty($filters['date'])) { $qb->andWhere('m.releaseDate = :releaseDate')->setParameter('releaseDate', new \DateTimeImmutable($filters['date'])); }
+        elseif (!empty($filters['annee'])) {
+            $year = (int) $filters['annee'];
+            $qb->andWhere('m.releaseDate >= :yearStart AND m.releaseDate < :yearEnd')
+                ->setParameter('yearStart', new \DateTimeImmutable(sprintf('%d-01-01', $year)))
+                ->setParameter('yearEnd', new \DateTimeImmutable(sprintf('%d-01-01', $year + 1)));
+        }
         return $qb->orderBy('m.title', 'ASC')->getQuery()->getResult();
     }
 
@@ -103,19 +103,6 @@ class MangaRepository extends ServiceEntityRepository
             ->setParameter('isPublic', true)
             ->setParameter('viewer', $viewer)
             ->distinct();
-    }
-
-    /**
-     * @return Manga[]
-     */
-    public function findPublic(): array
-    {
-        return $this->findBy(['isPublic' => true], ['title' => 'ASC']);
-    }
-
-    public function findOnePublic(): ?Manga
-    {
-        return $this->findOneBy(['isPublic' => true], ['id' => 'ASC']);
     }
 
     public function findOneOwnedByCoverUrl(string $coverUrl, User $owner): ?Manga

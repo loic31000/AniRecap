@@ -260,16 +260,6 @@ class SummaryRepository extends ServiceEntityRepository
     }
 
     /** @return list<Summary> */
-    public function findVisibleEpisodeSummariesForAnime(Anime $anime, User $viewer): array
-    {
-        return $this->createVisibleChildQueryBuilder($viewer)
-            ->andWhere('s.episode IS NOT NULL')->andWhere('season.anime = :anime')
-            ->setParameter('anime', $anime)
-            ->orderBy('season.number', 'ASC')->addOrderBy('episode.number', 'ASC')
-            ->getQuery()->getResult();
-    }
-
-    /** @return list<Summary> */
     public function findVisibleChildSummariesForManga(Manga $manga, User $viewer): array
     {
         return $this->createVisibleChildQueryBuilder($viewer)

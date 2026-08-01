@@ -86,7 +86,6 @@ final class ProfileController extends AbstractController
             'date' => $favorite->getCreatedAt()?->format('d.m.Y') ?? '',
             'dateLabel' => 'Ajouté le',
             'cover' => $anime?->getCoverAnimeUrl() ?? $manga?->getCoverMangaUrl() ?? '/images/coverCardSeason.png',
-            'votesCount' => $work->getVotes()->count(),
             'isPrivate' => !$work->isPublic(),
             'isFavorite' => false,
         ];
