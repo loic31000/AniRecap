@@ -15,10 +15,10 @@
     <div class="catalogue-page home-page" id="home-top">
         {{ component('Header', { backRoute: null }) }}
 
-        <main class="catalogue-shell">
+        <main class="catalogue-shell" id="main-content" tabindex="-1">
             <div class="catalogue-content">
                 {% include 'components/_flash_messages.html.twig' %}
-                <h1 class="page-title"><span>ホーム Home</span></h1>
+                <h1 class="page-title"><span><span lang="ja">ホーム</span> Home</span></h1>
 
                 {% if not is_authenticated %}
                     <section class="visitor-welcome" aria-labelledby="visitor-welcome-title">
@@ -34,13 +34,13 @@
                 <twig:SearchCard :genres="genres" :filters="filters" actionRoute="app_home"/>
 
                 <section class="home-section" aria-labelledby="popular-title">
-                    <h2 id="popular-title" class="section-title"><span>人気 Populaire</span></h2>
+                    <h2 id="popular-title" class="section-title"><span><span lang="ja">人気</span> Populaire</span></h2>
                     {% if popular_uses_fallback and popular is not empty %}<p class="home-section-note">Aucun J’aime pour le moment : voici les publications les plus récentes.</p>{% endif %}
                     <twig:OeuvreCard :results="popular"/>
                 </section>
 
                 <section class="home-section" aria-labelledby="available-title">
-                    <h2 id="available-title" class="section-title"><span>新着 Disponible récemment</span></h2>
+                    <h2 id="available-title" class="section-title"><span><span lang="ja">新着</span> Disponible récemment</span></h2>
                     <twig:OeuvreCard :results="available"/>
                 </section>
 

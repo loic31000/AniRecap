@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accessibilité — AniRecap{% endblock %}
+
+{% block body %}
+    <main class="legal-page" id="main-content">
+        <article class="legal-content">
+            <a href="{{ path('app_home') }}" class="legal-back">← Retour à l’accueil</a>
+            <h1>Déclaration d’accessibilité</h1>
+
+            <p>AniRecap s’engage à rendre son site accessible conformément au référentiel général d’amélioration de l’accessibilité, RGAA 4.1.2.</p>
+
+            <h2>État de conformité</h2>
+            <p><strong>AniRecap est actuellement non conforme au RGAA.</strong> Aucun audit de conformité complet portant sur les 106 critères n’a encore été réalisé. Cette mention sera mise à jour après un audit formel.</p>
+
+            <h2>Résultats du pré-audit technique</h2>
+            <p>L’auto-évaluation du 1 août 2026 a porté sur 20 pages ou états représentatifs, publics et authentifiés. Aucun défaut WCAG A ou AA propre à AniRecap n’a été signalé par axe-core 4.12.1 sur cet échantillon. Les contrôles clavier représentatifs et les contrastes principaux ont également été validés.</p>
+            <p>Ces résultats automatisés ne couvrent pas tous les critères RGAA. Les tests avec lecteurs d’écran et la grille manuelle des 106 critères restent nécessaires avant de calculer un taux officiel.</p>
+
+            <h2>Améliorations déjà réalisées</h2>
+            <ul>
+                <li>navigation complète au clavier et focus renforcé ;</li>
+                <li>lien d’évitement vers le contenu principal ;</li>
+                <li>structure sémantique et langue des contenus ;</li>
+                <li>alternatives textuelles des images porteuses d’information ;</li>
+                <li>contrastes de texte et d’interface renforcés ;</li>
+                <li>texte redimensionnable et mise en page responsive ;</li>
+                <li>réduction des animations selon la préférence du système ;</li>
+                <li>formulaires nommés, erreurs visibles et dialogues accessibles.</li>
+            </ul>
+
+            <h2>Plan d’action 2026</h2>
+            <ol>
+                <li>réaliser un audit manuel complet RGAA 4.1.2 ;</li>
+                <li>tester NVDA avec Firefox et VoiceOver avec Safari ;</li>
+                <li>tester toutes les pages à 200 % et 400 % de zoom ;</li>
+                <li>corriger les éventuelles non-conformités relevées ;</li>
+                <li>publier le taux de conformité et le détail des résultats.</li>
+            </ol>
+
+            <h2>Retour d’information</h2>
+            <p>Si vous ne parvenez pas à accéder à un contenu ou à une fonctionnalité, signalez le problème au responsable du projet AniRecap. Les coordonnées nominatives du responsable devront être ajoutées avant une mise en production publique.</p>
+
+            <h2>Voies de recours</h2>
+            <p>Si vous constatez un défaut d’accessibilité empêchant l’accès à un contenu et que vous n’obtenez pas de réponse satisfaisante, vous pouvez saisir le Défenseur des droits.</p>
+        </article>
+    </main>
+{% endblock %}

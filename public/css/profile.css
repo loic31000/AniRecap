@@ -94,6 +94,12 @@ body {
     cursor: pointer;
 }
 
+button.avatar-edit-btn {
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+}
+
 .profile-username {
     margin: 0 0 6px;
     color: var(--profile-gold);
@@ -223,12 +229,12 @@ body {
 .page-profile .badge-type {
     min-height: 18px;
     padding: 2px 7px;
-    font-size: 9px;
+    font-size: 0.75rem;
 }
 .page-profile .oeuvre-title { font-size: 15px; }
 .page-profile .oeuvre-subtitle { margin-bottom: 9px; font-size: 12px; }
 .page-profile .oeuvre-date,
-.page-profile .oeuvre-votes { font-size: 9px; }
+.page-profile .oeuvre-votes { font-size: 0.75rem; }
 .page-profile .oeuvre-votes { padding: 2px 8px; }
 
 .profile-summary-grid .summary-list-card__media { aspect-ratio: 16 / 9; }

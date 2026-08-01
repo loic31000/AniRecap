@@ -9,26 +9,26 @@
 {% endblock %}
 
 {% block body %}
-<div class="login-page">
+<main class="login-page" id="main-content">
     <div class="login-card">
 
         <div class="logo-wrap">
-            <img src="{{ asset('images/logo.png') }}" alt="AniRecap logo" class="logo-img">
+            <img src="{{ asset('images/logo.png') }}" alt="" class="logo-img">
         </div>
 
         <h1 class="brand-title">AniRecap</h1>
         <p class="brand-subtitle">Connectez-vous à votre espace</p>
 
         {% if error %}
-            <div class="flash-error">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            <div class="flash-error" role="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
         {% endif %}
 
-        <form class="login-form" method="post">
+        <form class="login-form" method="post" aria-label="Connexion à AniRecap">
 
             <div class="form-group">
-                <label for="inputEmail">Email</label>
+                <label for="inputEmail">Adresse e-mail</label>
                 <div class="input-icon">
-                    <i class="fa-regular fa-envelope"></i>
+                    <i class="fa-regular fa-envelope" aria-hidden="true"></i>
                     <input
                         type="email"
                         value="{{ last_username }}"
@@ -37,22 +37,22 @@
                         autocomplete="email"
                         required
                         autofocus
-                        placeholder="Entrer votre email"
+                        placeholder="nom@exemple.fr"
                     >
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="inputPassword">Password</label>
+                <label for="inputPassword">Mot de passe</label>
                 <div class="input-icon">
-                    <i class="fa-solid fa-lock"></i>
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
                     <input
                         type="password"
                         name="password"
                         id="inputPassword"
                         autocomplete="current-password"
                         required
-                        placeholder="Creer votre mots de passe"
+                        placeholder="Votre mot de passe"
                     >
                 </div>
             </div>
@@ -60,7 +60,7 @@
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
             <button type="submit" class="submit-btn">
-                Se connecter <i class="fa-solid fa-arrow-right"></i>
+                Se connecter <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
             </button>
         </form>
 
@@ -68,5 +68,5 @@
             <a href="{{ path('app_register') }}">Nouvel utilisateur ?</a>
         </p>
     </div>
-</div>
+</main>
 {% endblock %}

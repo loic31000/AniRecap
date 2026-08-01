@@ -16,23 +16,23 @@
 	<div class="catalogue-page catalogue-page--global" id="catalogue-top">
 		{{ component('Header', { backRoute: 'app_home' }) }}
 
-		<main class="catalogue-shell">
+		<main class="catalogue-shell" id="main-content" tabindex="-1">
 			<div class="catalogue-content">
 				{% include 'components/_flash_messages.html.twig' %}
 
 				<a href="{{ path('app_home') }}" class="retour-link">
-					<i class="fa-solid fa-arrow-left"></i>
+					<i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
 					Retour à l’accueil
 				</a>
 
 				<h1 class="page-title">
-					<span>カタログ Catalogue</span>
+					<span><span lang="ja">カタログ</span> Catalogue</span>
 				</h1>
 
 				<twig:SearchCard :genres="genres" :filters="filters"/>
 
 				<h2 class="section-title">
-					<span>カタログ Catalogue</span>
+					<span><span lang="ja">カタログ</span> Catalogue</span>
 				</h2>
 
 				<twig:OeuvreCard :results="results"/>

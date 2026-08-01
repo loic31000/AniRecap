@@ -558,7 +558,7 @@ body {
 }
 
 .synopsis-upload-zone small {
-    color: #9a722d;
+    color: #c99a47;
     font-size: 0.82rem;
     font-weight: 500;
     text-shadow: none;
@@ -799,7 +799,7 @@ body {
 }
 
 .synopsis-form [id$="_spoilerLevel"] label::after {
-    color: #9a722d;
+    color: #c99a47;
     font-size: 0.7rem;
     font-weight: 500;
 }

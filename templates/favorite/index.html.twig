@@ -15,7 +15,7 @@
     <div class="catalogue-page favorite-page" id="favorites-top">
         {{ component('Header', { backRoute: 'app_catalogue' }) }}
 
-        <main class="favorite-shell">
+        <main class="favorite-shell" id="main-content" tabindex="-1">
             {% include 'components/_flash_messages.html.twig' %}
             <a href="{{ path('app_catalogue') }}" class="retour-link">
                 <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
@@ -23,7 +23,7 @@
             </a>
 
             <h1 class="favorite-title">
-                <span>お気に入り</span>
+                <span lang="ja">お気に入り</span>
                 Mes Favoris
             </h1>
             <p class="favorite-intro">Gérez vos Œuvres Favorites.</p>

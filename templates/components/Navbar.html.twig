@@ -2,16 +2,18 @@
     <a
         href="{{ path('app_home') }}"
         class="nav-item {{ active is defined and active == 'home' ? 'is-active' : '' }}"
+        {% if active is defined and active == 'home' %}aria-current="page"{% endif %}
     >
-        <i class="fa-solid fa-house"></i>
+        <i class="fa-solid fa-house" aria-hidden="true"></i>
         <span>Accueil</span>
     </a>
 
     <a
         href="{{ path('app_catalogue') }}"
         class="nav-item {{ active is defined and active == 'catalogue' ? 'is-active' : '' }}"
+        {% if active is defined and active == 'catalogue' %}aria-current="page"{% endif %}
     >
-        <i class="fa-solid fa-book"></i>
+        <i class="fa-solid fa-book" aria-hidden="true"></i>
         <span>Catalogue</span>
     </a>
 
@@ -37,15 +39,16 @@
         class="nav-item {{ active is defined and active == 'favorites' ? 'is-active' : '' }}"
         {% if active is defined and active == 'favorites' %}aria-current="page"{% endif %}
     >
-        <i class="fa-solid fa-heart"></i>
+        <i class="fa-solid fa-heart" aria-hidden="true"></i>
         <span>Favoris</span>
     </a>
 
     <a
         href="{{ path('app_profile') }}"
         class="nav-item {{ active is defined and active == 'profile' ? 'is-active' : '' }}"
+        {% if active is defined and active == 'profile' %}aria-current="page"{% endif %}
     >
-        <i class="fa-solid fa-user"></i>
+        <i class="fa-solid fa-user" aria-hidden="true"></i>
         <span>Profil</span>
     </a>
 </nav>

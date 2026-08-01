@@ -221,7 +221,7 @@ body {
     border: 1px solid var(--story-gold);
     border-radius: 5px;
     color: var(--story-gold-light);
-    font-size: 11px;
+    font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.08em;
 }
@@ -326,7 +326,7 @@ body {
 
 .story__actions a {
     padding: 8px 11px;
-    font-size: 11px;
+    font-size: 0.75rem;
 }
 
 .story__empty {
@@ -348,7 +348,7 @@ body {
 
     .story__actions a {
         padding: 7px 9px;
-        font-size: 10px;
+        font-size: 0.75rem;
     }
 
     .story__card {

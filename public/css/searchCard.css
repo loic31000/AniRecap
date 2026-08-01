@@ -314,7 +314,7 @@ body.calendar-is-open { overflow: hidden; }
   cursor: pointer;
 }
 
-.calendar-day.is-outside { color: #34404f; }
+.calendar-day.is-outside { color: #9ba8b8; }
 .calendar-day.is-today { border-color: var(--gold); color: var(--gold); }
 .calendar-day.is-selected { border-color: #ffc225; color: #071525; background: #ffc225; box-shadow: 0 0 12px rgba(255, 194, 37, .65); }
 .calendar-day:focus-visible, .calendar-arrow:focus-visible, .calendar-reset:focus-visible, .calendar-confirm:focus-visible, .calendar-cancel:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }

@@ -62,7 +62,7 @@
     min-height: 18px;
     padding: 2px 7px;
     font-family: inherit;
-    font-size: 9px;
+    font-size: 0.75rem;
     font-weight: 600;
     line-height: 1.2;
     text-transform: none;
@@ -86,7 +86,7 @@
 
 .favorite-page .oeuvre-date,
 .favorite-page .oeuvre-votes {
-    font-size: 9px;
+    font-size: 0.75rem;
 }
 
 .favorite-page .oeuvre-votes {

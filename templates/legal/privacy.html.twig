@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Politique de confidentialité — AniRecap{% endblock %}
+
+{% block body %}
+    <main class="legal-page" id="main-content">
+        <article class="legal-content">
+            <a href="{{ path('app_register') }}" class="legal-back">← Retour à l’inscription</a>
+            <h1>Politique de confidentialité</h1>
+            <p class="legal-updated">Dernière mise à jour : 1 août 2026</p>
+
+            <h2>Données collectées et finalités</h2>
+            <p>AniRecap collecte votre nom d’utilisateur et votre adresse e-mail afin de créer, sécuriser et retrouver votre compte. L’adresse e-mail sert d’identifiant de connexion et n’est pas affichée publiquement.</p>
+
+            <h2>Caractère obligatoire</h2>
+            <p>Ces informations sont obligatoires pour créer un compte. Sans elles, l’inscription ne peut pas aboutir. La prise de connaissance demandée lors de l’inscription n’autorise aucune prospection commerciale.</p>
+
+            <h2>Base légale et destinataires</h2>
+            <p>Le traitement est nécessaire à l’exécution du service demandé lors de la création du compte. Les données sont accessibles uniquement à l’utilisateur concerné et aux personnes chargées de l’administration technique d’AniRecap.</p>
+
+            <h2>Durée de conservation</h2>
+            <p>Les données du compte sont conservées pendant son utilisation, puis supprimées lorsque le compte est supprimé, sous réserve des obligations légales applicables.</p>
+
+            <h2>Vos droits</h2>
+            <p>Vous pouvez demander l’accès, la rectification, l’effacement ou la limitation du traitement de vos données. Vous pouvez également introduire une réclamation auprès de la CNIL.</p>
+
+            <p class="legal-note"><strong>Responsable du traitement :</strong> l’éditeur du projet pédagogique AniRecap. Les coordonnées nominatives et de contact du responsable doivent être renseignées dans le dossier de présentation avant toute mise en production publique.</p>
+        </article>
+    </main>
+{% endblock %}
