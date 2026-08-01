@@ -113,7 +113,8 @@ body {
     align-items: center;
 }
 
-.input-icon i {
+.input-icon i,
+.input-icon .field-icon {
     position: absolute;
     left: 16px;
     width: 22px;

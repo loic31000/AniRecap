@@ -3,17 +3,18 @@
 {% block title %}Connexion{% endblock %}
 
 {% block stylesheets %}
-    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/layout.css') }}">
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 {% endblock %}
+
+{% block javascripts %}{% endblock %}
 
 {% block body %}
 <main class="login-page" id="main-content">
     <div class="login-card">
 
         <div class="logo-wrap">
-            <img src="{{ asset('images/logo.png') }}" alt="" class="logo-img">
+            <img src="{{ asset('images/logo.webp') }}" alt="" class="logo-img" width="160" height="160" fetchpriority="high">
         </div>
 
         <h1 class="brand-title">AniRecap</h1>
@@ -28,7 +29,7 @@
             <div class="form-group">
                 <label for="inputEmail">Adresse e-mail</label>
                 <div class="input-icon">
-                    <i class="fa-regular fa-envelope" aria-hidden="true"></i>
+                    <span class="field-icon" aria-hidden="true">✉</span>
                     <input
                         type="email"
                         value="{{ last_username }}"
@@ -45,7 +46,7 @@
             <div class="form-group">
                 <label for="inputPassword">Mot de passe</label>
                 <div class="input-icon">
-                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                    <span class="field-icon" aria-hidden="true">●</span>
                     <input
                         type="password"
                         name="password"
@@ -60,7 +61,7 @@
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
             <button type="submit" class="submit-btn">
-                Se connecter <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                Se connecter <span aria-hidden="true">→</span>
             </button>
         </form>
 

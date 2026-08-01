@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 {% block title %}{{ character.name }}{% endblock %}
-{% block stylesheets %}{{ parent() }}<link rel="stylesheet" href="{{ asset('css/character.css') }}"><link rel="stylesheet" href="{{ asset('css/spoiler-card.css') }}"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">{% endblock %}
+{% block stylesheets %}{{ parent() }}<link rel="stylesheet" href="{{ asset('css/character.css') }}"><link rel="stylesheet" href="{{ asset('css/spoiler-card.css') }}">{% endblock %}
 {% block body %}
     {% set return_to = app.request.query.get('return_to') %}
     {% set return_url = return_to and return_to starts with '/' and not (return_to starts with '//') ? return_to : path(catalogueRoute) %}

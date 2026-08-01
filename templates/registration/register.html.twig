@@ -4,17 +4,18 @@
 {% endblock %}
 
 {% block stylesheets %}
-	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('css/layout.css') }}">
 	<link rel="stylesheet" href="{{ asset('css/register.css') }}">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 {% endblock %}
+
+{% block javascripts %}{% endblock %}
 
 {% block body %}
 	<main class="register-page" id="main-content">
 		<div class="register-card">
 
 			<div class="logo-wrap">
-				<img src="{{ asset('images/logo.png') }}" alt="" class="logo-img">
+				<img src="{{ asset('images/logo.webp') }}" alt="" class="logo-img" width="160" height="160" fetchpriority="high">
 			</div>
 
 			<h1 class="brand-title">AniRecap</h1>
@@ -26,7 +27,7 @@
 			<div class="form-group">
 				{{ form_label(registrationForm.username) }}
 				<div class="input-icon">
-					<i class="fa-regular fa-user" aria-hidden="true"></i>
+					<span class="field-icon" aria-hidden="true">●</span>
 					{{ form_widget(registrationForm.username, {'attr': {'placeholder': 'Votre nom d’utilisateur'}}) }}
 				</div>
 				{{ form_errors(registrationForm.username) }}
@@ -35,7 +36,7 @@
 			<div class="form-group">
 				{{ form_label(registrationForm.email) }}
 				<div class="input-icon">
-					<i class="fa-regular fa-envelope" aria-hidden="true"></i>
+					<span class="field-icon" aria-hidden="true">✉</span>
 					{{ form_widget(registrationForm.email, {'attr': {'placeholder': 'nom@exemple.fr', 'aria-describedby': registrationForm.email.vars.id ~ '_help'}}) }}
 				</div>
 				<p id="{{ registrationForm.email.vars.id }}_help" class="form-help">Obligatoire pour vous connecter et sécuriser votre compte. Elle n’est pas affichée publiquement.</p>
@@ -45,7 +46,7 @@
 			<div class="form-group">
 				{{ form_label(registrationForm.plainPassword, 'Mot de passe') }}
 				<div class="input-icon">
-					<i class="fa-solid fa-lock" aria-hidden="true"></i>
+					<span class="field-icon" aria-hidden="true">●</span>
 					{{ form_widget(registrationForm.plainPassword, {'attr': {'placeholder': 'Au moins 6 caractères'}}) }}
 				</div>
 				{{ form_errors(registrationForm.plainPassword) }}

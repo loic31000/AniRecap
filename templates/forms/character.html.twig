@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}{{ is_edit ? 'Modifier un personnage' : 'Ajouter un personnage' }}{% endblock %}
-{% block stylesheets %}{{ parent() }}<link rel="stylesheet" href="{{ asset('css/forms.css') }}"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">{% endblock %}
+{% block stylesheets %}{{ parent() }}<link rel="stylesheet" href="{{ asset('css/forms.css') }}">{% endblock %}
 
 {% block body %}
     {% set return_to = app.request.query.get('return_to') %}
