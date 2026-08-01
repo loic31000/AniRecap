@@ -17,9 +17,17 @@
                 <div class="card-meta-line"><span class="badge-episodes">{{ badge }}</span>{% if status %}<span class="content-card-status">{{ status }}</span>{% endif %}</div>
                 <h3 class="card-episode-title">{{ title }}</h3>
                 <p class="card-episode-desc">{{ summary }}</p>
+                {% include 'components/_summary_like_toggle.html.twig' with {state: summary_state|default(null)} only %}
                 <div class="card-actions content-card-footer">
                     {% if linked_diaporamas|length == 1 %}<span class="card-diaporama-hint" aria-hidden="true">Voir le diaporama</span>{% elseif linked_diaporamas|length > 1 %}<details class="card-diaporama-list"><summary>Voir les diaporamas ({{ linked_diaporamas|length }})</summary><ul>{% for diaporama in linked_diaporamas %}<li><a href="{{ path('app_diaporama_show', {id: diaporama.id}) }}">{{ diaporama.title }}</a></li>{% endfor %}</ul></details>{% endif %}
-                    <a href="{{ path(edit_route, {id: item_id}) }}" class="{{ edit_class }}" aria-label="Modifier {{ title }}"><i class="fa-solid fa-pen" aria-hidden="true"></i><span class="visually-hidden">Modifier</span></a>
+                    {% if can_edit|default(true) %}
+                        <span class="content-card-management">
+                            <a href="{{ path(edit_route, {id: item_id}) }}" class="{{ edit_class }}" aria-label="Modifier {{ title }}"><i class="fa-solid fa-pen" aria-hidden="true"></i><span class="visually-hidden">Modifier</span></a>
+                            {% if delete_route|default(null) %}
+                                {% include 'components/_content_delete.html.twig' with {route: delete_route, item_id: item_id, token_id: delete_token_id, message: delete_message, label: delete_label} only %}
+                            {% endif %}
+                        </span>
+                    {% endif %}
                 </div>
             </div>
         </div>

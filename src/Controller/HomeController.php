@@ -10,13 +10,11 @@ use App\Repository\CategorieRepository;
 use App\Repository\MangaRepository;
 use App\Repository\FavoriteRepository;
 use App\Repository\SummaryRepository;
+use App\Repository\SummaryLikeRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
-
-#[IsGranted('ROLE_USER')]
 final class HomeController extends AbstractController
 {
     #[Route('/home', name: 'app_home', methods: ['GET'])]
@@ -27,11 +25,10 @@ final class HomeController extends AbstractController
         CategorieRepository $categorieRepository,
         FavoriteRepository $favoriteRepository,
         SummaryRepository $summaryRepository,
+        SummaryLikeRepository $summaryLikeRepository,
     ): Response {
         $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
+        $isAuthenticated = $user instanceof User;
 
         $filters = [
             'q' => trim((string) $request->query->get('q', '')),
@@ -44,29 +41,54 @@ final class HomeController extends AbstractController
         if ($filters['type'] === 'all' || $filters['type'] === 'anime') {
             $items = [
                 ...$items,
-                ...array_map($this->mapAnime(...), $animeRepository->searchVisibleTo($filters, $user)),
+                ...array_map($this->mapAnime(...), $isAuthenticated ? $animeRepository->searchVisibleTo($filters, $user) : $animeRepository->searchPublic($filters)),
             ];
         }
         if ($filters['type'] === 'all' || $filters['type'] === 'manga') {
             $items = [
                 ...$items,
-                ...array_map($this->mapManga(...), $mangaRepository->searchVisibleTo($filters, $user)),
+                ...array_map($this->mapManga(...), $isAuthenticated ? $mangaRepository->searchVisibleTo($filters, $user) : $mangaRepository->searchPublic($filters)),
             ];
         }
 
-        $items = $this->applyFavoriteStates($items, $favoriteRepository, $user);
-        $items = $this->applySummaryManagement($items, $summaryRepository, $user);
+        if ($isAuthenticated) {
+            $items = $this->applyFavoriteStates($items, $favoriteRepository, $user);
+            $items = $this->applySummaryManagement($items, $summaryRepository, $user);
+        }
+        foreach ($items as &$item) {
+            $item['canOpen'] = $isAuthenticated;
+            $item['canInteract'] = $isAuthenticated;
+        }
+        unset($item);
 
-        $popular = $items;
-        usort($popular, static fn (array $left, array $right): int =>
-            [$right['votesCount'], $right['id'], $right['type']]
-            <=> [$left['votesCount'], $left['id'], $left['type']]
-        );
+        $itemsByRoot = [];
+        foreach ($items as $item) {
+            $itemsByRoot[$item['type'] . ':' . $item['id']] = $item;
+        }
+        $recentRanks = $summaryLikeRepository->findRecentlyPublishedRoots($filters, 5);
+        $popularRanks = $summaryLikeRepository->findPopularRoots($filters, 5);
+        $popularUsesFallback = $popularRanks === [];
+        if ($popularUsesFallback) { $popularRanks = $recentRanks; }
 
-        $latest = $items;
-        usort($latest, static fn (array $left, array $right): int =>
-            [$right['id'], $right['type']] <=> [$left['id'], $left['type']]
-        );
+        $popular = [];
+        foreach ($popularRanks as $rank) {
+            $key = $rank['type'] . ':' . $rank['id'];
+            if (isset($itemsByRoot[$key])) {
+                $item = $itemsByRoot[$key];
+                $item['popularityLikes'] = $rank['score'];
+                $popular[] = $item;
+            }
+        }
+
+        $available = [];
+        foreach ($recentRanks as $rank) {
+            $key = $rank['type'] . ':' . $rank['id'];
+            if (isset($itemsByRoot[$key])) {
+                $item = $itemsByRoot[$key];
+                $item['popularityLikes'] = $rank['score'];
+                $available[] = $item;
+            }
+        }
 
         $genres = array_map(
             static fn ($category): array => [
@@ -77,10 +99,12 @@ final class HomeController extends AbstractController
         );
 
         return $this->render('home/index.html.twig', [
-            'popular' => array_slice($popular, 0, 5),
-            'latest' => array_slice($latest, 0, 4),
+            'popular' => $popular,
+            'available' => $available,
             'genres' => $genres,
             'filters' => $filters,
+            'is_authenticated' => $isAuthenticated,
+            'popular_uses_fallback' => $popularUsesFallback,
         ]);
     }
 

@@ -4,6 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Summary;
 use App\Entity\User;
+use App\Entity\Anime;
+use App\Entity\Manga;
+use App\Enum\SpoilerLevel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -12,6 +15,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class SummaryRepository extends ServiceEntityRepository
 {
+    private const LIKEABLE_ASSOCIATIONS = ['episode', 'tome', 'chapitre'];
     private const EDITABLE_PARENT_ASSOCIATIONS = ['anime', 'manga', 'season', 'episode', 'tome', 'chapitre'];
 
     public function __construct(ManagerRegistry $registry)
@@ -145,6 +149,133 @@ class SummaryRepository extends ServiceEntityRepository
         }
 
         return $qb->getQuery()->execute();
+    }
+
+    public function synchronizeOrCreateChild(
+        string $association,
+        object $parent,
+        User $owner,
+        string $title,
+        string $content,
+        SpoilerLevel $spoilerLevel,
+    ): Summary {
+        if (!in_array($association, self::LIKEABLE_ASSOCIATIONS, true)) {
+            throw new \InvalidArgumentException('Parent de résumé enfant non pris en charge.');
+        }
+
+        $summary = $this->findOneBy([$association => $parent, 'user' => $owner]);
+        if (!$summary instanceof Summary) {
+            $summary = (new Summary())->setUser($owner)->setIsPublic(false);
+            $setter = 'set' . ucfirst($association);
+            $summary->{$setter}($parent);
+            $this->getEntityManager()->persist($summary);
+        }
+
+        return $summary->setTitle($title)->setContent($content)->setSpoilerLevel($spoilerLevel->value);
+    }
+
+    public function findOneVisibleTo(int $id, User $viewer): ?Summary
+    {
+        return $this->createVisibleChildQueryBuilder($viewer)
+            ->andWhere('s.id = :id')->setParameter('id', $id)
+            ->getQuery()->getOneOrNullResult();
+    }
+
+    public function isPublishable(Summary $summary): bool
+    {
+        return $summary->getEpisode()?->getSeason()?->getAnime()?->isPublic() === true
+            || $summary->getTome()?->getManga()?->isPublic() === true
+            || $summary->getChapitre()?->getManga()?->isPublic() === true;
+    }
+
+    public function isPublicChildCoverVisible(string $coverUrl): bool
+    {
+        return (int) $this->createQueryBuilder('s')
+            ->select('COUNT(s.id)')
+            ->leftJoin('s.episode', 'episode')->leftJoin('episode.season', 'season')->leftJoin('season.anime', 'anime')
+            ->leftJoin('s.tome', 'tome')->leftJoin('tome.manga', 'tomeManga')
+            ->leftJoin('s.chapitre', 'chapitre')->leftJoin('chapitre.manga', 'chapitreManga')
+            ->andWhere('s.isPublic = true')
+            ->andWhere('((episode.coverEpisodeUrl = :coverUrl AND anime.isPublic = true) OR (tome.coverTomeUrl = :coverUrl AND tomeManga.isPublic = true) OR (chapitre.coverChapitreUrl = :coverUrl AND chapitreManga.isPublic = true))')
+            ->setParameter('coverUrl', $coverUrl)
+            ->getQuery()->getSingleScalarResult() > 0;
+    }
+
+    /** @param list<int> $parentIds @return array<int, Summary> */
+    public function findForParents(string $association, array $parentIds, User $viewer): array
+    {
+        if (!in_array($association, self::LIKEABLE_ASSOCIATIONS, true)) {
+            throw new \InvalidArgumentException('Parent de résumé enfant non pris en charge.');
+        }
+        $parentIds = array_values(array_unique(array_map('intval', $parentIds)));
+        if ($parentIds === []) { return []; }
+
+        $summaries = $this->createVisibleChildQueryBuilder($viewer)
+            ->andWhere(sprintf('IDENTITY(s.%s) IN (:parentIds)', $association))
+            ->andWhere(sprintf('s.%s IS NOT NULL', $association))
+            ->setParameter('parentIds', $parentIds)
+            ->orderBy('s.id', 'ASC')->getQuery()->getResult();
+        $result = [];
+        $getter = 'get' . ucfirst($association);
+        foreach ($summaries as $summary) {
+            $parentId = $summary->{$getter}()?->getId();
+            if ($parentId !== null && !isset($result[$parentId])) { $result[$parentId] = $summary; }
+        }
+        return $result;
+    }
+
+    /** @param array<int, Summary> $summaries @return array<int, array<string, mixed>> */
+    public function buildCardStates(array $summaries, User $viewer, SummaryLikeRepository $likes): array
+    {
+        $likeStates = $likes->findStates(array_map(static fn (Summary $summary): int => (int) $summary->getId(), array_values($summaries)), $viewer);
+        $states = [];
+        foreach ($summaries as $parentId => $summary) {
+            $owner = $summary->getOwner()?->getId() === $viewer->getId();
+            $likeState = $likeStates[$summary->getId()] ?? ['likeCount' => 0, 'likedByViewer' => false];
+            $states[$parentId] = [
+                'summaryId' => $summary->getId(),
+                'isPublic' => $summary->isPublic(),
+                'likeCount' => $likeState['likeCount'],
+                'likedByViewer' => $likeState['likedByViewer'],
+                'canChangeVisibility' => $owner,
+                'canLike' => !$owner && $summary->isPublic() && $this->isPublishable($summary),
+            ];
+        }
+        return $states;
+    }
+
+    private function createVisibleChildQueryBuilder(User $viewer): \Doctrine\ORM\QueryBuilder
+    {
+        return $this->createQueryBuilder('s')
+            ->leftJoin('s.episode', 'episode')->addSelect('episode')
+            ->leftJoin('episode.season', 'season')->addSelect('season')
+            ->leftJoin('season.anime', 'anime')->addSelect('anime')
+            ->leftJoin('s.tome', 'tome')->addSelect('tome')
+            ->leftJoin('tome.manga', 'tomeManga')->addSelect('tomeManga')
+            ->leftJoin('s.chapitre', 'chapitre')->addSelect('chapitre')
+            ->leftJoin('chapitre.manga', 'chapitreManga')->addSelect('chapitreManga')
+            ->andWhere('(s.episode IS NOT NULL OR s.tome IS NOT NULL OR s.chapitre IS NOT NULL)')
+            ->andWhere('(s.user = :viewer OR (s.isPublic = true AND ((episode.id IS NOT NULL AND anime.isPublic = true) OR (tome.id IS NOT NULL AND tomeManga.isPublic = true) OR (chapitre.id IS NOT NULL AND chapitreManga.isPublic = true))))')
+            ->setParameter('viewer', $viewer);
+    }
+
+    /** @return list<Summary> */
+    public function findVisibleEpisodeSummariesForAnime(Anime $anime, User $viewer): array
+    {
+        return $this->createVisibleChildQueryBuilder($viewer)
+            ->andWhere('s.episode IS NOT NULL')->andWhere('season.anime = :anime')
+            ->setParameter('anime', $anime)
+            ->orderBy('season.number', 'ASC')->addOrderBy('episode.number', 'ASC')
+            ->getQuery()->getResult();
+    }
+
+    /** @return list<Summary> */
+    public function findVisibleChildSummariesForManga(Manga $manga, User $viewer): array
+    {
+        return $this->createVisibleChildQueryBuilder($viewer)
+            ->andWhere('((s.tome IS NOT NULL AND tome.manga = :manga) OR (s.chapitre IS NOT NULL AND chapitre.manga = :manga))')
+            ->setParameter('manga', $manga)
+            ->orderBy('s.id', 'ASC')->getQuery()->getResult();
     }
 
     /**

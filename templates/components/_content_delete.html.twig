@@ -1,0 +1,9 @@
+<form method="post" action="{{ path(route, {id: item_id}) }}" class="content-delete-icon-form"
+      data-controller="publication-confirm"
+      data-publication-confirm-message-value="{{ message }}"
+      data-action="submit->publication-confirm#confirm">
+    <input type="hidden" name="_token" value="{{ csrf_token(token_id ~ item_id) }}">
+    <button type="submit" class="content-delete-icon" aria-label="{{ label }}">
+        <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+    </button>
+</form>

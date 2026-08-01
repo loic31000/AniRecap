@@ -116,8 +116,18 @@ final class ProfileController extends AbstractController
         };
         $parent = $summary->getAnime() ?? $summary->getManga() ?? $summary->getSeason()
             ?? $summary->getEpisode() ?? $summary->getTome() ?? $summary->getChapitre();
+        [$editRoute, $editId] = match (true) {
+            $summary->getAnime() !== null => ['app_forms_anime_edit', $summary->getAnime()->getId()],
+            $summary->getManga() !== null => ['app_forms_manga_edit', $summary->getManga()->getId()],
+            $summary->getSeason() !== null => ['app_forms_season_edit', $summary->getSeason()->getId()],
+            $summary->getEpisode() !== null => ['app_forms_episode_edit', $summary->getEpisode()->getId()],
+            $summary->getTome() !== null => ['app_forms_tome_edit', $summary->getTome()->getId()],
+            $summary->getChapitre() !== null => ['app_forms_chapitre_edit', $summary->getChapitre()->getId()],
+            default => [null, null],
+        };
 
         return [
+            'typeLabel' => $anime !== null ? 'Anime' : 'Manga',
             'title' => $summary->getTitle(),
             'description' => $summary->getContent(),
             'parentLabel' => $parent?->getTitle() ?? 'Contenu associé indisponible',
@@ -129,6 +139,8 @@ final class ProfileController extends AbstractController
                 ?? $summary->getChapitre()?->getCoverChapitreUrl(),
             'openRoute' => $route,
             'openParameters' => $parameters,
+            'editRoute' => $editRoute,
+            'editId' => $editId,
         ];
     }
 

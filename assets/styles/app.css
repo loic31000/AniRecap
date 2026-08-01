@@ -1,1 +1,37 @@
+/* Shared Summary visibility and like controls. */
+.summary-social {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .45rem;
+    margin-top: .65rem;
+    position: relative;
+    z-index: 3;
+}
 
+.summary-social form { margin: 0; }
+.summary-visibility,
+.summary-like-count,
+.summary-like-button,
+.summary-visibility-button {
+    min-height: 2.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .35rem;
+    border: 1px solid #d99a16;
+    border-radius: 999px;
+    background: #050a10;
+    color: #e8a82c;
+    padding: .35rem .7rem;
+    font: inherit;
+}
+
+.summary-like-button,
+.summary-visibility-button { cursor: pointer; }
+.summary-visibility-button { appearance: none; }
+.summary-visibility-button:hover { border-color: #ffd36a; color: #ffd36a; }
+.summary-like-button.is-liked { background: #e8a82c; color: #071423; }
+.summary-visibility--private { color: #d7d9df; border-color: #6c7380; }
+.summary-like-button:focus-visible,
+.summary-visibility-button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }

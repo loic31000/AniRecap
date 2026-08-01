@@ -1,0 +1,35 @@
+{% if state|default(null) %}
+    <div class="summary-social" aria-label="Interactions du résumé">
+        {% if state.canChangeVisibility %}
+            <form method="post" action="{{ path(state.isPublic ? 'app_summary_unpublish' : 'app_summary_publish', {id: state.summaryId}) }}" class="summary-visibility-form">
+                <input type="hidden" name="_token" value="{{ csrf_token((state.isPublic ? 'summary_unpublish_' : 'summary_publish_') ~ state.summaryId) }}">
+                <input type="hidden" name="return_to" value="{{ app.request.requestUri }}">
+                <button
+                    type="submit"
+                    class="summary-visibility summary-visibility-button summary-visibility--{{ state.isPublic ? 'public' : 'private' }}"
+                    data-controller="publication-confirm"
+                    data-action="click->publication-confirm#confirm"
+                    data-publication-confirm-message-value="{{ state.isPublic ? 'Ce résumé ne sera plus visible publiquement. Continuer ?' : 'Cette action rendra le résumé et son œuvre accessibles publiquement. Voulez-vous continuer ?' }}"
+                    aria-label="{{ state.isPublic ? 'Rendre ce résumé privé' : 'Publier ce résumé' }}"
+                    title="{{ state.isPublic ? 'Cliquer pour rendre privé' : 'Cliquer pour publier' }}"
+                >{{ state.isPublic ? 'Public' : 'Privé' }}</button>
+            </form>
+        {% else %}
+            <span class="summary-visibility summary-visibility--{{ state.isPublic ? 'public' : 'private' }}">
+                {{ state.isPublic ? 'Public' : 'Privé' }}
+            </span>
+        {% endif %}
+        {% if state.canLike %}
+            <form method="post" action="{{ path(state.likedByViewer ? 'app_summary_unlike' : 'app_summary_like', {id: state.summaryId}) }}" class="summary-like-form">
+                <input type="hidden" name="_token" value="{{ csrf_token((state.likedByViewer ? 'summary_unlike_' : 'summary_like_') ~ state.summaryId) }}">
+                <input type="hidden" name="return_to" value="{{ app.request.requestUri }}">
+                <button type="submit" class="summary-like-button{{ state.likedByViewer ? ' is-liked' : '' }}" aria-label="{{ state.likedByViewer ? 'Retirer mon J’aime' : 'Aimer ce résumé' }}">
+                    <i class="{{ state.likedByViewer ? 'fa-solid' : 'fa-regular' }} fa-heart" aria-hidden="true"></i>
+                    <span>{{ state.likeCount }}</span>
+                </button>
+            </form>
+        {% else %}
+            <span class="summary-like-count" aria-label="{{ state.likeCount }} J’aime"><i class="fa-solid fa-heart" aria-hidden="true"></i> {{ state.likeCount }}</span>
+        {% endif %}
+    </div>
+{% endif %}

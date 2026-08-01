@@ -10,6 +10,7 @@ use App\Repository\MangaRepository;
 use App\Repository\TomeRepository;
 use App\Repository\SummaryRepository;
 use App\Service\SynopsisImageUploader;
+use App\Service\OwnedContentDeletionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -30,6 +31,7 @@ final class TomeFormController extends AbstractController
         TomeRepository $tomeRepository,
         EntityManagerInterface $entityManager,
         SynopsisImageUploader $imageUploader,
+        SummaryRepository $summaryRepository,
     ): Response {
         $user = $this->requireUser();
         $manga = $mangaRepository->findOneOwnedPrivate($mangaId, $user);
@@ -58,10 +60,11 @@ final class TomeFormController extends AbstractController
 
                     $filename = $imageUploader->store($input->image);
                     $coverUrl = $this->generateUrl('app_forms_synopsis_image', ['filename' => $filename]);
-                    $entityManager->wrapInTransaction(function (EntityManagerInterface $entityManager) use ($tome, $manga, $user, $input, $coverUrl): void {
+                    $entityManager->wrapInTransaction(function (EntityManagerInterface $entityManager) use ($tome, $manga, $user, $input, $coverUrl, $summaryRepository): void {
                         $tome->setManga($manga)->setUser($user);
                         $this->applyInput($tome, $input, $coverUrl);
                         $entityManager->persist($tome);
+                        $summaryRepository->synchronizeOrCreateChild('tome', $tome, $user, $input->title, $input->description, $input->spoilerLevel);
                     });
                 } catch (\Throwable) {
                     if ($filename !== null) {
@@ -117,13 +120,7 @@ final class TomeFormController extends AbstractController
                     $entityManager->wrapInTransaction(function () use ($tome, $manga, $user, $input, $coverUrl, $summaryRepository): void {
                         $tome->setManga($manga)->setUser($user);
                         $this->applyInput($tome, $input, $coverUrl);
-                        $summaryRepository->synchronizeOwnedForParent(
-                            'tome',
-                            $tome,
-                            $user,
-                            $input->description,
-                            spoilerLevel: $input->spoilerLevel->value,
-                        );
+                        $summaryRepository->synchronizeOrCreateChild('tome', $tome, $user, $input->title, $input->description, $input->spoilerLevel);
                     });
                 } catch (\Throwable) {
                     if ($newFilename !== null) {
@@ -144,6 +141,25 @@ final class TomeFormController extends AbstractController
         }
 
         return $this->render('forms/tome.html.twig', ['form' => $form, 'manga' => $manga, 'is_edit' => true, 'current_cover_url' => $tome->getCoverTomeUrl()]);
+    }
+
+    #[Route('/formulaires/tomes/{id}/supprimer', name: 'app_forms_tome_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function delete(int $id, Request $request, TomeRepository $tomeRepository, OwnedContentDeletionService $deletionService): Response
+    {
+        $user = $this->requireUser();
+        $tome = $tomeRepository->findOneOwned($id, $user);
+        if ($tome === null || $tome->getManga() === null) {
+            throw $this->createNotFoundException();
+        }
+        if (!$this->isCsrfTokenValid('tome_delete_' . $id, (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $mangaId = $tome->getManga()->getId();
+        $deletionService->deleteTome($tome);
+        $this->addFlash('success', 'Le tome a été supprimé.');
+
+        return $this->redirectToRoute('app_manga_show', ['id' => $mangaId, '_fragment' => 'tomes']);
     }
 
     private function requireUser(): User

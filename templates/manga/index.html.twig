@@ -56,7 +56,7 @@
                 </div>
             </section>
 
-            {% if is_owner_private %}
+            {% if is_owner or tomes is not empty or chapitres is not empty %}
                 <section class="manga-content-tabs" data-controller="manga-tabs">
                     <div class="manga-tabs-toolbar">
                         <div class="tabs-row" role="tablist" aria-label="Contenus du manga">
@@ -97,7 +97,7 @@
                     >
                         <div class="manga-tab-actions">
                             <p class="episode-count-meta">{{ chapitres|length }} chapitre{{ chapitres|length > 1 ? 's' : '' }} disponible{{ chapitres|length > 1 ? 's' : '' }}</p>
-                            <a href="{{ path('app_forms_chapitre_create', {mangaId: manga.id}) }}" class="chip-btn private-content-add">Ajouter un chapitre</a>
+                            {% if is_owner_private %}<a href="{{ path('app_forms_chapitre_create', {mangaId: manga.id}) }}" class="chip-btn private-content-add">Ajouter un chapitre</a>{% endif %}
                         </div>
                         {% if chapitres is empty %}
                             <p class="episode-count-meta manga-empty-state">Aucun chapitre n’a encore été ajouté à ce manga.</p>
@@ -107,7 +107,7 @@
                                     {% set linkedDiaporamas = chapitre_diaporamas[chapitre.id]|default([]) %}
                                     <div class="manga-timeline-entry">
                                         <span class="manga-timeline-node" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
-                                        {% include 'components/_spoiler_card.html.twig' with {item_id: chapitre.id, title: chapitre.title, summary: chapitre.synopsis, status: chapitre.status, badge: 'CHAP ' ~ chapitre.number, image_url: chapitre.coverChapitreUrl, effective_level: chapitre_spoiler_levels[chapitre.id], linked_diaporamas: linkedDiaporamas, edit_route: 'app_forms_chapitre_edit', edit_class: 'content-card-edit'} only %}
+                                        {% include 'components/_spoiler_card.html.twig' with {item_id: chapitre.id, title: chapitre.title, summary: chapitre.synopsis, status: chapitre.status, badge: 'CHAP ' ~ chapitre.number, image_url: chapitre.coverChapitreUrl, effective_level: chapitre_spoiler_levels[chapitre.id], linked_diaporamas: linkedDiaporamas, edit_route: 'app_forms_chapitre_edit', edit_class: 'content-card-edit', delete_route: 'app_forms_chapitre_delete', delete_token_id: 'chapitre_delete_', delete_message: 'Supprimer définitivement ce chapitre, son résumé et ses scènes associées ?', delete_label: 'Supprimer ' ~ chapitre.title, summary_state: chapitre_summary_states[chapitre.id]|default(null), can_edit: is_owner} only %}
                                     </div>
                                 {% endfor %}
                             </div>
@@ -125,7 +125,7 @@
                     >
                         <div class="manga-tab-actions">
                             <p class="episode-count-meta">{{ tomes|length }} tome{{ tomes|length > 1 ? 's' : '' }} disponible{{ tomes|length > 1 ? 's' : '' }}</p>
-                            <a href="{{ path('app_forms_tome_create', {mangaId: manga.id}) }}" class="chip-btn private-content-add">Ajouter un tome</a>
+                            {% if is_owner_private %}<a href="{{ path('app_forms_tome_create', {mangaId: manga.id}) }}" class="chip-btn private-content-add">Ajouter un tome</a>{% endif %}
                         </div>
                         {% if tomes is empty %}
                             <p class="episode-count-meta manga-empty-state">Aucun tome n’a encore été ajouté à ce manga.</p>
@@ -135,7 +135,7 @@
                                     {% set linkedDiaporamas = tome_diaporamas[tome.id]|default([]) %}
                                     <div class="manga-timeline-entry">
                                         <span class="manga-timeline-node" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
-                                        {% include 'components/_spoiler_card.html.twig' with {item_id: tome.id, title: tome.title, summary: tome.synopsis, status: tome.status, badge: 'TOME ' ~ tome.number, image_url: tome.coverTomeUrl, effective_level: tome_spoiler_levels[tome.id], linked_diaporamas: linkedDiaporamas, edit_route: 'app_forms_tome_edit', edit_class: 'content-card-edit'} only %}
+                                        {% include 'components/_spoiler_card.html.twig' with {item_id: tome.id, title: tome.title, summary: tome.synopsis, status: tome.status, badge: 'TOME ' ~ tome.number, image_url: tome.coverTomeUrl, effective_level: tome_spoiler_levels[tome.id], linked_diaporamas: linkedDiaporamas, edit_route: 'app_forms_tome_edit', edit_class: 'content-card-edit', delete_route: 'app_forms_tome_delete', delete_token_id: 'tome_delete_', delete_message: 'Supprimer définitivement ce tome, son résumé et ses scènes associées ?', delete_label: 'Supprimer ' ~ tome.title, summary_state: tome_summary_states[tome.id]|default(null), can_edit: is_owner} only %}
                                     </div>
                                 {% endfor %}
                             </div>

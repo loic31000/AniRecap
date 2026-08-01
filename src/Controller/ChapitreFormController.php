@@ -10,6 +10,7 @@ use App\Repository\ChapitreRepository;
 use App\Repository\MangaRepository;
 use App\Repository\SummaryRepository;
 use App\Service\SynopsisImageUploader;
+use App\Service\OwnedContentDeletionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -30,6 +31,7 @@ final class ChapitreFormController extends AbstractController
         ChapitreRepository $chapitreRepository,
         EntityManagerInterface $entityManager,
         SynopsisImageUploader $imageUploader,
+        SummaryRepository $summaryRepository,
     ): Response {
         $user = $this->requireUser();
         $manga = $mangaRepository->findOneOwnedPrivate($mangaId, $user);
@@ -54,10 +56,11 @@ final class ChapitreFormController extends AbstractController
                     }
                     $filename = $imageUploader->store($input->image);
                     $coverUrl = $this->generateUrl('app_forms_synopsis_image', ['filename' => $filename]);
-                    $entityManager->wrapInTransaction(function (EntityManagerInterface $entityManager) use ($chapitre, $manga, $user, $input, $coverUrl): void {
+                    $entityManager->wrapInTransaction(function (EntityManagerInterface $entityManager) use ($chapitre, $manga, $user, $input, $coverUrl, $summaryRepository): void {
                         $chapitre->setManga($manga)->setUser($user);
                         $this->applyInput($chapitre, $input, $coverUrl);
                         $entityManager->persist($chapitre);
+                        $summaryRepository->synchronizeOrCreateChild('chapitre', $chapitre, $user, $input->title, $input->description, $input->spoilerLevel);
                     });
                 } catch (\Throwable) {
                     if ($filename !== null) {
@@ -113,13 +116,7 @@ final class ChapitreFormController extends AbstractController
                     $entityManager->wrapInTransaction(function () use ($chapitre, $manga, $user, $input, $coverUrl, $summaryRepository): void {
                         $chapitre->setManga($manga)->setUser($user);
                         $this->applyInput($chapitre, $input, $coverUrl);
-                        $summaryRepository->synchronizeOwnedForParent(
-                            'chapitre',
-                            $chapitre,
-                            $user,
-                            $input->description,
-                            spoilerLevel: $input->spoilerLevel->value,
-                        );
+                        $summaryRepository->synchronizeOrCreateChild('chapitre', $chapitre, $user, $input->title, $input->description, $input->spoilerLevel);
                     });
                 } catch (\Throwable) {
                     if ($newFilename !== null) {
@@ -140,6 +137,25 @@ final class ChapitreFormController extends AbstractController
         }
 
         return $this->render('forms/chapitre.html.twig', ['form' => $form, 'manga' => $manga, 'is_edit' => true, 'current_cover_url' => $chapitre->getCoverChapitreUrl()]);
+    }
+
+    #[Route('/formulaires/chapitres/{id}/supprimer', name: 'app_forms_chapitre_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function delete(int $id, Request $request, ChapitreRepository $chapitreRepository, OwnedContentDeletionService $deletionService): Response
+    {
+        $user = $this->requireUser();
+        $chapitre = $chapitreRepository->findOneOwned($id, $user);
+        if ($chapitre === null || $chapitre->getManga() === null) {
+            throw $this->createNotFoundException();
+        }
+        if (!$this->isCsrfTokenValid('chapitre_delete_' . $id, (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $mangaId = $chapitre->getManga()->getId();
+        $deletionService->deleteChapitre($chapitre);
+        $this->addFlash('success', 'Le chapitre a été supprimé.');
+
+        return $this->redirectToRoute('app_manga_show', ['id' => $mangaId, '_fragment' => 'chapitres']);
     }
 
     private function requireUser(): User

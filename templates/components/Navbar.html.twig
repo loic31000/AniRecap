@@ -21,6 +21,10 @@
                 href="{{ path('app_forms_index') }}"
                 class="nav-item--center {{ active is defined and active == 'forms' ? 'is-active' : '' }}"
                 aria-label="Accéder aux formulaires de création"
+                aria-controls="creation-menu"
+                aria-expanded="false"
+                data-form-menu-target="trigger"
+                data-action="form-menu#open"
                 {% if active is defined and active == 'forms' %}aria-current="page"{% endif %}
             >
                 <img src="{{ asset('images/Icon.svg') }}" alt="">

@@ -88,8 +88,6 @@ class TomeRepository extends ServiceEntityRepository
             ->addSelect('m', 'c')
             ->andWhere('t.user = :owner')
             ->andWhere('m.owner = :owner')
-            ->andWhere('m.isPublic = :isPublic')
-            ->setParameter('owner', $owner)
-            ->setParameter('isPublic', false);
+            ->setParameter('owner', $owner);
     }
 }

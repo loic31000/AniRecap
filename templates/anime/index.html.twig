@@ -63,10 +63,13 @@
                 {% else %}
                     <div class="anime-list">
                         {% for season in anime.seasons %}
-                            {% if is_owner and not anime.isPublic %}
-                                <a href="{{ path('app_private_season_show', {id: season.id}) }}" class="anime-row">
-                                    <span class="anime-row__name">Saison {{ season.number }} — {{ season.title }}</span>
-                                </a>
+                            {% if is_owner %}
+                                <div class="anime-row">
+                                    <a href="{{ path('app_private_season_show', {id: season.id}) }}" class="anime-row__link">
+                                        <span class="anime-row__name">Saison {{ season.number }} — {{ season.title }}</span>
+                                    </a>
+                                    {% include 'components/_content_delete.html.twig' with {route: 'app_forms_season_delete', item_id: season.id, token_id: 'season_delete_', message: 'Supprimer cette saison supprimera aussi tous ses épisodes, résumés et scènes associés. Continuer ?', label: 'Supprimer la saison ' ~ season.title} only %}
+                                </div>
                             {% else %}
                                 <div class="anime-row">
                                     <span class="anime-row__name">Saison {{ season.number }} — {{ season.title }}</span>

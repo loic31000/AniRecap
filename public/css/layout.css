@@ -197,6 +197,42 @@ body.form-menu-is-open {
     overflow: hidden;
 }
 
+.content-card-management {
+    position: relative;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    pointer-events: auto;
+}
+
+.content-delete-icon-form {
+    display: inline-flex;
+    margin: 0;
+}
+
+.content-delete-icon {
+    display: inline-grid;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    color: #e8a53f;
+    background: transparent;
+    cursor: pointer;
+}
+
+.content-delete-icon:hover {
+    color: #ff7272;
+}
+
+.content-delete-icon:focus-visible {
+    outline: 2px solid #e8a53f;
+    outline-offset: 2px;
+}
+
 .form-menu-overlay {
     position: fixed;
     z-index: 100;
@@ -234,9 +270,9 @@ body.form-menu-is-open {
 .form-menu {
     position: relative;
     z-index: 1;
-    width: min(100%, 430px);
-    min-height: 530px;
-    padding: 28px 20px 78px;
+    width: min(100%, 470px);
+    min-height: 570px;
+    padding: 32px 22px 86px;
     color: var(--text-light);
     border: 1px solid rgba(255, 255, 255, 0.07);
     border-bottom: 0;
@@ -245,6 +281,9 @@ body.form-menu-is-open {
     box-shadow: 0 -16px 38px rgba(0, 0, 0, 0.45);
     transform: translateY(105%);
     transition: transform 0.25s ease;
+    max-height: calc(100dvh - env(safe-area-inset-top, 0px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .form-menu-overlay.is-open .form-menu {
@@ -293,8 +332,8 @@ body.form-menu-is-open {
     display: flex;
     align-items: center;
     gap: 11px;
-    min-height: 52px;
-    padding: 7px 10px;
+    min-height: 56px;
+    padding: 8px 11px;
     color: var(--text-light);
     text-decoration: none;
     border: 1px solid var(--card-border);
@@ -331,14 +370,14 @@ body.form-menu-is-open {
 
 .form-menu-card__content strong {
     color: var(--gold);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
 }
 
 .form-menu-card__content small {
     overflow: hidden;
     color: var(--text-muted);
-    font-size: 8px;
+    font-size: 9px;
     line-height: 1.2;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -351,11 +390,12 @@ body.form-menu-is-open {
 
 .form-menu__close {
     position: absolute;
-    right: 20px;
-    bottom: 18px;
+    left: 50%;
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
     display: grid;
-    width: 31px;
-    height: 31px;
+    width: 44px;
+    height: 44px;
     padding: 0;
     place-items: center;
     cursor: pointer;
@@ -370,4 +410,11 @@ body.form-menu-is-open {
     outline: none;
     color: var(--bg-dark);
     background: var(--gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .form-menu,
+    .form-menu-overlay__backdrop {
+        transition: none;
+    }
 }

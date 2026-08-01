@@ -27,7 +27,9 @@ final class SeasonType extends AbstractType
             ->add('anime', EntityType::class, [
                 'class' => Anime::class,
                 'choice_label' => 'title',
-                'query_builder' => fn (AnimeRepository $repository) => $repository->createOwnedPrivateQueryBuilder($options['owner']),
+                'query_builder' => fn (AnimeRepository $repository) => $options['is_edit']
+                    ? $repository->createOwnedQueryBuilder($options['owner'])
+                    : $repository->createOwnedPrivateQueryBuilder($options['owner']),
                 'label' => 'Animé parent',
                 'placeholder' => 'Choisissez un animé privé',
                 'disabled' => $options['is_edit'],

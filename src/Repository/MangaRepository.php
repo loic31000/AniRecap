@@ -57,6 +57,21 @@ class MangaRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /** @return Manga[] */
+    public function searchPublic(array $filters): array
+    {
+        $qb = $this->createQueryBuilder('m')
+            ->leftJoin('m.categorie', 'c')->addSelect('c')
+            ->andWhere('m.isPublic = true')->distinct();
+        if (!empty($filters['q'])) {
+            $qb->andWhere('(LOWER(m.title) LIKE :q OR LOWER(m.synopsis) LIKE :q OR LOWER(m.author) LIKE :q)')
+                ->setParameter('q', '%' . mb_strtolower($filters['q']) . '%');
+        }
+        if (!empty($filters['genre'])) { $qb->andWhere('c.slug = :genre')->setParameter('genre', $filters['genre']); }
+        if (!empty($filters['annee'])) { $qb->andWhere('m.mangaDate = :annee')->setParameter('annee', (int) $filters['annee']); }
+        return $qb->orderBy('m.title', 'ASC')->getQuery()->getResult();
+    }
+
     public function findOneVisibleTo(int $id, User $viewer): ?Manga
     {
         return $this->createVisibleQueryBuilder($viewer)

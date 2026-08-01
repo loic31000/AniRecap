@@ -89,8 +89,6 @@ class EpisodeRepository extends ServiceEntityRepository
             ->addSelect('s', 'a', 'c')
             ->andWhere('e.user = :owner')
             ->andWhere('a.owner = :owner')
-            ->andWhere('a.isPublic = :isPublic')
-            ->setParameter('owner', $owner)
-            ->setParameter('isPublic', false);
+            ->setParameter('owner', $owner);
     }
 }
