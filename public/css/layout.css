@@ -2,8 +2,8 @@
     --bg-dark: #0a1220;
     --bg-darker: #060b15;
     --card-border: rgba(230, 161, 60, 0.22);
-    --gold: #e8a53f;
-    --gold-soft: rgba(232, 165, 63, 0.65);
+    --gold: #f2b84b;
+    --gold-soft: #d7a849;
     --text-light: #f3ead9;
     --text-muted: #d7cde8;
     --nav-height: 78px;
@@ -52,8 +52,25 @@
     text-decoration: none;
 }
 
-.app-header-logo-title {
+.app-header-brand {
     display: flex;
+    align-items: center;
+    gap: 10px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.app-header-brand__logo {
+    width: auto;
+    height: 87px;
+    display: block;
+}
+
+.app-header-brand__title {
+    width: auto;
+    max-width: 190px;
+    height: 42px;
+    display: block;
 }
 
 .header-spacer {
@@ -69,19 +86,6 @@
     display: flex;
     align-items: center;
     gap: 10px;
-}
-
-.app-header-logo {
-    height: auto;
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-}
-
-.app-header-logo img {
-    height: 87px;
-    width: auto;
-    display: block;
 }
 
 .app-header-title {
@@ -115,9 +119,9 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
-    color: #e8a53f;
+    color: var(--gold);
     text-decoration: none;
-    font-size: 10px;
+    font-size: 0.75rem;
     font-weight: 700;
     text-shadow: 0px 0px 10px #090808;
 }
@@ -318,7 +322,7 @@ body.form-menu-is-open {
 }
 
 .form-menu__header h2 small {
-    font-size: 10px;
+    font-size: 0.75rem;
     font-weight: 500;
     letter-spacing: 0.06em;
 }
@@ -371,14 +375,14 @@ body.form-menu-is-open {
 
 .form-menu-card__content strong {
     color: var(--gold);
-    font-size: 11px;
+    font-size: 0.75rem;
     font-weight: 700;
 }
 
 .form-menu-card__content small {
     overflow: hidden;
     color: var(--text-muted);
-    font-size: 9px;
+    font-size: 0.75rem;
     line-height: 1.2;
     text-overflow: ellipsis;
     white-space: nowrap;

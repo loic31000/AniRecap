@@ -192,7 +192,7 @@ button {
 .catalogue-page--global .badge-type {
   min-height: 18px;
   padding: 2px 7px;
-  font-size: 9px;
+  font-size: 0.75rem;
 }
 
 .catalogue-page--global .oeuvre-title {
@@ -206,7 +206,7 @@ button {
 
 .catalogue-page--global .oeuvre-date,
 .catalogue-page--global .oeuvre-votes {
-  font-size: 9px;
+  font-size: 0.75rem;
 }
 
 .catalogue-page--global .oeuvre-votes {

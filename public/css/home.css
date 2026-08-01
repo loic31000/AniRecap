@@ -50,7 +50,7 @@
 .home-page .badge-type {
     min-height: 18px;
     padding: 2px 7px;
-    font-size: 9px;
+    font-size: 0.75rem;
 }
 
 .home-page .oeuvre-title {
@@ -64,7 +64,7 @@
 
 .home-page .oeuvre-date,
 .home-page .oeuvre-votes {
-    font-size: 9px;
+    font-size: 0.75rem;
 }
 
 .home-page .oeuvre-votes {

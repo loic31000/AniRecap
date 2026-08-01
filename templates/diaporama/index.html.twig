@@ -10,7 +10,9 @@
 {% block body %}
 {% set return_to = app.request.query.get('return_to') %}
 {% set return_url = return_to and return_to starts with '/' and not (return_to starts with '//') ? return_to : path('app_forms_index') %}
-<div
+<main
+    id="main-content"
+    tabindex="-1"
     class="story"
     data-controller="diaporama-reader"
     data-action="click->diaporama-reader#tap keydown@window->diaporama-reader#keydown"
@@ -144,5 +146,5 @@
             >›</button>
         </div>
     {% endif %}
-</div>
+</main>
 {% endblock %}

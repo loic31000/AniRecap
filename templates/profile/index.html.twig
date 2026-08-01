@@ -23,13 +23,13 @@
 
 	{{ component('Header', { backRoute: null }) }}
 
-	<main class="page-profile" id="profile-top">
+	<main class="page-profile" id="main-content" tabindex="-1">
 		<div class="profile-inner">
 
 			{% include 'components/_flash_messages.html.twig' %}
 
 			<h1 class="profile-page-title">
-				<span class="jp">プロフィール</span>
+				<span class="jp" lang="ja">プロフィール</span>
 				<span>Profil</span>
 			</h1>
 
@@ -37,12 +37,13 @@
 				<div class="profile-avatar-wrap">
 					<img src="{{ avatar }}" alt="Avatar de {{ username }}" class="profile-avatar">
 
-					<form action="{{ path('app_profile_upload') }}" method="post" enctype="multipart/form-data" class="avatar-upload-form">
+					<form action="{{ path('app_profile_upload') }}" method="post" enctype="multipart/form-data" class="avatar-upload-form" data-controller="avatar-upload">
 						<input type="hidden" name="_token" value="{{ csrf_token('avatar_upload') }}">
-						<label for="avatarInput" class="avatar-edit-btn" title="Changer l'avatar">
-							<i class="fa-solid fa-pencil"></i>
-						</label>
-						<input id="avatarInput" type="file" name="avatar" accept="image/png,image/jpeg" style="display:none">
+						<button type="button" class="avatar-edit-btn" title="Changer l'avatar" aria-label="Changer l’avatar" data-action="avatar-upload#choose">
+							<i class="fa-solid fa-pencil" aria-hidden="true"></i>
+						</button>
+						<input id="avatarInput" class="visually-hidden" type="file" name="avatar" accept="image/png,image/jpeg" data-avatar-upload-target="input" data-action="change->avatar-upload#submit">
+						<p class="visually-hidden" role="status" aria-live="polite" data-avatar-upload-target="status"></p>
 					</form>
 				</div>
 
@@ -65,7 +66,7 @@
 			<section class="panel panel--profile-list" aria-labelledby="favorites-title">
 				<div class="panel-header-row">
 					<h2 id="favorites-title" class="section-title section-title--inline">
-						<span class="jp">お気に入り</span>
+						<span class="jp" lang="ja">お気に入り</span>
 						<span>Mes Favoris</span>
 					</h2>
 					<a class="see-all-link" href="{{ path('app_favorites') }}">Voir tout →</a>
@@ -81,7 +82,7 @@
 			<section class="panel panel--profile-list" aria-labelledby="summaries-title">
 				<div class="panel-header-row">
 					<h2 id="summaries-title" class="section-title section-title--inline">
-						<span class="jp">私の要約</span>
+						<span class="jp" lang="ja">私の要約</span>
 						<span>Mes Résumés</span>
 					</h2>
 					<a class="see-all-link" href="{{ path('app_my_summaries') }}">Voir tout →</a>
@@ -99,46 +100,14 @@
 
 			<form action="{{ path('app_logout') }}" method="post" class="logout-form">
 				<button type="submit" class="btn-logout">
-					<i class="fa-solid fa-right-from-bracket"></i>
+					<i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
 					<span>Déconnexion</span>
 				</button>
 			</form>
 
-			{% include 'components/_scroll_top.html.twig' with {target: 'profile-top'} only %}
+			{% include 'components/_scroll_top.html.twig' with {target: 'main-content'} only %}
 		</div>
 	</main>
 
 	{{ component('Navbar', { active: 'profile' }) }}
-{% endblock %}
-
-{% block javascripts %}
-	{{ parent() }}
-	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-			const input = document.getElementById('avatarInput');
-			if (!input) return;
-
-			input.addEventListener('change', function () {
-				const file = input.files && input.files[0];
-				if (!file) return;
-
-				const allowed = ['image/png', 'image/jpeg'];
-				const maxSize = 2 * 1024 * 1024; // 2MB
-
-				if (!allowed.includes(file.type)) {
-					alert('Format invalide : seuls PNG et JPEG sont acceptés.');
-					input.value = '';
-					return;
-				}
-
-				if (file.size > maxSize) {
-					alert('Fichier trop volumineux : taille maximale 2MB.');
-					input.value = '';
-					return;
-				}
-
-				input.form.submit();
-			});
-		});
-	</script>
 {% endblock %}

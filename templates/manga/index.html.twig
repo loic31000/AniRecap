@@ -17,7 +17,7 @@
 
     {{ component('Header', { backRoute: 'app_catalogue' }) }}
 
-    <main class="page-manga">
+    <main class="page-manga" id="main-content" tabindex="-1">
         <div class="manga-inner">
             {% include 'components/_flash_messages.html.twig' %}
             <a href="{{ return_url }}" class="back-link">

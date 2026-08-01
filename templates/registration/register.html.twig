@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Page inscription
+{% block title %}Inscription — AniRecap
 {% endblock %}
 
 {% block stylesheets %}
@@ -10,43 +10,53 @@
 {% endblock %}
 
 {% block body %}
-	<div class="register-page">
+	<main class="register-page" id="main-content">
 		<div class="register-card">
 
 			<div class="logo-wrap">
-				<img src="{{ asset('images/logo.png') }}" alt="AniRecap logo" class="logo-img">
+				<img src="{{ asset('images/logo.png') }}" alt="" class="logo-img">
 			</div>
 
 			<h1 class="brand-title">AniRecap</h1>
 			<p class="brand-subtitle">Inscrivez-vous pour profiter des fonctionnalités</p>
 
-			{{ form_start(registrationForm, {'attr': {'class': 'register-form'}}) }}
+			{{ form_start(registrationForm, {'attr': {'class': 'register-form', 'aria-label': 'Créer un compte AniRecap'}}) }}
+			{{ form_errors(registrationForm) }}
 
 			<div class="form-group">
-				{{ form_label(registrationForm.username, 'Username') }}
+				{{ form_label(registrationForm.username) }}
 				<div class="input-icon">
-					<i class="fa-regular fa-user"></i>
-					{{ form_widget(registrationForm.username, {'attr': {'placeholder': 'Entrer votre username'}}) }}
+					<i class="fa-regular fa-user" aria-hidden="true"></i>
+					{{ form_widget(registrationForm.username, {'attr': {'placeholder': 'Votre nom d’utilisateur'}}) }}
 				</div>
 				{{ form_errors(registrationForm.username) }}
 			</div>
 
 			<div class="form-group">
-				{{ form_label(registrationForm.email, 'Email') }}
+				{{ form_label(registrationForm.email) }}
 				<div class="input-icon">
-					<i class="fa-regular fa-envelope"></i>
-					{{ form_widget(registrationForm.email, {'attr': {'placeholder': 'Entrer votre email'}}) }}
+					<i class="fa-regular fa-envelope" aria-hidden="true"></i>
+					{{ form_widget(registrationForm.email, {'attr': {'placeholder': 'nom@exemple.fr', 'aria-describedby': registrationForm.email.vars.id ~ '_help'}}) }}
 				</div>
+				<p id="{{ registrationForm.email.vars.id }}_help" class="form-help">Obligatoire pour vous connecter et sécuriser votre compte. Elle n’est pas affichée publiquement.</p>
 				{{ form_errors(registrationForm.email) }}
 			</div>
 
 			<div class="form-group">
-				{{ form_label(registrationForm.plainPassword, 'Password') }}
+				{{ form_label(registrationForm.plainPassword, 'Mot de passe') }}
 				<div class="input-icon">
-					<i class="fa-solid fa-lock"></i>
-					{{ form_widget(registrationForm.plainPassword, {'attr': {'placeholder': 'Créer votre mots de passe'}}) }}
+					<i class="fa-solid fa-lock" aria-hidden="true"></i>
+					{{ form_widget(registrationForm.plainPassword, {'attr': {'placeholder': 'Au moins 6 caractères'}}) }}
 				</div>
 				{{ form_errors(registrationForm.plainPassword) }}
+			</div>
+
+			<div class="privacy-consent">
+				{{ form_widget(registrationForm.dataPolicyAccepted) }}
+				<label for="{{ registrationForm.dataPolicyAccepted.vars.id }}">
+					J’ai lu la <a href="{{ path('app_privacy_policy') }}" target="_blank" rel="noopener">politique de confidentialité<span class="visually-hidden"> (s’ouvre dans un nouvel onglet)</span></a> et je comprends l’utilisation obligatoire de mon adresse e-mail pour créer mon compte.
+				</label>
+				{{ form_errors(registrationForm.dataPolicyAccepted) }}
 			</div>
 
 			<button type="submit" class="submit-btn">S'inscrire</button>
@@ -54,9 +64,9 @@
 			{{ form_end(registrationForm) }}
 
 			<p class="login-link">
-				Déjà membres ?
+			Déjà membre ?
 				<a href="{{ path('app_login') }}">Se connecter</a>
 			</p>
 		</div>
-	</div>
+	</main>
 {% endblock %}
