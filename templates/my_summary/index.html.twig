@@ -4,7 +4,6 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('css/oeuvreCard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/my-summaries.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 {% endblock %}
@@ -13,43 +12,22 @@
     <div class="my-summaries-page">
         {{ component('Header', {backRoute: 'app_profile'}) }}
         <main class="my-summaries-shell">
-            {% include 'components/_flash_messages.html.twig' %}
             <a class="my-summaries-back" href="{{ path('app_profile') }}">← Retour au Profil</a>
             <h1><span>私の要約</span> Mes Résumés</h1>
-            <p class="my-summaries-intro">Gérez vos résumés et vos diaporamas personnels.</p>
+            <p class="my-summaries-intro">Retrouvez vos contenus de synthèse enregistrés.</p>
 
-            {% if root_filter %}
-                <p class="my-summaries-filter">
-                    Résumés filtrés pour cette œuvre.
-                    <a href="{{ path('app_my_summaries') }}">Afficher tous mes résumés</a>
-                </p>
+            {% if summary_cards is empty %}
+                <section class="management-empty" role="status">
+                    <p>Vous n’avez encore enregistré aucun résumé.</p>
+                    <a href="{{ path('app_catalogue') }}">Découvrir le Catalogue</a>
+                </section>
+            {% else %}
+                <div class="summary-list-grid">
+                    {% for card in summary_cards %}
+                        {% include 'my_summary/_summary_card.html.twig' with {card: card} only %}
+                    {% endfor %}
+                </div>
             {% endif %}
-
-            <section aria-labelledby="summaries-heading">
-                <h2 id="summaries-heading">Mes résumés</h2>
-                {% if summary_cards is empty %}
-                    <p class="management-empty">Vous n’avez encore créé aucun résumé.</p>
-                {% else %}
-                    <div class="management-grid">
-                        {% for card in summary_cards %}
-                            {% include 'my_summary/_management_card.html.twig' with {card: card} only %}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </section>
-
-            {% if not root_filter %}<section aria-labelledby="diaporamas-heading">
-                <h2 id="diaporamas-heading">Mes diaporamas</h2>
-                {% if diaporama_cards is empty %}
-                    <p class="management-empty">Vous n’avez encore créé aucun diaporama.</p>
-                {% else %}
-                    <div class="management-grid">
-                        {% for card in diaporama_cards %}
-                            {% include 'my_summary/_management_card.html.twig' with {card: card} only %}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </section>{% endif %}
         </main>
         {{ component('Navbar', {active: 'profile'}) }}
     </div>

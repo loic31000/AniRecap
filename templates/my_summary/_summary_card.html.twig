@@ -1,0 +1,23 @@
+<article class="summary-list-card">
+    {% if card.openRoute %}
+        <a class="summary-list-card__link" href="{{ path(card.openRoute, card.openParameters) }}" aria-label="Ouvrir le contenu associé à {{ card.title }}">
+    {% else %}
+        <div class="summary-list-card__link summary-list-card__link--disabled">
+    {% endif %}
+        <span class="summary-list-card__media">
+            {% if card.image|default('')|trim is not empty %}
+                <img src="{{ card.image }}" alt="Miniature du contenu associé à {{ card.title }}">
+            {% else %}
+                <span class="summary-list-card__placeholder" aria-hidden="true"><i class="fa-regular fa-image"></i></span>
+            {% endif %}
+        </span>
+        <span class="summary-list-card__body">
+            <span class="summary-list-card__badge">Résumé</span>
+            <strong>{{ card.title }}</strong>
+            {% if card.description|default('')|striptags|trim is not empty %}
+                <span class="summary-list-card__excerpt">{{ card.description|striptags }}</span>
+            {% endif %}
+            <span class="summary-list-card__parent">{{ card.parentLabel }}</span>
+        </span>
+    {% if card.openRoute %}</a>{% else %}</div>{% endif %}
+</article>

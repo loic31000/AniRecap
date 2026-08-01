@@ -201,7 +201,7 @@
 }
 
 .page-profile .oeuvre-card,
-.page-profile .management-card {
+.page-profile .summary-list-card {
     border-radius: 12px;
 }
 
@@ -223,8 +223,8 @@
 .page-profile .oeuvre-votes { font-size: 9px; }
 .page-profile .oeuvre-votes { padding: 2px 8px; }
 
-.profile-summary-grid .management-card__media { aspect-ratio: 16 / 9; }
-.profile-summary-grid .management-card__body { min-height: 116px; }
+.profile-summary-grid .summary-list-card__media { aspect-ratio: 16 / 9; }
+.profile-summary-grid .summary-list-card__body { min-height: 116px; }
 
 .logout-form { margin: 38px 0 0; }
 .btn-logout {
