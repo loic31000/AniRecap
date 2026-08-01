@@ -469,8 +469,7 @@ body {
 	white-space: nowrap;
 }
 
-.content-card-status,
-.content-card-spoiler {
+.content-card-status {
 	color: var(--manga-text-muted);
 	font-size: 10px;
 	font-weight: 700;
@@ -536,56 +535,6 @@ body {
 .content-card-edit:hover,
 .content-card-edit:focus-visible {
 	text-decoration: underline;
-}
-
-/* ---------- SPOILER CARDS ---------- */
-
-.episode-figma-card.is-spoiler {
-	aspect-ratio: 16 / 9;
-	cursor: pointer;
-}
-
-.spoiler-blur-bg {
-	position: absolute;
-	inset: 0;
-	background-size: cover;
-	background-position: center;
-	filter: blur(10px) brightness(0.4);
-	transform: scale(1.1);
-}
-
-.spoiler-overlay-content {
-	position: relative;
-	z-index: 1;
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: 6px;
-	text-align: center;
-	background: rgba(12, 20, 37, 0.35);
-}
-
-.warning-icon {
-	color: var(--manga-danger);
-	font-size: 20px;
-}
-
-.spoiler-title-text {
-	font-size: 13px;
-	font-weight: 700;
-	letter-spacing: 0.04em;
-	color: var(--manga-text);
-}
-
-.spoiler-major .spoiler-title-text {
-	color: #e2653b;
-}
-
-.spoiler-action-text {
-	font-size: 11px;
-	color: var(--manga-text-muted);
 }
 
 .action-row-center {

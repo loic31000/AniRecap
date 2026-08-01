@@ -11,6 +11,8 @@ use App\Repository\SeasonRepository;
 use App\Repository\SummaryRepository;
 use App\Repository\EpisodeRepository;
 use App\Repository\DiaporamaRepository;
+use App\Repository\SlideRepository;
+use App\Enum\SpoilerLevel;
 use App\Service\SynopsisImageUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -165,6 +167,7 @@ final class SeasonFormController extends AbstractController
         SeasonRepository $seasonRepository,
         EpisodeRepository $episodeRepository,
         DiaporamaRepository $diaporamaRepository,
+        SlideRepository $slideRepository,
     ): Response
     {
         $user = $this->requireUser();
@@ -178,12 +181,32 @@ final class SeasonFormController extends AbstractController
             static fn ($episode): int => (int) $episode->getId(),
             $episodes,
         );
+        $slideLevels = $slideRepository->findHighestLevelsForEpisodes($episodeIds);
+        $effectiveLevels = [];
+        foreach ($episodes as $episode) {
+            $effectiveLevels[$episode->getId()] = $this->highestLevel(
+                $episode->getSpoilerLevel(),
+                $slideLevels[$episode->getId()] ?? SpoilerLevel::Aucun,
+            );
+        }
 
         return $this->render('season/private_show.html.twig', [
             'season' => $season,
             'episodes' => $episodes,
             'episode_diaporamas' => $diaporamaRepository->findOwnedLinksForEpisodes($episodeIds, $user),
+            'episode_spoiler_levels' => $effectiveLevels,
         ]);
+    }
+
+    private function highestLevel(SpoilerLevel $first, SpoilerLevel $second): SpoilerLevel
+    {
+        $rank = static fn (SpoilerLevel $level): int => match ($level) {
+            SpoilerLevel::Aucun => 0,
+            SpoilerLevel::Mineur => 1,
+            SpoilerLevel::Majeur => 2,
+        };
+
+        return $rank($first) >= $rank($second) ? $first : $second;
     }
 
     private function requireUser(): User

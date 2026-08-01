@@ -32,7 +32,7 @@
                         <h2>Vérifiez les informations suivantes :</h2>
                         <ul>
                             {% for field in form %}
-                                {% for error in field.vars.errors %}
+                                {% for error in field.vars.errors|default([]) %}
                                     <li><a href="#{{ field.vars.id }}">{{ field.vars.label }} : {{ error.message }}</a></li>
                                 {% endfor %}
                             {% endfor %}

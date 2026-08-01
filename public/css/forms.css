@@ -633,6 +633,67 @@
     background: #071526;
 }
 
+/* Sélecteur SpoilerLevel partagé par les deux formulaires de scènes. */
+.synopsis-form [id$="_spoilerLevel"] {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 5px;
+    border: 2px solid #e8a226;
+    border-radius: 18px;
+    background: #000;
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.7);
+}
+
+.synopsis-form [id$="_spoilerLevel"] > div {
+    position: relative;
+    min-width: 0;
+}
+
+.synopsis-form [id$="_spoilerLevel"] input {
+    position: absolute;
+    opacity: 0;
+}
+
+.synopsis-form [id$="_spoilerLevel"] label {
+    display: flex;
+    min-height: 58px;
+    margin: 0;
+    padding: 7px 3px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 3px;
+    border: 2px solid transparent;
+    border-radius: 13px;
+    color: #efa92f;
+    font-size: 0.88rem;
+    font-weight: 500;
+    line-height: 1.15;
+    text-align: center;
+    text-shadow: none;
+    cursor: pointer;
+}
+
+.synopsis-form [id$="_spoilerLevel"] label::after {
+    color: #9a722d;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.synopsis-form [id$="_spoilerLevel"] input[value="aucun"] + label::after { content: "Public"; }
+.synopsis-form [id$="_spoilerLevel"] input[value="mineur"] + label::after { content: "Événements"; }
+.synopsis-form [id$="_spoilerLevel"] input[value="majeur"] + label::after { content: "Révélations"; }
+
+.synopsis-form [id$="_spoilerLevel"] input:checked + label {
+    border-color: #e8a226;
+    background: #071526;
+}
+
+.synopsis-form [id$="_spoilerLevel"] input:focus-visible + label {
+    outline: 3px solid rgba(239, 169, 47, 0.45);
+    outline-offset: 2px;
+}
+
 .category-selector {
     position: relative;
     margin-bottom: 28px;

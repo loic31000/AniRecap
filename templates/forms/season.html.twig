@@ -38,7 +38,7 @@
                                 <li>{{ error.message }}</li>
                             {% endfor %}
                             {% for field in form %}
-                                {% for error in field.vars.errors %}
+                                {% for error in field.vars.errors|default([]) %}
                                     <li><a href="#{{ field.vars.id }}">{{ field.vars.label }} : {{ error.message }}</a></li>
                                 {% endfor %}
                             {% endfor %}

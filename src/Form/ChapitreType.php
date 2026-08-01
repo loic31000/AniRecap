@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Dto\ChapitreInput;
 use App\Entity\Categorie;
 use App\Enum\SpoilerLevel;
+use App\Repository\CategorieRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -24,7 +25,20 @@ final class ChapitreType extends AbstractType
             ->add('image', FileType::class, ['label' => 'Miniature du chapitre', 'required' => !$options['is_edit'], 'help' => $options['is_edit'] ? 'Laissez vide pour conserver la miniature actuelle. PNG ou JPG, 2 Mio maximum.' : 'PNG ou JPG, 2 Mio maximum.'])
             ->add('title', TextType::class, ['label' => 'Titre du chapitre'])
             ->add('number', IntegerType::class, ['label' => 'Numéro du chapitre', 'attr' => ['min' => 1, 'max' => 10000], 'invalid_message' => 'Le numéro doit être un nombre entier.'])
-            ->add('categories', EntityType::class, ['class' => Categorie::class, 'choice_label' => 'name', 'label' => 'Catégories', 'multiple' => true, 'invalid_message' => 'Une catégorie sélectionnée n’existe pas.'])
+            ->add('categories', EntityType::class, [
+                'class' => Categorie::class,
+                'choice_label' => 'name',
+                'label' => 'Catégories',
+                'multiple' => true,
+                'expanded' => true,
+                'query_builder' => static fn (CategorieRepository $repository) => $repository->createAlphabeticalQueryBuilder(),
+                'help' => 'Choisissez entre une et trois catégories.',
+                'invalid_message' => 'Une catégorie sélectionnée n’existe pas.',
+                'choice_attr' => static fn () => [
+                    'data-category-selector-target' => 'checkbox',
+                    'data-action' => 'change->category-selector#change',
+                ],
+            ])
             ->add('description', TextareaType::class, ['label' => 'Description du chapitre', 'attr' => ['rows' => 10]])
             ->add('type', ChoiceType::class, ['label' => 'Type', 'choices' => ['Manga' => 'Manga'], 'expanded' => true])
             ->add('status', ChoiceType::class, ['label' => 'Statut', 'choices' => ['En cours' => 'En cours', 'Terminé' => 'Terminé'], 'expanded' => true])

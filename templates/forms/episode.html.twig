@@ -38,7 +38,7 @@
                                 <li>{{ error.message }}</li>
                             {% endfor %}
                             {% for field in form %}
-                                {% for error in field.vars.errors %}
+                                {% for error in field.vars.errors|default([]) %}
                                     <li><a href="#{{ field.vars.id }}">{{ field.vars.label }} : {{ error.message }}</a></li>
                                 {% endfor %}
                             {% endfor %}
@@ -67,7 +67,7 @@
 
                 {{ form_row(form.title) }}
                 {{ form_row(form.number) }}
-                {{ form_row(form.categories) }}
+                {{ include('forms/_category_selector.html.twig', {field: form.categories, max: 3}) }}
                 {{ form_row(form.description) }}
 
                 <fieldset class="synopsis-fieldset synopsis-fieldset--plain">

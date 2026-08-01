@@ -5,6 +5,7 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 {% endblock %}
 
 {% block body %}
@@ -32,7 +33,7 @@
                         <h2>Vérifiez les informations suivantes :</h2>
                         <ul>
                             {% for field in form %}
-                                {% for error in field.vars.errors %}
+                                {% for error in field.vars.errors|default([]) %}
                                     <li><a href="#{{ field.vars.id }}">{{ field.vars.label }} : {{ error.message }}</a></li>
                                 {% endfor %}
                             {% endfor %}

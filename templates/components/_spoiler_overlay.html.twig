@@ -1,0 +1,5 @@
+<button type="button" class="spoiler-card__overlay{{ compact ? ' spoiler-card__overlay--compact' : '' }}" data-spoiler-card-target="overlay" data-action="click->spoiler-card#reveal" aria-expanded="false" aria-label="Révéler le contenu avec spoiler {{ level }}">
+    <i class="fa-solid fa-triangle-exclamation warning-icon" aria-hidden="true"></i>
+    <span class="spoiler-title-text">SPOILER {{ level|upper }}</span>
+    <span class="spoiler-action-text">APPUYER POUR RÉVÉLER</span>
+</button>
