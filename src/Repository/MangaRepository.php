@@ -60,13 +60,6 @@ class MangaRepository extends ServiceEntityRepository
     public function findOneVisibleTo(int $id, User $viewer): ?Manga
     {
         return $this->createVisibleQueryBuilder($viewer)
-            ->leftJoin(
-                'm.character',
-                'visibleCharacter',
-                'WITH',
-                'visibleCharacter.owner IS NULL OR visibleCharacter.owner = :viewer',
-            )
-            ->addSelect('visibleCharacter')
             ->andWhere('m.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
@@ -116,5 +109,14 @@ class MangaRepository extends ServiceEntityRepository
             'coverMangaUrl' => $coverUrl,
             'owner' => $owner,
         ]);
+    }
+
+    /** @return Manga[] */
+    public function findOwnedPrivate(User $owner): array
+    {
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.owner = :owner')->andWhere('m.isPublic = false')
+            ->setParameter('owner', $owner)->orderBy('m.title', 'ASC')
+            ->getQuery()->getResult();
     }
 }

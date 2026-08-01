@@ -13,6 +13,11 @@
 	--radius-md: 12px;
 }
 
+.personnage-portrait--placeholder,
+.character-chip-placeholder { display:grid; place-items:center; background:#071729; color:#d9a323; }
+.personnage-portrait--placeholder { font-size:5rem; }
+.character-chip-placeholder { font-size:1.2rem; }
+
 .page-personnage {
 	background: radial-gradient(circle at top, var(--perso-bg-alt) 0%, var(--perso-bg) 55%);
 	color: var(--perso-text);

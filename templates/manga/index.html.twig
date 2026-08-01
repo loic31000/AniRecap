@@ -151,7 +151,7 @@
                 {% else %}
                     <div class="manga-characters-grid">
                         {% for character in characters %}
-                            {% include 'components/_spoiler_card.html.twig' with {variant: 'character', effective_level: character.spoilerLevel, image_url: character.imageUrl ? asset(character.imageUrl) : null, title: character.name} only %}
+                            {% include 'components/_spoiler_card.html.twig' with {variant: 'character', effective_level: character.spoilerLevel, image_url: character.imageUrl ? path('app_character_image', {id: character.id}) : null, title: character.name, detail_url: path('app_character_show', {id: character.id})} only %}
                         {% endfor %}
                     </div>
                 {% endif %}

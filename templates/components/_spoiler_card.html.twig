@@ -4,8 +4,7 @@
 {% if variant|default('content') == 'character' %}
     <article class="manga-character-card spoiler-character{{ is_spoiler ? ' is-spoiler spoiler-' ~ level : '' }}"{% if is_spoiler %} data-controller="spoiler-card"{% endif %}>
         <div class="spoiler-character__content"{% if is_spoiler %} data-spoiler-card-target="content" aria-hidden="true" inert{% endif %}>
-            {% if image_url %}<img src="{{ image_url }}" alt="Portrait de {{ title }}" class="manga-character-portrait" loading="lazy">{% else %}<span class="manga-character-portrait manga-character-placeholder"><i class="fa-solid fa-user" aria-hidden="true"></i></span>{% endif %}
-            <h3 class="manga-character-name">{{ title }}</h3>
+            {% if detail_url|default(null) %}<a href="{{ detail_url }}" class="spoiler-character__link">{% endif %}{% if image_url %}<img src="{{ image_url }}" alt="Portrait de {{ title }}" class="manga-character-portrait" loading="lazy">{% else %}<span class="manga-character-portrait manga-character-placeholder"><i class="fa-solid fa-user" aria-hidden="true"></i></span>{% endif %}<h3 class="manga-character-name">{{ title }}</h3>{% if detail_url|default(null) %}</a>{% endif %}
         </div>
         {% if is_spoiler %}{% include 'components/_spoiler_overlay.html.twig' with {level: level, compact: true} only %}{% endif %}
     </article>
