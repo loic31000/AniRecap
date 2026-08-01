@@ -9,8 +9,63 @@
     --forms-border: rgba(232, 165, 63, 0.45);
 }
 
-.character-upload-zone { display:flex; min-height:100px; align-items:center; justify-content:center; flex-direction:column; gap:14px; border:1px solid #d9a323; border-radius:8px; background:#000; color:#d9a323; cursor:pointer; text-align:center; }
-.character-upload-zone i { font-size:1.6rem; }
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    background: var(--forms-background);
+}
+
+.forms-page,
+.forms-page *,
+.synopsis-editor-hero,
+.synopsis-editor-hero * {
+    box-sizing: border-box;
+}
+
+.synopsis-form .synopsis-upload-field > label.character-upload-zone {
+    display: flex;
+    width: 100%;
+    min-height: 142px;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 14px;
+    border: 0;
+    background: transparent;
+    color: #d9a323;
+    cursor: pointer;
+    text-align: center;
+    text-shadow: none;
+}
+
+.synopsis-form .character-upload-zone i {
+    display: grid;
+    width: 96px;
+    height: 96px;
+    place-items: center;
+    border: 1px solid #06101d;
+    border-radius: 6px;
+    background: #000;
+    font-size: 1.35rem;
+    box-shadow: 0 4px 7px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(27, 73, 116, 0.4);
+}
+
+.synopsis-form .character-upload-zone span {
+    color: #d9a323;
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+
+.synopsis-form .character-upload-zone:focus-within i,
+.synopsis-form .character-upload-zone:hover i {
+    border-color: #efa92f;
+}
 .character-current-image { display:block; width:100px; aspect-ratio:1; margin:0 auto 16px; border:2px solid #d9a323; border-radius:8px; object-fit:cover; }
 .character-links { display:grid; gap:12px; margin:20px 0 0; padding:16px; border:1px solid rgba(217,163,35,.35); border-radius:10px; }
 .character-links legend { padding:0 8px; color:#d9a323; font-weight:800; }
@@ -131,8 +186,8 @@
     display: flex;
     align-items: flex-end;
     min-height: 100dvh;
-    width: calc(100% + 16px);
-    margin: -8px;
+    width: 100%;
+    margin: 0;
     padding: clamp(150px, 23vh, 205px) 0 0;
     overflow-x: hidden;
     background:
@@ -303,7 +358,7 @@
     top: 0;
     z-index: 40;
     display: grid;
-    grid-template-columns: 42px minmax(0, 1fr) 42px;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
     align-items: center;
     min-height: 88px;
     padding: env(safe-area-inset-top, 0) 18px 0;
@@ -315,17 +370,25 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     color: #efa92f;
+    font-size: 1.35rem;
     text-decoration: none;
+}
+
+.synopsis-editor-hero .form-back-icon {
+    display: block;
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
 }
 
 .synopsis-editor-hero h1 {
     margin: 0;
     color: #efa92f;
-    font-size: clamp(1.85rem, 8vw, 2.55rem);
+    font-size: clamp(1.55rem, 6.2vw, 2.15rem);
     font-weight: 900;
     line-height: 1.1;
     text-align: center;
@@ -365,7 +428,16 @@
 }
 
 .synopsis-form {
+    width: 100%;
+    min-width: 0;
     color: #efa92f;
+}
+
+.synopsis-form > div,
+.synopsis-fieldset > div,
+.scene-timecodes > div,
+.scene-manga-targets > div {
+    min-width: 0;
 }
 
 .synopsis-form > div:not(.synopsis-upload-field, .synopsis-save-bar),
@@ -393,7 +465,10 @@
 .synopsis-form input[type="date"],
 .synopsis-form select,
 .synopsis-form textarea {
+    display: block;
+    box-sizing: border-box;
     width: 100%;
+    max-width: 100%;
     min-height: 58px;
     padding: 14px 22px;
     border: 1px solid #06101d;
@@ -499,6 +574,86 @@
     white-space: nowrap;
 }
 
+.upload-selection {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 14px;
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px solid #efa92f;
+    border-radius: 8px;
+    background: #02070d;
+    color: #efa92f;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.55);
+}
+
+.upload-selection[hidden] {
+    display: none;
+}
+
+.upload-selection__image {
+    display: block;
+    width: 96px;
+    height: 96px;
+    border: 1px solid rgba(239, 169, 47, 0.55);
+    border-radius: 6px;
+    object-fit: cover;
+    background: #000;
+}
+
+.upload-selection__information {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 7px;
+}
+
+.upload-selection__filename {
+    width: 100%;
+    overflow: hidden;
+    color: #f4bd5c;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.upload-selection__size {
+    color: #c99a47;
+    font-size: 0.78rem;
+}
+
+.upload-selection__cancel {
+    min-height: 38px;
+    padding: 7px 11px;
+    border: 1px solid #efa92f;
+    border-radius: 4px;
+    background: #000;
+    color: #efa92f;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.upload-selection__cancel:hover,
+.upload-selection__cancel:focus-visible {
+    background: #10243b;
+    outline: 2px solid #efa92f;
+    outline-offset: 2px;
+}
+
+@media (max-width: 380px) {
+    .upload-selection {
+        grid-template-columns: 76px minmax(0, 1fr);
+    }
+
+    .upload-selection__image {
+        width: 76px;
+        height: 76px;
+    }
+}
+
 .synopsis-fieldset {
     min-width: 0;
     margin: 0;
@@ -513,11 +668,29 @@
     column-gap: 22px;
 }
 
+.synopsis-fieldset--range > div {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+}
+
+.synopsis-fieldset--range > div > label {
+    display: flex;
+    min-height: 2.7em;
+    align-items: flex-end;
+}
+
+.synopsis-fieldset--range > div > input {
+    margin-top: auto;
+}
+
 .synopsis-fieldset--range legend {
     grid-column: 1 / -1;
 }
 
 .synopsis-form [id$="_sourceType"],
+.synopsis-form [id$="_targetType"],
+.synopsis-form [id$="_type"],
 .synopsis-form [id$="_status"] {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -529,11 +702,15 @@
 }
 
 .synopsis-form [id$="_sourceType"] > div,
+.synopsis-form [id$="_targetType"] > div,
+.synopsis-form [id$="_type"] > div,
 .synopsis-form [id$="_status"] > div {
     min-width: 0;
 }
 
 .synopsis-form [id$="_sourceType"] input,
+.synopsis-form [id$="_targetType"] input,
+.synopsis-form [id$="_type"] input,
 .synopsis-form [id$="_status"] input {
     position: absolute;
     opacity: 0;
@@ -541,6 +718,8 @@
 }
 
 .synopsis-form [id$="_sourceType"] label,
+.synopsis-form [id$="_targetType"] label,
+.synopsis-form [id$="_type"] label,
 .synopsis-form [id$="_status"] label {
     display: flex;
     align-items: center;
@@ -556,9 +735,26 @@
 }
 
 .synopsis-form [id$="_sourceType"] input:checked + label,
+.synopsis-form [id$="_targetType"] input:checked + label,
+.synopsis-form [id$="_type"] input:checked + label,
 .synopsis-form [id$="_status"] input:checked + label {
     border-color: #e8a226;
     background: #071526;
+}
+
+.synopsis-form [id$="_sourceType"] input:focus-visible + label,
+.synopsis-form [id$="_targetType"] input:focus-visible + label,
+.synopsis-form [id$="_type"] input:focus-visible + label,
+.synopsis-form [id$="_status"] input:focus-visible + label {
+    outline: 3px solid rgba(239, 169, 47, 0.45);
+    outline-offset: 2px;
+}
+
+.synopsis-form [id$="_sourceType"]:has(> div:only-child),
+.synopsis-form [id$="_targetType"]:has(> div:only-child),
+.synopsis-form [id$="_type"]:has(> div:only-child),
+.synopsis-form [id$="_status"]:has(> div:only-child) {
+    grid-template-columns: 1fr;
 }
 
 /* Sélecteur SpoilerLevel partagé par les deux formulaires de scènes. */
@@ -920,15 +1116,16 @@
     }
 
     .synopsis-editor-hero {
-        grid-template-columns: 32px minmax(0, 1fr) 32px;
+        grid-template-columns: 44px minmax(0, 1fr) 44px;
         min-height: 88px;
         padding-right: 10px;
         padding-left: 10px;
     }
 
     .synopsis-editor-hero a {
-        width: 32px;
-        height: 32px;
+        width: 44px;
+        height: 44px;
+        font-size: 1.4rem;
     }
 
     .forms-page--editor {

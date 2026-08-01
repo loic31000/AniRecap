@@ -11,8 +11,8 @@
                 {% if oeuvre.canOpen|default(true) %}
                     <a
                         href="{{ oeuvre.type == 'anime'
-                            ? path('app_anime_show', {id: oeuvre.id})
-                            : path('app_manga_show', {id: oeuvre.id}) }}"
+                            ? path('app_anime_show', {id: oeuvre.id, return_to: app.request.requestUri})
+                            : path('app_manga_show', {id: oeuvre.id, return_to: app.request.requestUri}) }}"
                         class="oeuvre-card-link"
                         aria-label="Voir {{ oeuvre.title }}"
                     ></a>

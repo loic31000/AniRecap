@@ -30,9 +30,16 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class FormsController extends AbstractController
 {
     #[Route('/formulaires', name: 'app_forms_index', methods: ['GET'])]
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        return $this->redirectToRoute('app_home', ['creation' => 1]);
+        $returnTo = (string) $request->query->get('return_to', '');
+        if (!str_starts_with($returnTo, '/') || str_starts_with($returnTo, '//')) {
+            return $this->redirectToRoute('app_home', ['creation' => 1]);
+        }
+
+        $separator = str_contains($returnTo, '?') ? '&' : '?';
+
+        return $this->redirect($returnTo.$separator.'creation=1');
     }
 
     #[Route('/formulaires/synopsis-anime', name: 'app_forms_anime_synopsis', methods: ['GET', 'POST'])]

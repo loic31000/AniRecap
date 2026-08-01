@@ -1,6 +1,6 @@
 <article class="summary-list-card">
     {% if card.openRoute %}
-        <a class="summary-list-card__open-link" href="{{ path(card.openRoute, card.openParameters) }}" aria-label="Ouvrir le contenu associé à {{ card.title }}"></a>
+        <a class="summary-list-card__open-link" href="{{ path(card.openRoute, card.openParameters|merge({return_to: app.request.requestUri})) }}" aria-label="Ouvrir le contenu associé à {{ card.title }}"></a>
     {% endif %}
     <span class="summary-list-card__media">
         {% if card.image|default('')|trim is not empty %}
@@ -16,11 +16,14 @@
             <span class="summary-list-card__excerpt">{{ card.description|striptags }}</span>
         {% endif %}
         <span class="summary-list-card__parent">{{ card.parentLabel }}</span>
-        {% if card.editRoute %}
-            <a class="summary-card-edit" href="{{ path(card.editRoute, {id: card.editId}) }}" aria-label="Modifier {{ card.title }}">
-                <i class="fa-solid fa-pencil" aria-hidden="true"></i>
-            </a>
-        {% endif %}
+        <div class="summary-list-card__actions">
+            {% include 'components/_summary_like_toggle.html.twig' with {state: card.likeState|default(null)} only %}
+            {% if card.editRoute %}
+                <a class="summary-card-edit" href="{{ path(card.editRoute, {id: card.editId, return_to: app.request.requestUri}) }}" aria-label="Modifier {{ card.title }}">
+                    <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+                    <span>Modifier</span>
+                </a>
+            {% endif %}
+        </div>
     </div>
-    {% include 'components/_summary_like_toggle.html.twig' with {state: card.likeState|default(null)} only %}
 </article>

@@ -61,8 +61,30 @@ body {
 .season-title {
     display: flex;
     flex-direction: column;
+    width: 100%;
+    align-items: flex-start;
     gap: 4px;
     margin: 0 0 15px 0;
+    text-align: left;
+}
+
+.season-copy {
+    width: 100%;
+}
+
+.season-copy > p {
+    width: 100%;
+    margin: 0 0 15px;
+    text-align: left;
+}
+
+.season-copy .badge-row {
+    width: 100%;
+    justify-content: flex-start;
+}
+
+.season-copy .chip-btn {
+    align-self: flex-start;
 }
 
 .season-title__jp {
@@ -85,13 +107,19 @@ body {
 }
 
 .badge {
+    display: inline-flex;
+    min-height: 28px;
+    align-items: center;
+    justify-content: center;
     border: 1px solid var(--gold);
     color: var(--gold);
-    background: transparent;
-    padding: 3px 12px;
-    border-radius: 20px;
+    background: #02070d;
+    padding: 5px 11px;
+    border-radius: 4px;
     font-size: 0.75rem;
     font-weight: bold;
+    line-height: 1;
+    text-align: center;
 }
 
 .btn-favorite {
@@ -117,17 +145,29 @@ body {
 }
 
 .chip-btn {
-    background: transparent;
+    min-height: 44px;
+    background: #02070d;
     border: 1px solid var(--gold);
     color: var(--gold);
-    padding: 6px 16px;
+    padding: 9px 18px;
     border-radius: 4px;
     font-size: 0.8rem;
     font-weight: bold;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
+    line-height: 1;
+    text-align: center;
+    text-decoration: none;
+}
+
+.chip-btn:hover,
+.chip-btn:focus-visible {
+    background: #0b1b2d;
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
 }
 
 .panel {
@@ -148,11 +188,18 @@ body {
     gap: 8px;
 }
 
+.section-title--bilingual {
+    align-items: baseline;
+    flex-wrap: wrap;
+}
+
 .synopsis {
     font-size: 0.85rem;
     line-height: 1.5;
     color: var(--text-white);
     margin: 0 0 12px 0;
+    text-align: left;
+    overflow-wrap: anywhere;
 }
 
 .info-grid {

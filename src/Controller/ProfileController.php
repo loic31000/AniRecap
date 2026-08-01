@@ -195,7 +195,7 @@ final class ProfileController extends AbstractController
         };
 
         if ($extension === null) {
-            $this->addFlash('error', 'Format invalide — seuls PNG et JPEG sont acceptés.');
+            $this->addFlash('error', 'Format invalide : seuls PNG et JPEG sont acceptés.');
 
             return $this->redirectToRoute('app_profile');
         }

@@ -61,7 +61,9 @@ final class DiaporamaFormController extends AbstractController
 
                 $this->addFlash('error', 'Le diaporama n’a pas pu être créé. Veuillez réessayer.');
 
-                return $this->redirectToRoute('app_diaporama_create');
+                return $this->redirectToRoute('app_diaporama_create', array_filter([
+                    'return_to' => $this->safeReturnTo($request),
+                ]));
             }
 
             $this->addFlash('success', 'Le diaporama a été créé avec succès.');
@@ -70,7 +72,10 @@ final class DiaporamaFormController extends AbstractController
                 $input->sourceType === Diaporama::SOURCE_ANIME
                     ? 'app_diaporama_scene_anime_create'
                     : 'app_diaporama_scene_manga_create',
-                ['id' => $diaporama->getId()],
+                array_filter([
+                    'id' => $diaporama->getId(),
+                    'return_to' => $this->safeReturnTo($request),
+                ]),
             );
         }
 
@@ -85,5 +90,12 @@ final class DiaporamaFormController extends AbstractController
         }
 
         return $user;
+    }
+
+    private function safeReturnTo(Request $request): ?string
+    {
+        $returnTo = (string) $request->query->get('return_to', '');
+
+        return str_starts_with($returnTo, '/') && !str_starts_with($returnTo, '//') ? $returnTo : null;
     }
 }

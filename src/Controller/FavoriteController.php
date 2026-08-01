@@ -224,7 +224,7 @@ final class FavoriteController extends AbstractController
 
         return $numbers === []
             ? sprintf('Saison %d', $season->getNumber())
-            : sprintf('Saison %d · EP %d – EP %d', $season->getNumber(), $numbers[0], $numbers[array_key_last($numbers)]);
+            : sprintf('Saison %d • EP %d à EP %d', $season->getNumber(), $numbers[0], $numbers[array_key_last($numbers)]);
     }
 
     private function mangaProgress(Manga $manga): string
@@ -233,7 +233,7 @@ final class FavoriteController extends AbstractController
         $chapterNumbers = array_values(array_filter($chapterNumbers, static fn (?int $number): bool => $number !== null));
         sort($chapterNumbers);
         if ($chapterNumbers !== []) {
-            return sprintf('Chapitre %d – Chapitre %d', $chapterNumbers[0], $chapterNumbers[array_key_last($chapterNumbers)]);
+            return sprintf('Chapitre %d à Chapitre %d', $chapterNumbers[0], $chapterNumbers[array_key_last($chapterNumbers)]);
         }
 
         $tomeNumbers = array_map(static fn ($tome): ?int => $tome->getNumber(), $manga->getTomes()->toArray());
@@ -242,7 +242,7 @@ final class FavoriteController extends AbstractController
 
         return $tomeNumbers === []
             ? ($manga->getStatus() ?: 'Aucun tome renseigné')
-            : sprintf('Tome %d – Tome %d', $tomeNumbers[0], $tomeNumbers[array_key_last($tomeNumbers)]);
+            : sprintf('Tome %d à Tome %d', $tomeNumbers[0], $tomeNumbers[array_key_last($tomeNumbers)]);
     }
 
     /**

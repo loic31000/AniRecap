@@ -12,15 +12,17 @@
 
 {% block body %}
     {% set cover = manga.coverMangaUrl ?: asset('images/coverManga.png') %}
+    {% set return_to = app.request.query.get('return_to') %}
+    {% set return_url = return_to and return_to starts with '/' and not (return_to starts with '//') ? return_to : path('app_catalogue') %}
 
     {{ component('Header', { backRoute: 'app_catalogue' }) }}
 
     <main class="page-manga">
         <div class="manga-inner">
             {% include 'components/_flash_messages.html.twig' %}
-            <a href="{{ path('app_catalogue') }}" class="back-link">
+            <a href="{{ return_url }}" class="back-link">
                 <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-                <span>Retour au Catalogue</span>
+                <span>Retour</span>
             </a>
 
             <section class="manga-hero">
@@ -37,22 +39,22 @@
                             <span class="badge">PRIVÉ</span>
                         {% endif %}
                     </div>
-                    <div class="detail-favorite-action">{% include 'components/_favorite_toggle.html.twig' with {oeuvre: favorite_oeuvre, modifier: 'favorite-toggle-form--detail'} only %}<span>{{ favorite_oeuvre.isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris' }}</span></div>
+                    <div class="detail-favorite-action">{% include 'components/_favorite_toggle.html.twig' with {oeuvre: favorite_oeuvre, modifier: 'favorite-toggle-form--detail', label: favorite_oeuvre.isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'} only %}</div>
                 </div>
             </section>
 
             <section class="panel panel--synopsis" aria-labelledby="synopsis-title">
-                <h2 id="synopsis-title" class="section-title">Synopsis complet</h2>
+                <h2 id="synopsis-title" class="section-title section-title--bilingual"><span lang="ja">あらすじ（全文）</span><span>Synopsis complet</span></h2>
                 {% if manga.synopsis %}
                     <p class="synopsis">{{ manga.synopsis }}</p>
                 {% else %}
                     <p class="synopsis">Aucun synopsis renseigné.</p>
                 {% endif %}
                 <div class="info-grid">
-                    <article class="info-item"><p class="info-label">TYPE</p><p class="info-value">{{ manga.type ?: 'Non renseigné' }}</p></article>
-                    <article class="info-item"><p class="info-label">STATUT</p><p class="info-value">{{ manga.status ?: 'Non renseigné' }}</p></article>
-                    <article class="info-item"><p class="info-label">AUTEUR</p><p class="info-value">{{ manga.author ?: 'Non renseigné' }}</p></article>
-                    <article class="info-item"><p class="info-label">ANNÉE</p><p class="info-value">{{ manga.releaseDate ? manga.releaseDate|date('Y') : 'Non renseignée' }}</p></article>
+                    <article class="info-item"><p class="info-label"><span lang="ja">タイプ</span><span>TYPE</span></p><p class="info-value">{{ manga.type ?: 'Non renseigné' }}</p></article>
+                    <article class="info-item"><p class="info-label"><span lang="ja">定款</span><span>STATUT</span></p><p class="info-value">{{ manga.status ?: 'Non renseigné' }}</p></article>
+                    <article class="info-item"><p class="info-label"><span lang="ja">著者</span><span>AUTEUR</span></p><p class="info-value">{{ manga.author ?: 'Non renseigné' }}</p></article>
+                    <article class="info-item"><p class="info-label"><span lang="ja">年</span><span>ANNÉE</span></p><p class="info-value">{{ manga.releaseDate ? manga.releaseDate|date('Y') : 'Non renseignée' }}</p></article>
                 </div>
             </section>
 
@@ -97,7 +99,7 @@
                     >
                         <div class="manga-tab-actions">
                             <p class="episode-count-meta">{{ chapitres|length }} chapitre{{ chapitres|length > 1 ? 's' : '' }} disponible{{ chapitres|length > 1 ? 's' : '' }}</p>
-                            {% if is_owner_private %}<a href="{{ path('app_forms_chapitre_create', {mangaId: manga.id}) }}" class="chip-btn private-content-add">Ajouter un chapitre</a>{% endif %}
+                            {% if is_owner_private %}<a href="{{ path('app_forms_chapitre_create', {mangaId: manga.id, return_to: app.request.requestUri}) }}" class="chip-btn private-content-add">Ajouter un chapitre</a>{% endif %}
                         </div>
                         {% if chapitres is empty %}
                             <p class="episode-count-meta manga-empty-state">Aucun chapitre n’a encore été ajouté à ce manga.</p>
@@ -125,7 +127,7 @@
                     >
                         <div class="manga-tab-actions">
                             <p class="episode-count-meta">{{ tomes|length }} tome{{ tomes|length > 1 ? 's' : '' }} disponible{{ tomes|length > 1 ? 's' : '' }}</p>
-                            {% if is_owner_private %}<a href="{{ path('app_forms_tome_create', {mangaId: manga.id}) }}" class="chip-btn private-content-add">Ajouter un tome</a>{% endif %}
+                            {% if is_owner_private %}<a href="{{ path('app_forms_tome_create', {mangaId: manga.id, return_to: app.request.requestUri}) }}" class="chip-btn private-content-add">Ajouter un tome</a>{% endif %}
                         </div>
                         {% if tomes is empty %}
                             <p class="episode-count-meta manga-empty-state">Aucun tome n’a encore été ajouté à ce manga.</p>
@@ -145,13 +147,13 @@
             {% endif %}
 
             <section class="manga-characters" aria-labelledby="manga-characters-title">
-                <h2 id="manga-characters-title" class="section-title">Personnages</h2>
+                <h2 id="manga-characters-title" class="section-title section-title--bilingual"><span lang="ja">登場人物</span><span>Personnages</span></h2>
                 {% if characters is empty %}
                     <p class="manga-characters-empty">Aucun personnage n'a encore été ajouté à ce manga.</p>
                 {% else %}
                     <div class="manga-characters-grid">
                         {% for character in characters %}
-                            {% include 'components/_spoiler_card.html.twig' with {variant: 'character', effective_level: character.spoilerLevel, image_url: character.imageUrl ? path('app_character_image', {id: character.id}) : null, title: character.name, detail_url: path('app_character_show', {id: character.id})} only %}
+                            {% include 'components/_spoiler_card.html.twig' with {variant: 'character', effective_level: character.spoilerLevel, image_url: character.imageUrl ? path('app_character_image', {id: character.id}) : null, title: character.name, detail_url: path('app_character_show', {id: character.id, return_to: app.request.requestUri})} only %}
                         {% endfor %}
                     </div>
                 {% endif %}

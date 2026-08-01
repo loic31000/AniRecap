@@ -18,7 +18,7 @@
     {% if app.user %}
         <div class="nav-item--center-wrapper">
             <a
-                href="{{ path('app_forms_index') }}"
+                href="{{ path('app_forms_index', {return_to: app.request.requestUri}) }}"
                 class="nav-item--center {{ active is defined and active == 'forms' ? 'is-active' : '' }}"
                 aria-label="Accéder aux formulaires de création"
                 aria-controls="creation-menu"

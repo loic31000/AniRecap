@@ -31,7 +31,7 @@ final class CharacterType extends AbstractType
                 'help' => $options['is_edit'] ? 'Laissez vide pour conserver l’image actuelle.' : 'PNG ou JPG, 2 Mio maximum. Format carré recommandé.',
             ])
             ->add('name', TextType::class, ['label' => 'Nom du personnage', 'attr' => ['placeholder' => 'Ex. Sangoku, Luffy, Guts…']])
-            ->add('description', TextareaType::class, ['label' => 'Biographie - Description', 'attr' => ['rows' => 7, 'placeholder' => 'Décrivez le personnage…']])
+            ->add('description', TextareaType::class, ['label' => 'Biographie : Description', 'attr' => ['rows' => 7, 'placeholder' => 'Décrivez le personnage…']])
             ->add('spoilerLevel', ChoiceType::class, [
                 'label' => 'Niveau de Spoiler',
                 'choices' => ['Aucun' => SpoilerLevel::Aucun, 'Mineur' => SpoilerLevel::Mineur, 'Majeur' => SpoilerLevel::Majeur],
@@ -68,10 +68,10 @@ final class CharacterType extends AbstractType
     {
         return match (true) {
             $entity instanceof Anime, $entity instanceof Manga => (string) $entity->getTitle(),
-            $entity instanceof Season => $entity->getAnime()?->getTitle() . ' — Saison ' . $entity->getNumber() . ' — ' . $entity->getTitle(),
-            $entity instanceof Episode => $entity->getSeason()?->getAnime()?->getTitle() . ' — S' . $entity->getSeason()?->getNumber() . ' E' . $entity->getNumber() . ' — ' . $entity->getTitle(),
-            $entity instanceof Tome => $entity->getManga()?->getTitle() . ' — Tome ' . $entity->getNumber() . ' — ' . $entity->getTitle(),
-            $entity instanceof Chapitre => $entity->getManga()?->getTitle() . ' — Chapitre ' . $entity->getNumber() . ' — ' . $entity->getTitle(),
+            $entity instanceof Season => $entity->getAnime()?->getTitle() . ' • Saison ' . $entity->getNumber() . ' • ' . $entity->getTitle(),
+            $entity instanceof Episode => $entity->getSeason()?->getAnime()?->getTitle() . ' • S' . $entity->getSeason()?->getNumber() . ' E' . $entity->getNumber() . ' • ' . $entity->getTitle(),
+            $entity instanceof Tome => $entity->getManga()?->getTitle() . ' • Tome ' . $entity->getNumber() . ' • ' . $entity->getTitle(),
+            $entity instanceof Chapitre => $entity->getManga()?->getTitle() . ' • Chapitre ' . $entity->getNumber() . ' • ' . $entity->getTitle(),
             default => '',
         };
     }

@@ -4,5 +4,6 @@
     <input type="hidden" name="return_to" value="{{ app.request.requestUri }}">
     <button class="card-action-hitbox favorite-toggle-button{{ favorite ? ' is-active' : '' }}" type="submit" aria-label="{{ favorite ? 'Retirer ' ~ oeuvre.title ~ ' des favoris' : 'Ajouter ' ~ oeuvre.title ~ ' aux favoris' }}">
         <i class="{{ favorite ? 'fa-solid' : 'fa-regular' }} fa-star" aria-hidden="true"></i>
+        {% if label is defined and label %}<span>{{ label }}</span>{% endif %}
     </button>
 </form>

@@ -51,7 +51,7 @@ final class SceneFormController extends AbstractController
         foreach ($episodes as $episode) {
             $season = $episode->getSeason();
             $anime = $season?->getAnime();
-            $choices[sprintf('%s — Saison %d — Épisode %d', $anime?->getTitle(), $season?->getNumber(), $episode->getNumber())] = $episode->getId();
+            $choices[sprintf('%s • Saison %d • Épisode %d', $anime?->getTitle(), $season?->getNumber(), $episode->getNumber())] = $episode->getId();
         }
 
         $input = new SeasonSceneInput();
@@ -101,6 +101,7 @@ final class SceneFormController extends AbstractController
                     $entityManager,
                     $imageUploader,
                     $isInitialScene,
+                    $this->safeReturnTo($request),
                     static fn (Slide $slide): Slide => $slide
                         ->setEpisode($episode)
                         ->setStartTimecodeSeconds($start)
@@ -135,12 +136,12 @@ final class SceneFormController extends AbstractController
 
         $tomeChoices = [];
         foreach ($tomeRepository->findOwnedForSceneSelection($user) as $tome) {
-            $tomeChoices[sprintf('%s — Tome %d', $tome->getManga()?->getTitle(), $tome->getNumber())] = $tome->getId();
+            $tomeChoices[sprintf('%s • Tome %d', $tome->getManga()?->getTitle(), $tome->getNumber())] = $tome->getId();
         }
 
         $chapitreChoices = [];
         foreach ($chapitreRepository->findOwnedForSceneSelection($user) as $chapitre) {
-            $chapitreChoices[sprintf('%s — Chapitre %d', $chapitre->getManga()?->getTitle(), $chapitre->getNumber())] = $chapitre->getId();
+            $chapitreChoices[sprintf('%s • Chapitre %d', $chapitre->getManga()?->getTitle(), $chapitre->getNumber())] = $chapitre->getId();
         }
 
         $input = new MangaSceneInput();
@@ -193,6 +194,7 @@ final class SceneFormController extends AbstractController
                     $entityManager,
                     $imageUploader,
                     $isInitialScene,
+                    $this->safeReturnTo($request),
                     static fn (Slide $slide): Slide => $slide->setTome($tome)->setChapitre($chapitre),
                 );
             }
@@ -214,6 +216,7 @@ final class SceneFormController extends AbstractController
         EntityManagerInterface $entityManager,
         SynopsisImageUploader $imageUploader,
         bool $isInitialScene,
+        ?string $returnTo,
         \Closure $setTarget,
     ): Response {
         $filename = null;
@@ -267,13 +270,26 @@ final class SceneFormController extends AbstractController
                     : ($diaporama->getSourceType() === Diaporama::SOURCE_ANIME
                         ? 'app_diaporama_scene_anime_create'
                         : 'app_diaporama_scene_manga_create'),
-                $isInitialScene ? [] : ['id' => $diaporama->getId()],
+                array_filter([
+                    'id' => $isInitialScene ? null : $diaporama->getId(),
+                    'return_to' => $returnTo,
+                ], static fn (mixed $value): bool => $value !== null),
             );
         }
 
         $this->addFlash('success', 'La scène a été ajoutée au diaporama.');
 
-        return $this->redirectToRoute('app_diaporama_show', ['id' => $diaporama->getId()]);
+        return $this->redirectToRoute('app_diaporama_show', array_filter([
+            'id' => $diaporama->getId(),
+            'return_to' => $returnTo,
+        ], static fn (mixed $value): bool => $value !== null));
+    }
+
+    private function safeReturnTo(Request $request): ?string
+    {
+        $returnTo = (string) $request->query->get('return_to', '');
+
+        return str_starts_with($returnTo, '/') && !str_starts_with($returnTo, '//') ? $returnTo : null;
     }
 
     private function parseTimecode(string $timecode): int
