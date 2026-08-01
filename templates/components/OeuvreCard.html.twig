@@ -21,10 +21,15 @@
                 {% endif %}
 
                 <div class="oeuvre-thumb">
+                    {% set coverUrl = oeuvre.cover ?: asset(oeuvre.type == 'anime' ? 'images/coverAnime.png' : 'images/coverMangaCard.png') %}
                     <img
-                        src="{{ oeuvre.cover ?: asset(oeuvre.type == 'anime' ? 'images/coverAnime.png' : 'images/coverMangaCard.png') }}"
+                        src="{{ coverUrl }}{{ '/formulaires/miniature/' in coverUrl ? '?variant=card' : '' }}"
                         alt="Miniature de {{ oeuvre.title }}"
                         class="oeuvre-thumb-image"
+                        width="800"
+                        height="350"
+                        loading="{{ prioritizeFirst and loop.first ? 'eager' : 'lazy' }}"
+                        {% if prioritizeFirst and loop.first %}fetchpriority="high"{% endif %}
                     >
                 </div>
                 {% if oeuvre.canInteract|default(true) %}{% include 'components/_favorite_toggle.html.twig' with {oeuvre: oeuvre} only %}{% endif %}

@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="{{ asset('css/searchCard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/oeuvreCard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 {% endblock %}
 
 {% block body %}
@@ -36,7 +35,7 @@
                 <section class="home-section" aria-labelledby="popular-title">
                     <h2 id="popular-title" class="section-title"><span><span lang="ja">人気</span> Populaire</span></h2>
                     {% if popular_uses_fallback and popular is not empty %}<p class="home-section-note">Aucun J’aime pour le moment : voici les publications les plus récentes.</p>{% endif %}
-                    <twig:OeuvreCard :results="popular"/>
+                    <twig:OeuvreCard :results="popular" :prioritizeFirst="true"/>
                 </section>
 
                 <section class="home-section" aria-labelledby="available-title">

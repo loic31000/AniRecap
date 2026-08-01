@@ -8,4 +8,6 @@ use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 final class OeuvreCard
 {
     public array $results = [];
+
+    public bool $prioritizeFirst = false;
 }
