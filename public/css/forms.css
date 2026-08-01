@@ -132,6 +132,164 @@
     font-size: 1rem;
 }
 
+/* Sélecteur de création autonome */
+.forms-page--menu {
+    display: flex;
+    align-items: flex-end;
+    min-height: 100dvh;
+    width: calc(100% + 16px);
+    margin: -8px;
+    padding: clamp(150px, 23vh, 205px) 0 0;
+    overflow-x: hidden;
+    background:
+        radial-gradient(circle at 50% 30%, rgba(23, 50, 82, 0.3), transparent 45%),
+        #071525;
+}
+
+.forms-menu {
+    width: min(100%, 620px);
+    min-height: calc(100dvh - clamp(150px, 23vh, 205px));
+    box-sizing: border-box;
+    padding: 34px 23px calc(26px + env(safe-area-inset-bottom, 0px));
+    border: 1px solid rgba(129, 151, 179, 0.65);
+    border-bottom: 0;
+    border-radius: 32px 32px 0 0;
+    background:
+        radial-gradient(circle at 50% 30%, rgba(27, 61, 101, 0.26), transparent 54%),
+        #071525;
+    box-shadow: 0 -18px 40px rgba(0, 0, 0, 0.16);
+}
+
+.forms-menu .forms-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    margin: 0 0 28px;
+}
+
+.forms-menu .forms-heading__line {
+    width: 45px;
+    height: 5px;
+    flex: 0 0 auto;
+    background: #e7a12d;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.75);
+}
+
+.forms-menu .forms-heading h1 {
+    gap: 15px;
+    font-size: clamp(1.35rem, 6vw, 1.75rem);
+    line-height: 1;
+}
+
+.forms-menu .forms-heading h1 span {
+    font-size: 1em;
+}
+
+.forms-menu .forms-list {
+    gap: 23px;
+}
+
+.forms-menu .forms-card {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 12px;
+    min-height: 55px;
+    padding: 8px 11px;
+    border: 1px solid rgba(255, 255, 255, 0.025);
+    border-radius: 7px;
+    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.22);
+}
+
+.forms-menu .forms-card:hover {
+    border-color: rgba(232, 165, 63, 0.5);
+    transform: none;
+    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.3);
+}
+
+.forms-menu .forms-card__icon {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #e8a53f;
+    border-radius: 12px;
+    font-size: 1rem;
+}
+
+.forms-menu .forms-card__content {
+    gap: 4px;
+}
+
+.forms-menu .forms-card__content strong {
+    overflow: hidden;
+    font-size: 0.8rem;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.forms-menu .forms-card__content small {
+    overflow: hidden;
+    font-size: 0.59rem;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.forms-menu__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
+    box-sizing: border-box;
+    margin: 22px auto 0;
+    border: 1px solid var(--forms-gold);
+    border-radius: 50%;
+    background: #02070d;
+    color: var(--forms-gold);
+    font-size: 1.3rem;
+    text-decoration: none;
+}
+
+.forms-menu__close:hover {
+    background: #09182a;
+}
+
+.forms-menu__close:focus-visible {
+    outline: 3px solid var(--forms-gold-soft);
+    outline-offset: 4px;
+}
+
+@media (max-height: 820px) {
+    .forms-page--menu {
+        padding-top: 100px;
+    }
+
+    .forms-menu {
+        min-height: calc(100dvh - 100px);
+        padding-top: 26px;
+    }
+
+    .forms-menu .forms-list {
+        gap: 14px;
+    }
+
+    .forms-menu__close {
+        margin-top: 18px;
+    }
+}
+
+@media (min-width: 700px) {
+    .forms-page--menu {
+        align-items: center;
+        padding: 40px 20px;
+    }
+
+    .forms-menu {
+        min-height: 0;
+        border-bottom: 1px solid rgba(129, 151, 179, 0.65);
+        border-radius: 32px;
+    }
+}
+
 .forms-page--orientation {
     display: grid;
     place-items: center;
@@ -810,5 +968,36 @@
 @media (prefers-reduced-motion: reduce) {
     .forms-card {
         transition: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .forms-page--menu {
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    .forms-menu {
+        width: 100%;
+    }
+
+    .forms-menu .forms-heading h1 {
+        flex-direction: row;
+        gap: 15px;
+        font-family: Arial, sans-serif;
+    }
+
+    .forms-menu .forms-card {
+        grid-template-columns: 42px minmax(0, 1fr);
+        gap: 12px;
+        min-height: 55px;
+        padding: 8px 11px;
+    }
+
+    .forms-menu .forms-card__icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        font-size: 1rem;
     }
 }

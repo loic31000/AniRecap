@@ -51,6 +51,12 @@ class SummaryRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /** @return list<Summary> */
+    public function findOwnedForList(User $user): array
+    {
+        return $this->findByUser($user);
+    }
+
     public function findOneOwned(int $id, User $owner): ?Summary
     {
         return $this->createQueryBuilder('s')

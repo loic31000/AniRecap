@@ -48,15 +48,6 @@ final class ProfileController extends AbstractController
             $card['isFavorite'] = $states[$card['type']][$card['id']] ?? false;
         }
         unset($card);
-        $summaryStates = $summaryRepository->findRootManagementStates(
-            $current,
-            array_column(array_filter($favoriteCards, static fn (array $card): bool => $card['type'] === 'anime'), 'id'),
-            array_column(array_filter($favoriteCards, static fn (array $card): bool => $card['type'] === 'manga'), 'id'),
-        );
-        foreach ($favoriteCards as &$card) {
-            $card['summaryManagement'] = $summaryStates[$card['type']][$card['id']] ?? null;
-        }
-        unset($card);
         $summaryCount = $summaryRepository->count(['user' => $current]);
         $summaryCards = array_map(
             fn (Summary $summary): array => $this->buildSummaryCard($summary, $current),
@@ -102,53 +93,43 @@ final class ProfileController extends AbstractController
     }
 
     /** @return array<string, mixed> */
-    private function buildSummaryCard(Summary $summary, User $owner): array
+    private function buildSummaryCard(Summary $summary, User $viewer): array
     {
+        $anime = $summary->getAnime()
+            ?? $summary->getSeason()?->getAnime()
+            ?? $summary->getEpisode()?->getSeason()?->getAnime();
+        $manga = $summary->getManga()
+            ?? $summary->getTome()?->getManga()
+            ?? $summary->getChapitre()?->getManga();
+        [$route, $parameters] = match (true) {
+            $summary->getAnime() !== null => ['app_anime_show', ['id' => $anime->getId()]],
+            $summary->getManga() !== null => ['app_manga_show', ['id' => $manga->getId()]],
+            $summary->getSeason() !== null && $summary->getSeason()->getOwner()?->getId() === $viewer->getId()
+                => ['app_private_season_show', ['id' => $summary->getSeason()->getId()]],
+            $summary->getSeason() !== null => ['app_anime_show', ['id' => $anime->getId()]],
+            $summary->getEpisode() !== null && $summary->getEpisode()->getSeason()?->getOwner()?->getId() === $viewer->getId()
+                => ['app_private_season_show', ['id' => $summary->getEpisode()->getSeason()->getId(), '_fragment' => 'episodes']],
+            $summary->getEpisode() !== null => ['app_anime_show', ['id' => $anime->getId()]],
+            $summary->getTome() !== null => ['app_manga_show', ['id' => $manga->getId(), '_fragment' => 'tomes']],
+            $summary->getChapitre() !== null => ['app_manga_show', ['id' => $manga->getId(), '_fragment' => 'chapitres']],
+            default => [null, []],
+        };
         $parent = $summary->getAnime() ?? $summary->getManga() ?? $summary->getSeason()
             ?? $summary->getEpisode() ?? $summary->getTome() ?? $summary->getChapitre();
-        $directUserMatches = !is_object($parent)
-            || !method_exists($parent, 'getUser')
-            || $parent->getUser()?->getId() === $owner->getId();
-        $parentIsOwned = $parent?->getOwner()?->getId() === $owner->getId() && $directUserMatches;
-
-        [$editRoute, $editId] = $parentIsOwned ? match (true) {
-            $summary->getAnime() !== null => ['app_forms_anime_edit', $summary->getAnime()->getId()],
-            $summary->getManga() !== null => ['app_forms_manga_edit', $summary->getManga()->getId()],
-            $summary->getSeason() !== null => ['app_forms_season_edit', $summary->getSeason()->getId()],
-            $summary->getEpisode() !== null => ['app_forms_episode_edit', $summary->getEpisode()->getId()],
-            $summary->getTome() !== null => ['app_forms_tome_edit', $summary->getTome()->getId()],
-            $summary->getChapitre() !== null => ['app_forms_chapitre_edit', $summary->getChapitre()->getId()],
-            default => ['app_summary_edit', $summary->getId()],
-        } : ['app_summary_edit', $summary->getId()];
 
         return [
-            'id' => $summary->getId(),
-            'type' => 'Résumé',
             'title' => $summary->getTitle(),
             'description' => $summary->getContent(),
-            'meta' => $this->summaryParentLabel($summary),
+            'parentLabel' => $parent?->getTitle() ?? 'Contenu associé indisponible',
             'image' => $summary->getAnime()?->getCoverAnimeUrl()
                 ?? $summary->getManga()?->getCoverMangaUrl()
                 ?? $summary->getSeason()?->getCoverSeasonUrl()
                 ?? $summary->getEpisode()?->getCoverEpisodeUrl()
                 ?? $summary->getTome()?->getCoverTomeUrl()
                 ?? $summary->getChapitre()?->getCoverChapitreUrl(),
-            'openRoute' => 'app_summary_show',
-            'editRoute' => $editRoute,
-            'editId' => $editId,
-            'deleteRoute' => 'app_summary_delete_confirm',
+            'openRoute' => $route,
+            'openParameters' => $parameters,
         ];
-    }
-
-    private function summaryParentLabel(Summary $summary): string
-    {
-        return $summary->getAnime()?->getTitle()
-            ?? $summary->getManga()?->getTitle()
-            ?? $summary->getSeason()?->getTitle()
-            ?? $summary->getEpisode()?->getTitle()
-            ?? $summary->getTome()?->getTitle()
-            ?? $summary->getChapitre()?->getTitle()
-            ?? 'Aucun parent renseigné';
     }
 
     #[Route('/profile/upload', name: 'app_profile_upload', methods: ['POST'])]
