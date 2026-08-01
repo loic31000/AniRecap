@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block body %}
-    <div class="my-summaries-page">
+    <div class="my-summaries-page" id="my-summaries-top">
         {{ component('Header', {backRoute: 'app_profile'}) }}
         <main class="my-summaries-shell">
             {% include 'components/_flash_messages.html.twig' %}
@@ -29,6 +29,8 @@
                     {% endfor %}
                 </div>
             {% endif %}
+
+            {% include 'components/_scroll_top.html.twig' with {target: 'my-summaries-top'} only %}
         </main>
         {{ component('Navbar', {active: 'profile'}) }}
     </div>

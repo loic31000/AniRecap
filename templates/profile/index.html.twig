@@ -126,13 +126,13 @@
 				const maxSize = 2 * 1024 * 1024; // 2MB
 
 				if (!allowed.includes(file.type)) {
-					alert('Format invalide — seuls PNG et JPEG sont acceptés.');
+					alert('Format invalide : seuls PNG et JPEG sont acceptés.');
 					input.value = '';
 					return;
 				}
 
 				if (file.size > maxSize) {
-					alert('Fichier trop volumineux — taille maximale 2MB.');
+					alert('Fichier trop volumineux : taille maximale 2MB.');
 					input.value = '';
 					return;
 				}

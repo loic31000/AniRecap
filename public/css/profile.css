@@ -7,6 +7,14 @@
     --profile-muted: #aeb8ca;
 }
 
+html,
+body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: var(--profile-bg);
+}
+
 .page-profile {
     min-height: 100dvh;
     background: radial-gradient(circle at 50% 5%, #10233d 0, var(--profile-bg) 55%);

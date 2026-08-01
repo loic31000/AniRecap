@@ -36,8 +36,8 @@
 @media (prefers-reduced-motion: reduce) { .spoiler-card__content { transition: none; } }
 
 .detail-favorite-action { position: relative; display: flex; width: min(100%, 360px); min-height: 48px; align-items: center; justify-content: center; gap: 8px; margin: 8px auto 4px; border: 1px solid rgba(229,169,59,.35); background: #02070d; color: #e5a93b; }
-.detail-favorite-action .favorite-toggle-form--detail { position: static; }
-.detail-favorite-action .favorite-toggle-button { color: #e5a93b; }
+.detail-favorite-action .favorite-toggle-form--detail { position: static; width: 100%; height: 100%; }
+.detail-favorite-action .favorite-toggle-button { position: static; display: flex; width: 100%; min-height: 46px; align-items: center; justify-content: center; gap: 10px; color: #e5a93b; line-height: 1; text-align: center; }
 
 @media (max-width: 430px) {
     .spoiler-card.is-spoiler { min-height: 132px; }

@@ -36,7 +36,7 @@
                             <span class="badge">{{ category.name|upper }}</span>
                         {% endfor %}
                     </div>
-                    <a href="{{ path('app_forms_season_edit', {id: season.id}) }}" class="chip-btn">Modifier la saison</a>
+                    <a href="{{ path('app_forms_season_edit', {id: season.id, return_to: app.request.requestUri}) }}" class="chip-btn">Modifier la saison</a>
                 </div>
             </section>
 
@@ -54,7 +54,7 @@
             <section id="episodes" class="panel panel--episodes" aria-labelledby="episodes-title">
                 <h2 id="episodes-title" class="section-title">Épisodes</h2>
                 <p>
-                    <a href="{{ path('app_forms_episode_create', {seasonId: season.id}) }}" class="chip-btn">
+                    <a href="{{ path('app_forms_episode_create', {seasonId: season.id, return_to: app.request.requestUri}) }}" class="chip-btn">
                         Ajouter un épisode
                     </a>
                 </p>
@@ -73,7 +73,7 @@
                     </div>
                 {% endif %}
             </section>
-            <section class="panel panel--characters"><h2 class="section-title">Personnages</h2>{% if characters is empty %}<p>Aucun personnage lié à cette saison.</p>{% else %}<div class="manga-characters-grid">{% for character in characters %}{% include 'components/_spoiler_card.html.twig' with {variant: 'character', effective_level: character.spoilerLevel, image_url: character.imageUrl ? path('app_character_image', {id: character.id}) : null, title: character.name, detail_url: path('app_character_show', {id: character.id})} only %}{% endfor %}</div>{% endif %}</section>
+            <section class="panel panel--characters"><h2 class="section-title section-title--bilingual"><span lang="ja">登場人物</span><span>Personnages</span></h2>{% if characters is empty %}<p>Aucun personnage lié à cette saison.</p>{% else %}<div class="manga-characters-grid">{% for character in characters %}{% include 'components/_spoiler_card.html.twig' with {variant: 'character', effective_level: character.spoilerLevel, image_url: character.imageUrl ? path('app_character_image', {id: character.id}) : null, title: character.name, detail_url: path('app_character_show', {id: character.id, return_to: app.request.requestUri})} only %}{% endfor %}</div>{% endif %}</section>
         </div>
     </main>
 

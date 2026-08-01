@@ -65,7 +65,7 @@ body {
 .manga-hero {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	align-items: stretch;
 	gap: 12px;
 }
 
@@ -84,15 +84,15 @@ body {
 	width: 100%;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	align-items: flex-start;
 	gap: 8px;
-	text-align: center;
+	text-align: left;
 }
 
 .manga-title {
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: center;
+	justify-content: flex-start;
 	align-items: baseline;
 	column-gap: 10px;
 	row-gap: 2px;
@@ -108,25 +108,50 @@ body {
 .manga-title__main {
 	font-size: 22px;
 	font-weight: 700;
-	color: var(--manga-text);
+	color: var(--manga-gold);
 }
 
 .badge-row {
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: center;
+	justify-content: flex-start;
 	gap: 8px;
 }
 
 .badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	font-size: 11px;
 	letter-spacing: 0.04em;
 	font-weight: 600;
-	color: var(--manga-text);
-	border: 1px solid var(--manga-gold-soft);
-	border-radius: 999px;
-	padding: 6px 12px;
-	background: rgba(212, 175, 55, 0.08);
+	color: var(--manga-gold);
+	border: 1px solid var(--manga-gold);
+	border-radius: 5px;
+	padding: 5px 11px;
+	background: #02070d;
+	line-height: 1;
+	text-align: center;
+}
+
+.page-manga .detail-favorite-action {
+	width: 100%;
+	max-width: none;
+	min-height: 48px;
+	margin: 6px 0 2px;
+	border: 1px solid var(--manga-gold);
+	border-radius: 5px;
+	background: #02070d;
+	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.28);
+}
+
+.page-manga .detail-favorite-action:hover {
+	background: #111a2b;
+}
+
+.page-manga .detail-favorite-action:focus-within {
+	outline: 2px solid var(--manga-gold);
+	outline-offset: 3px;
 }
 
 .btn-favorite {
@@ -171,15 +196,22 @@ body {
 	justify-content: center;
 	gap: 8px;
 	padding: 10px 12px;
-	border-radius: var(--radius-sm);
-	border: 1px solid var(--manga-gold-soft);
-	background: var(--manga-bg);
+	border-radius: 5px;
+	border: 1px solid var(--manga-gold);
+	background: #02070d;
 	color: var(--manga-gold);
 	font-size: 12px;
 	font-weight: 700;
 	letter-spacing: 0.03em;
 	cursor: pointer;
 	text-decoration: none;
+}
+
+.chip-btn:hover,
+.chip-btn:focus-visible {
+	background: #111a2b;
+	outline: 2px solid var(--manga-gold);
+	outline-offset: 2px;
 }
 
 .chip-btn i {
@@ -218,6 +250,12 @@ body {
 	color: var(--manga-text-muted);
 }
 
+.section-title--bilingual {
+	flex-direction: row;
+	align-items: baseline;
+	gap: 8px;
+}
+
 .synopsis {
 	font-size: 14px;
 	line-height: 1.55;
@@ -239,6 +277,13 @@ body {
 	gap: 4px;
 	padding: 9px 10px;
 	border-bottom: 1px solid var(--manga-panel-border);
+}
+
+.info-label {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 6px;
 }
 
 .info-item:nth-child(odd) {

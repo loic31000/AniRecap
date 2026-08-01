@@ -9,9 +9,12 @@
 {% endblock %}
 
 {% block body %}
+    {% set return_to = app.request.query.get('return_to') %}
+    {% set fallback_url = path('app_private_season_show', {id: season.id}) %}
+    {% set return_url = return_to and return_to starts with '/' and not (return_to starts with '//') ? return_to : fallback_url %}
     <header class="synopsis-editor-hero">
-        <a href="{{ path('app_private_season_show', {id: season.id}) }}" aria-label="Retour à la saison">
-            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+        <a href="{{ return_url }}" aria-label="Retour à la page précédente">
+            {% include 'forms/_back_icon.html.twig' %}
         </a>
         <h1>{{ is_edit ? 'Modifier un Épisode' : 'Ajouter un Épisode' }}</h1>
     </header>
@@ -20,7 +23,7 @@
         <div class="forms-shell synopsis-editor">
             <header class="synopsis-editor__intro">
                 <h2>{{ is_edit ? 'MODIFIER L’ÉPISODE' : 'NOUVEL ÉPISODE' }}</h2>
-                <p>Saison {{ season.number }} — {{ season.title }}</p>
+                <p>Saison {{ season.number }} : {{ season.title }}</p>
             </header>
 
             {% for label, messages in app.flashes %}
@@ -50,7 +53,7 @@
                     <img src="{{ current_cover_url }}" alt="Miniature actuelle de l’épisode" class="synopsis-current-cover">
                 {% endif %}
 
-                <div class="synopsis-upload-field">
+                <div class="synopsis-upload-field" data-controller="upload-preview">
                     {{ form_label(form.image) }}
                     <label class="synopsis-upload-zone" for="{{ form.image.vars.id }}">
                         <span class="synopsis-upload-zone__icon" aria-hidden="true">

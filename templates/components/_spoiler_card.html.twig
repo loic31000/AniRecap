@@ -11,7 +11,7 @@
 {% else %}
     <article class="episode-figma-card spoiler-card{{ is_spoiler ? ' is-spoiler spoiler-' ~ level : '' }}{{ linked_diaporamas|length == 1 ? ' has-diaporama-link' : '' }}"{% if is_spoiler %} data-controller="spoiler-card"{% endif %}>
         <div class="spoiler-card__content"{% if is_spoiler %} data-spoiler-card-target="content" aria-hidden="true" inert{% endif %}>
-            {% if linked_diaporamas|length == 1 %}<a href="{{ path('app_diaporama_show', {id: linked_diaporamas[0].id}) }}" class="card-diaporama-overlay" aria-label="Voir le diaporama {{ linked_diaporamas[0].title }} lié à ce contenu"></a>{% endif %}
+            {% if linked_diaporamas|length == 1 %}<a href="{{ path('app_diaporama_show', {id: linked_diaporamas[0].id, return_to: app.request.requestUri}) }}" class="card-diaporama-overlay" aria-label="Voir le diaporama {{ linked_diaporamas[0].title }} lié à ce contenu"></a>{% endif %}
             <div class="card-media-wrap"><img src="{{ image_url }}" alt="Miniature de {{ title }}" class="card-banner"></div>
             <div class="card-content-wrap">
                 <div class="card-meta-line"><span class="badge-episodes">{{ badge }}</span>{% if status %}<span class="content-card-status">{{ status }}</span>{% endif %}</div>
@@ -19,10 +19,10 @@
                 <p class="card-episode-desc">{{ summary }}</p>
                 {% include 'components/_summary_like_toggle.html.twig' with {state: summary_state|default(null)} only %}
                 <div class="card-actions content-card-footer">
-                    {% if linked_diaporamas|length == 1 %}<span class="card-diaporama-hint" aria-hidden="true">Voir le diaporama</span>{% elseif linked_diaporamas|length > 1 %}<details class="card-diaporama-list"><summary>Voir les diaporamas ({{ linked_diaporamas|length }})</summary><ul>{% for diaporama in linked_diaporamas %}<li><a href="{{ path('app_diaporama_show', {id: diaporama.id}) }}">{{ diaporama.title }}</a></li>{% endfor %}</ul></details>{% endif %}
+                    {% if linked_diaporamas|length == 1 %}<span class="card-diaporama-hint" aria-hidden="true">Voir le diaporama</span>{% elseif linked_diaporamas|length > 1 %}<details class="card-diaporama-list"><summary>Voir les diaporamas ({{ linked_diaporamas|length }})</summary><ul>{% for diaporama in linked_diaporamas %}<li><a href="{{ path('app_diaporama_show', {id: diaporama.id, return_to: app.request.requestUri}) }}">{{ diaporama.title }}</a></li>{% endfor %}</ul></details>{% endif %}
                     {% if can_edit|default(true) %}
                         <span class="content-card-management">
-                            <a href="{{ path(edit_route, {id: item_id}) }}" class="{{ edit_class }}" aria-label="Modifier {{ title }}"><i class="fa-solid fa-pen" aria-hidden="true"></i><span class="visually-hidden">Modifier</span></a>
+                            <a href="{{ path(edit_route, {id: item_id, return_to: app.request.requestUri}) }}" class="{{ edit_class }}" aria-label="Modifier {{ title }}"><i class="fa-solid fa-pen" aria-hidden="true"></i><span class="visually-hidden">Modifier</span></a>
                             {% if delete_route|default(null) %}
                                 {% include 'components/_content_delete.html.twig' with {route: delete_route, item_id: item_id, token_id: delete_token_id, message: delete_message, label: delete_label} only %}
                             {% endif %}

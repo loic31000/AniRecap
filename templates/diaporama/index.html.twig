@@ -8,13 +8,15 @@
 {% endblock %}
 
 {% block body %}
+{% set return_to = app.request.query.get('return_to') %}
+{% set return_url = return_to and return_to starts with '/' and not (return_to starts with '//') ? return_to : path('app_forms_index') %}
 <div
     class="story"
     data-controller="diaporama-reader"
     data-action="click->diaporama-reader#tap keydown@window->diaporama-reader#keydown"
 >
     <div class="story__actions">
-        <a href="{{ path(diaporama.sourceType == 'anime' ? 'app_diaporama_scene_anime_create' : 'app_diaporama_scene_manga_create', {id: diaporama.id}) }}">
+        <a href="{{ path(diaporama.sourceType == 'anime' ? 'app_diaporama_scene_anime_create' : 'app_diaporama_scene_manga_create', {id: diaporama.id, return_to: app.request.requestUri}) }}">
             Ajouter une scène
         </a>
     </div>
@@ -40,7 +42,7 @@
         </p>
     {% endif %}
 
-    <a href="{{ path('app_forms_index') }}" class="story__close" aria-label="Fermer le lecteur">
+    <a href="{{ return_url }}" class="story__close" aria-label="Fermer le lecteur">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <line x1="4" y1="4" x2="20" y2="20"/>
             <line x1="20" y1="4" x2="4" y2="20"/>
@@ -51,7 +53,7 @@
         <section class="story__empty">
             <h1>{{ diaporama.title }}</h1>
             <p>Ce diaporama ne contient encore aucune scène.</p>
-            <a href="{{ path(diaporama.sourceType == 'anime' ? 'app_diaporama_scene_anime_create' : 'app_diaporama_scene_manga_create', {id: diaporama.id}) }}">
+            <a href="{{ path(diaporama.sourceType == 'anime' ? 'app_diaporama_scene_anime_create' : 'app_diaporama_scene_manga_create', {id: diaporama.id, return_to: app.request.requestUri}) }}">
                 Ajouter la première scène
             </a>
         </section>
@@ -110,7 +112,7 @@
                     <p class="story__timecode">
                         {{ '%02d:%02d'|format((item.startTimecodeSeconds / 60)|round(0, 'floor'), item.startTimecodeSeconds % 60) }}
                         {% if item.endTimecodeSeconds is not null %}
-                            – {{ '%02d:%02d'|format((item.endTimecodeSeconds / 60)|round(0, 'floor'), item.endTimecodeSeconds % 60) }}
+                            à {{ '%02d:%02d'|format((item.endTimecodeSeconds / 60)|round(0, 'floor'), item.endTimecodeSeconds % 60) }}
                         {% endif %}
                     </p>
                 {% endif %}

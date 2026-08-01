@@ -23,13 +23,11 @@ final class MySummaryController extends AbstractController
         }
 
         $summaries = $summaryRepository->findOwnedForList($user);
-        $eligible = [];
+        $summariesById = [];
         foreach ($summaries as $summary) {
-            if ($summary->getEpisode() !== null || $summary->getTome() !== null || $summary->getChapitre() !== null) {
-                $eligible[$summary->getId()] = $summary;
-            }
+            $summariesById[(int) $summary->getId()] = $summary;
         }
-        $states = $summaryRepository->buildCardStates($eligible, $user, $summaryLikeRepository);
+        $states = $summaryRepository->buildCardStates($summariesById, $user, $summaryLikeRepository);
 
         return $this->render('my_summary/index.html.twig', [
             'summary_cards' => array_map(

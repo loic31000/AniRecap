@@ -10,7 +10,7 @@
         </summary>
         <div class="summary-management__menu">
             {% if management.count == 1 %}
-                <a href="{{ path(management.editRoute, {id: management.editId}) }}">
+                <a href="{{ path(management.editRoute, {id: management.editId, return_to: app.request.requestUri}) }}">
                     <i class="fa-solid fa-pencil" aria-hidden="true"></i>
                     Éditer le résumé
                 </a>

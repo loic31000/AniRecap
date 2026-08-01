@@ -4,14 +4,17 @@
 {% block stylesheets %}{{ parent() }}<link rel="stylesheet" href="{{ asset('css/forms.css') }}"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">{% endblock %}
 
 {% block body %}
-    <header class="synopsis-editor-hero"><a href="{{ character ? path('app_character_show', {id: character.id}) : path('app_forms_index') }}" aria-label="Retour">‹</a><h1>{{ is_edit ? 'Modifier un Personnage' : 'Ajouter un Personnage' }}</h1></header>
+    {% set return_to = app.request.query.get('return_to') %}
+    {% set fallback_url = character ? path('app_character_show', {id: character.id}) : path('app_forms_index') %}
+    {% set return_url = return_to and return_to starts with '/' and not (return_to starts with '//') ? return_to : fallback_url %}
+    <header class="synopsis-editor-hero"><a href="{{ return_url }}" aria-label="Retour à la page précédente">{% include 'forms/_back_icon.html.twig' %}</a><h1>{{ is_edit ? 'Modifier un Personnage' : 'Ajouter un Personnage' }}</h1></header>
     <main class="forms-page forms-page--editor"><div class="forms-shell synopsis-editor character-editor">
         <header class="synopsis-editor__intro"><h2>{{ is_edit ? 'MODIFIER LE PERSONNAGE' : 'NOUVEAU PERSONNAGE' }}</h2><p>{{ is_edit ? 'Modifiez sa fiche et ses liaisons.' : 'Créez un personnage.' }}</p></header>
         {% include 'components/_flash_messages.html.twig' %}
         {{ form_start(form, {attr: {enctype: 'multipart/form-data', class: 'synopsis-form'}}) }}
             {% if form.vars.submitted and not form.vars.valid %}<section class="form-error-summary" role="alert"><h2>Vérifiez les informations suivantes :</h2><ul>{% for error in form.vars.errors %}<li>{{ error.message }}</li>{% endfor %}{% for field in form %}{% for error in field.vars.errors|default([]) %}<li>{{ field.vars.label }} : {{ error.message }}</li>{% endfor %}{% endfor %}</ul></section>{% endif %}
             {% if character and character.imageUrl %}<img class="character-current-image" src="{{ path('app_character_image', {id: character.id}) }}" alt="Image actuelle de {{ character.name }}">{% endif %}
-            <div class="synopsis-upload-field">{{ form_label(form.image) }}<label class="character-upload-zone" for="{{ form.image.vars.id }}"><i class="fa-regular fa-camera" aria-hidden="true"></i><span>Appuyez pour ajouter une image (1:1 recommandé)</span></label>{{ form_widget(form.image, {attr: {class: 'synopsis-upload-input'}}) }}{{ form_help(form.image) }}{{ form_errors(form.image) }}</div>
+            <div class="synopsis-upload-field" data-controller="upload-preview">{{ form_label(form.image) }}<label class="character-upload-zone" for="{{ form.image.vars.id }}"><i class="fa-solid fa-camera" aria-hidden="true"></i><span>Appuyez pour ajouter une image (1:1 recommandé)</span></label>{{ form_widget(form.image, {attr: {class: 'synopsis-upload-input'}}) }}{{ form_help(form.image) }}{{ form_errors(form.image) }}</div>
             {{ form_row(form.name) }}
             {{ form_row(form.description) }}
             {{ form_row(form.spoilerLevel) }}

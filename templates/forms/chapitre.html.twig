@@ -8,8 +8,11 @@
 {% endblock %}
 
 {% block body %}
+    {% set return_to = app.request.query.get('return_to') %}
+    {% set fallback_url = path('app_manga_show', {id: manga.id}) %}
+    {% set return_url = return_to and return_to starts with '/' and not (return_to starts with '//') ? return_to : fallback_url %}
     <header class="synopsis-editor-hero">
-        <a href="{{ path('app_manga_show', {id: manga.id}) }}" aria-label="Retour au manga">←</a>
+        <a href="{{ return_url }}" aria-label="Retour à la page précédente">{% include 'forms/_back_icon.html.twig' %}</a>
         <h1>{{ is_edit ? 'Modifier un Chapitre' : 'Ajouter un Chapitre' }}</h1>
     </header>
 
@@ -17,7 +20,7 @@
         <div class="forms-shell synopsis-editor">
             <header class="synopsis-editor__intro">
                 <h2>{{ is_edit ? 'MODIFIER LE CHAPITRE' : 'NOUVEAU CHAPITRE' }}</h2>
-                <p>{{ manga.title }} — contenu privé</p>
+                <p>{{ manga.title }} : contenu privé</p>
             </header>
 
             {% for label, messages in app.flashes %}
@@ -40,7 +43,7 @@
                 {% endif %}
 
                 {% if current_cover_url %}<img src="{{ current_cover_url }}" alt="Miniature actuelle du chapitre" class="synopsis-current-cover">{% endif %}
-                <div class="synopsis-upload-field">
+                <div class="synopsis-upload-field" data-controller="upload-preview">
                     {{ form_label(form.image) }}
                     <label class="synopsis-upload-zone" for="{{ form.image.vars.id }}">
                         <strong>{{ is_edit ? 'Remplacer la miniature' : 'Importer une miniature' }}</strong>

@@ -12,15 +12,17 @@
 
 {% block body %}
     {% set cover = anime.coverAnimeUrl ?: asset('images/coverAnime.png') %}
+    {% set return_to = app.request.query.get('return_to') %}
+    {% set return_url = return_to and return_to starts with '/' and not (return_to starts with '//') ? return_to : path('app_catalogue') %}
 
     {{ component('Header', { backRoute: 'app_catalogue' }) }}
 
     <main class="page-anime">
         <div class="anime-inner">
             {% include 'components/_flash_messages.html.twig' %}
-            <a href="{{ path('app_catalogue') }}" class="back-link">
+            <a href="{{ return_url }}" class="back-link">
                 <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-                <span>Retour au Catalogue</span>
+                <span>Retour</span>
             </a>
 
             <section class="anime-hero">
@@ -37,27 +39,27 @@
                             <span class="badge">PRIVÉ</span>
                         {% endif %}
                     </div>
-                    <div class="detail-favorite-action">{% include 'components/_favorite_toggle.html.twig' with {oeuvre: favorite_oeuvre, modifier: 'favorite-toggle-form--detail'} only %}<span>{{ favorite_oeuvre.isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris' }}</span></div>
+                    <div class="detail-favorite-action">{% include 'components/_favorite_toggle.html.twig' with {oeuvre: favorite_oeuvre, modifier: 'favorite-toggle-form--detail', label: favorite_oeuvre.isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'} only %}</div>
                 </div>
             </section>
 
             <section class="panel panel--synopsis" aria-labelledby="synopsis-title">
-                <h2 id="synopsis-title" class="section-title">Synopsis complet</h2>
+                <h2 id="synopsis-title" class="section-title section-title--bilingual"><span lang="ja">あらすじ（全文）</span><span>Synopsis complet</span></h2>
                 {% if anime.synopsis %}
                     <p class="synopsis">{{ anime.synopsis }}</p>
                 {% else %}
                     <p class="synopsis">Aucun synopsis renseigné.</p>
                 {% endif %}
                 <div class="info-grid">
-                    <article class="info-item"><p class="info-label">TYPE</p><p class="info-value">{{ anime.type ?: 'Non renseigné' }}</p></article>
-                    <article class="info-item"><p class="info-label">STATUT</p><p class="info-value">{{ anime.status ?: 'Non renseigné' }}</p></article>
-                    <article class="info-item"><p class="info-label">AUTEUR</p><p class="info-value">{{ anime.author ?: 'Non renseigné' }}</p></article>
-                    <article class="info-item"><p class="info-label">ANNÉE</p><p class="info-value">{{ anime.releaseDate ? anime.releaseDate|date('Y') : 'Non renseignée' }}</p></article>
+                    <article class="info-item"><p class="info-label"><span lang="ja">タイプ</span><span>TYPE</span></p><p class="info-value">{{ anime.type ?: 'Non renseigné' }}</p></article>
+                    <article class="info-item"><p class="info-label"><span lang="ja">定款</span><span>STATUT</span></p><p class="info-value">{{ anime.status ?: 'Non renseigné' }}</p></article>
+                    <article class="info-item"><p class="info-label"><span lang="ja">著者</span><span>AUTEUR</span></p><p class="info-value">{{ anime.author ?: 'Non renseigné' }}</p></article>
+                    <article class="info-item"><p class="info-label"><span lang="ja">年</span><span>ANNÉE</span></p><p class="info-value">{{ anime.releaseDate ? anime.releaseDate|date('Y') : 'Non renseignée' }}</p></article>
                 </div>
             </section>
 
             <section class="panel panel--animes" aria-labelledby="seasons-title">
-                <h2 id="seasons-title" class="section-title">Saisons</h2>
+                <h2 id="seasons-title" class="section-title section-title--seasons"><span lang="ja">シーズン</span><span>Saisons</span></h2>
                 {% if anime.seasons is empty %}
                     <p>Aucune saison disponible.</p>
                 {% else %}
@@ -66,13 +68,22 @@
                             {% if is_owner %}
                                 <div class="anime-row">
                                     <a href="{{ path('app_private_season_show', {id: season.id}) }}" class="anime-row__link">
-                                        <span class="anime-row__name">Saison {{ season.number }} — {{ season.title }}</span>
+                                        <span class="anime-row__name">Saison {{ season.number }}</span>
                                     </a>
-                                    {% include 'components/_content_delete.html.twig' with {route: 'app_forms_season_delete', item_id: season.id, token_id: 'season_delete_', message: 'Supprimer cette saison supprimera aussi tous ses épisodes, résumés et scènes associés. Continuer ?', label: 'Supprimer la saison ' ~ season.title} only %}
+                                    <span class="anime-row__count">{{ season.episodes|length }} Épisode{{ season.episodes|length > 1 ? 's' : '' }}</span>
+                                    <details class="anime-row__management">
+                                        <summary class="anime-row__edit" aria-label="Gérer la saison {{ season.number }}"><i class="fa-solid fa-pencil" aria-hidden="true"></i></summary>
+                                        <div class="anime-row__management-menu">
+                                            <a href="{{ path('app_forms_season_edit', {id: season.id, return_to: app.request.requestUri}) }}">Modifier</a>
+                                            {% include 'components/_content_delete.html.twig' with {route: 'app_forms_season_delete', item_id: season.id, token_id: 'season_delete_', message: 'Supprimer cette saison supprimera aussi tous ses épisodes, résumés et scènes associés. Continuer ?', label: 'Supprimer la saison ' ~ season.title} only %}
+                                        </div>
+                                    </details>
+                                    <a href="{{ path('app_private_season_show', {id: season.id}) }}" class="anime-row__chevron" aria-label="Ouvrir la saison {{ season.number }}"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></a>
                                 </div>
                             {% else %}
                                 <div class="anime-row">
-                                    <span class="anime-row__name">Saison {{ season.number }} — {{ season.title }}</span>
+                                    <span class="anime-row__name">Saison {{ season.number }}</span>
+                                    <span class="anime-row__count">{{ season.episodes|length }} Épisode{{ season.episodes|length > 1 ? 's' : '' }}</span>
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -81,8 +92,8 @@
             </section>
 
             <section class="panel panel--characters" aria-labelledby="anime-characters-title">
-                <h2 id="anime-characters-title" class="section-title">Personnages</h2>
-                {% if characters is empty %}<p>Aucun personnage lié à cet animé.</p>{% else %}<div class="manga-characters-grid">{% for character in characters %}{% include 'components/_spoiler_card.html.twig' with {variant: 'character', effective_level: character.spoilerLevel, image_url: character.imageUrl ? path('app_character_image', {id: character.id}) : null, title: character.name, detail_url: path('app_character_show', {id: character.id})} only %}{% endfor %}</div>{% endif %}
+                <h2 id="anime-characters-title" class="section-title section-title--bilingual"><span lang="ja">登場人物</span><span>Personnages</span></h2>
+                {% if characters is empty %}<p>Aucun personnage lié à cet animé.</p>{% else %}<div class="manga-characters-grid">{% for character in characters %}{% include 'components/_spoiler_card.html.twig' with {variant: 'character', effective_level: character.spoilerLevel, image_url: character.imageUrl ? path('app_character_image', {id: character.id}) : null, title: character.name, detail_url: path('app_character_show', {id: character.id, return_to: app.request.requestUri})} only %}{% endfor %}</div>{% endif %}
             </section>
         </div>
     </main>

@@ -20,7 +20,7 @@
                 {route: 'app_forms_character', icon: 'fa-user', title: 'Éditeur de Personnage'}
             ] %}
             {% for action in actions %}
-                <a class="form-menu-card" href="{{ path(action.route) }}">
+                <a class="form-menu-card" href="{{ path(action.route, {return_to: app.request.requestUri}) }}">
                     <span class="form-menu-card__icon" aria-hidden="true"><i class="fa-solid {{ action.icon }}"></i></span>
                     <span class="form-menu-card__content">
                         <strong>{{ action.title }}</strong>

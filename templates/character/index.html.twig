@@ -2,10 +2,12 @@
 {% block title %}{{ character.name }}{% endblock %}
 {% block stylesheets %}{{ parent() }}<link rel="stylesheet" href="{{ asset('css/character.css') }}"><link rel="stylesheet" href="{{ asset('css/spoiler-card.css') }}"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">{% endblock %}
 {% block body %}
+    {% set return_to = app.request.query.get('return_to') %}
+    {% set return_url = return_to and return_to starts with '/' and not (return_to starts with '//') ? return_to : path(catalogueRoute) %}
     {{ component('Header', {backRoute: null}) }}
     <main class="page-personnage"><div class="personnage-inner">
         {% include 'components/_flash_messages.html.twig' %}
-        <div class="personnage-toolbar"><a href="{{ path(catalogueRoute) }}" class="back-link">← Retour au Catalogue</a><a href="{{ path('app_forms_character_edit', {id: character.id}) }}" class="edit-link" aria-label="Modifier le personnage"><i class="fa-solid fa-pencil" aria-hidden="true"></i></a></div>
+        <div class="personnage-toolbar"><a href="{{ return_url }}" class="back-link">← Retour</a><a href="{{ path('app_forms_character_edit', {id: character.id, return_to: app.request.requestUri}) }}" class="edit-link" aria-label="Modifier le personnage"><i class="fa-solid fa-pencil" aria-hidden="true"></i></a></div>
         <div class="personnage-portrait-wrap">{% if character.imageUrl %}<img src="{{ path('app_character_image', {id: character.id}) }}" alt="Portrait de {{ character.name }}" class="personnage-portrait">{% else %}<div class="personnage-portrait personnage-portrait--placeholder"><i class="fa-solid fa-user" aria-hidden="true"></i></div>{% endif %}</div>
         {% set root = character.animes|first ?: character.mangas|first %}
         {% if root %}<div class="personnage-meta-row"><span class="jp">{{ character.animes|length ? 'アニメ' : 'マンガ' }}</span><span class="value">{{ root.title }}</span></div>{% endif %}
