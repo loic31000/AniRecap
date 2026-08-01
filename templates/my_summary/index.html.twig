@@ -12,6 +12,7 @@
     <div class="my-summaries-page">
         {{ component('Header', {backRoute: 'app_profile'}) }}
         <main class="my-summaries-shell">
+            {% include 'components/_flash_messages.html.twig' %}
             <a class="my-summaries-back" href="{{ path('app_profile') }}">← Retour au Profil</a>
             <h1><span>私の要約</span> Mes Résumés</h1>
             <p class="my-summaries-intro">Retrouvez vos contenus de synthèse enregistrés.</p>

@@ -40,6 +40,12 @@ class Summary implements Ownable
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $spoilerLevel = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isPublic = false;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $publishedAt = null;
+
     #[ORM\ManyToOne(inversedBy: 'summaries')]
     private ?Tome $tome = null;
 
@@ -160,6 +166,30 @@ class Summary implements Ownable
     public function setSpoilerLevel(?string $spoilerLevel): static
     {
         $this->spoilerLevel = $spoilerLevel;
+
+        return $this;
+    }
+
+    public function isPublic(): bool
+    {
+        return $this->isPublic;
+    }
+
+    public function setIsPublic(bool $isPublic): static
+    {
+        $this->isPublic = $isPublic;
+
+        return $this;
+    }
+
+    public function getPublishedAt(): ?\DateTimeImmutable
+    {
+        return $this->publishedAt;
+    }
+
+    public function setPublishedAt(?\DateTimeImmutable $publishedAt): static
+    {
+        $this->publishedAt = $publishedAt;
 
         return $this;
     }

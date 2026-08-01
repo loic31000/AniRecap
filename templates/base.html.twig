@@ -9,6 +9,7 @@
 
     {% block stylesheets %}
         <link rel="stylesheet" href="{{ asset('css/layout.css') }}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     {% endblock %}
 
     {% block javascripts %}
@@ -22,7 +23,10 @@
         <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
     {% endif %}
 </head>
-<body data-turbo="false">
+<body data-turbo="false"{% if app.user %} data-controller="form-menu"{% endif %}>
     {% block body %}{% endblock %}
+    {% if app.user %}
+        {% include 'components/_form_menu_overlay.html.twig' %}
+    {% endif %}
 </body>
 </html>

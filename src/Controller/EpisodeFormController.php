@@ -13,6 +13,7 @@ use App\Repository\EpisodeRepository;
 use App\Repository\SeasonRepository;
 use App\Repository\SummaryRepository;
 use App\Service\SynopsisImageUploader;
+use App\Service\OwnedContentDeletionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -38,6 +39,7 @@ final class EpisodeFormController extends AbstractController
         EpisodeRepository $episodeRepository,
         EntityManagerInterface $entityManager,
         SynopsisImageUploader $imageUploader,
+        SummaryRepository $summaryRepository,
     ): Response {
         $user = $this->requireUser();
         $season = $seasonRepository->findOneOwned($seasonId, $user);
@@ -72,6 +74,7 @@ final class EpisodeFormController extends AbstractController
                         $end,
                         $entityManager,
                         $imageUploader,
+                        $summaryRepository,
                     );
                 }
             }
@@ -93,6 +96,7 @@ final class EpisodeFormController extends AbstractController
         ?int $end,
         EntityManagerInterface $entityManager,
         SynopsisImageUploader $imageUploader,
+        SummaryRepository $summaryRepository,
     ): Response {
         $filename = null;
         $episode = new Episode();
@@ -115,6 +119,7 @@ final class EpisodeFormController extends AbstractController
                 $filename,
                 $start,
                 $end,
+                $summaryRepository,
             ): void {
                 $episode
                     ->setSeason($season)
@@ -141,6 +146,7 @@ final class EpisodeFormController extends AbstractController
                 $entityManager->persist($episode);
                 $entityManager->persist($diaporama);
                 $entityManager->persist($slide);
+                $summaryRepository->synchronizeOrCreateChild('episode', $episode, $user, $input->title, $input->description, $input->spoilerLevel);
                 $entityManager->flush();
 
                 $episode->setCoverEpisodeUrl($this->generateUrl('app_diaporama_slide_image', [
@@ -213,13 +219,7 @@ final class EpisodeFormController extends AbstractController
                             ->setSeason($season)
                             ->setUser($user);
                         $this->applyInput($episode, $input, $coverUrl);
-                        $summaryRepository->synchronizeOwnedForParent(
-                            'episode',
-                            $episode,
-                            $user,
-                            $input->description,
-                            spoilerLevel: $input->spoilerLevel->value,
-                        );
+                        $summaryRepository->synchronizeOrCreateChild('episode', $episode, $user, $input->title, $input->description, $input->spoilerLevel);
                     });
                 } catch (\Throwable) {
                     if ($newFilename !== null) {
@@ -251,6 +251,25 @@ final class EpisodeFormController extends AbstractController
             'is_edit' => true,
             'current_cover_url' => $episode->getCoverEpisodeUrl(),
         ]);
+    }
+
+    #[Route('/formulaires/episodes/{id}/supprimer', name: 'app_forms_episode_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function delete(int $id, Request $request, EpisodeRepository $episodeRepository, OwnedContentDeletionService $deletionService): Response
+    {
+        $user = $this->requireUser();
+        $episode = $episodeRepository->findOneOwned($id, $user);
+        if ($episode === null || !$episode->getSeason() instanceof Season) {
+            throw $this->createNotFoundException();
+        }
+        if (!$this->isCsrfTokenValid('episode_delete_' . $id, (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $seasonId = $episode->getSeason()->getId();
+        $deletionService->deleteEpisode($episode);
+        $this->addFlash('success', 'L’épisode a été supprimé.');
+
+        return $this->redirectToRoute('app_private_season_show', ['id' => $seasonId, '_fragment' => 'episodes']);
     }
 
     private function requireUser(): User

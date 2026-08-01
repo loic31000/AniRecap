@@ -10,6 +10,8 @@ use App\Repository\DiaporamaRepository;
 use App\Repository\SlideRepository;
 use App\Repository\FavoriteRepository;
 use App\Repository\CharacterRepository;
+use App\Repository\SummaryRepository;
+use App\Repository\SummaryLikeRepository;
 use App\Enum\SpoilerLevel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,6 +31,8 @@ final class MangaController extends AbstractController
         SlideRepository $slideRepository,
         FavoriteRepository $favoriteRepository,
         CharacterRepository $characterRepository,
+        SummaryRepository $summaryRepository,
+        SummaryLikeRepository $summaryLikeRepository,
     ): Response
     {
         $user = $this->getUser();
@@ -41,13 +45,24 @@ final class MangaController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $isOwnerPrivate = !$manga->isPublic() && $manga->getOwner()?->getId() === $user->getId();
-        $tomes = $isOwnerPrivate ? $tomeRepository->findOwnedByManga($manga, $user) : [];
-        $chapitres = $isOwnerPrivate ? $chapitreRepository->findOwnedByManga($manga, $user) : [];
+        $isOwner = $manga->getOwner()?->getId() === $user->getId();
+        $isOwnerPrivate = $isOwner && !$manga->isPublic();
+        $tomes = $isOwner ? $tomeRepository->findOwnedByManga($manga, $user) : [];
+        $chapitres = $isOwner ? $chapitreRepository->findOwnedByManga($manga, $user) : [];
+        if (!$isOwner) {
+            foreach ($summaryRepository->findVisibleChildSummariesForManga($manga, $user) as $summary) {
+                if ($summary->getTome() !== null) { $tomes[$summary->getTome()->getId()] = $summary->getTome(); }
+                if ($summary->getChapitre() !== null) { $chapitres[$summary->getChapitre()->getId()] = $summary->getChapitre(); }
+            }
+            $tomes = array_values($tomes);
+            $chapitres = array_values($chapitres);
+            usort($tomes, static fn ($a, $b): int => $a->getNumber() <=> $b->getNumber());
+            usort($chapitres, static fn ($a, $b): int => $a->getNumber() <=> $b->getNumber());
+        }
         $tomeIds = array_map(static fn ($tome): int => (int) $tome->getId(), $tomes);
         $chapitreIds = array_map(static fn ($chapitre): int => (int) $chapitre->getId(), $chapitres);
-        $tomeSlideLevels = $slideRepository->findHighestLevelsForTomes($tomeIds);
-        $chapitreSlideLevels = $slideRepository->findHighestLevelsForChapitres($chapitreIds);
+        $tomeSlideLevels = $isOwner ? $slideRepository->findHighestLevelsForTomes($tomeIds) : [];
+        $chapitreSlideLevels = $isOwner ? $slideRepository->findHighestLevelsForChapitres($chapitreIds) : [];
         $tomeLevels = [];
         foreach ($tomes as $tome) {
             $tomeLevels[$tome->getId()] = $this->highestLevel($tome->getSpoilerLevel(), $tomeSlideLevels[$tome->getId()] ?? SpoilerLevel::Aucun);
@@ -57,18 +72,23 @@ final class MangaController extends AbstractController
             $chapitreLevels[$chapitre->getId()] = $this->highestLevel($chapitre->getSpoilerLevel(), $chapitreSlideLevels[$chapitre->getId()] ?? SpoilerLevel::Aucun);
         }
         $favoriteState = $favoriteRepository->findRootFavoriteStates($user, [], [$manga->getId()]);
+        $tomeSummaries = $summaryRepository->findForParents('tome', $tomeIds, $user);
+        $chapitreSummaries = $summaryRepository->findForParents('chapitre', $chapitreIds, $user);
 
         return $this->render('manga/index.html.twig', [
             'manga' => $manga,
+            'is_owner' => $isOwner,
             'is_owner_private' => $isOwnerPrivate,
             'tomes' => $tomes,
             'chapitres' => $chapitres,
-            'tome_diaporamas' => $diaporamaRepository->findOwnedLinksForTomes($tomeIds, $user),
-            'chapitre_diaporamas' => $diaporamaRepository->findOwnedLinksForChapitres($chapitreIds, $user),
+            'tome_diaporamas' => $isOwner ? $diaporamaRepository->findOwnedLinksForTomes($tomeIds, $user) : [],
+            'chapitre_diaporamas' => $isOwner ? $diaporamaRepository->findOwnedLinksForChapitres($chapitreIds, $user) : [],
             'characters' => $characterRepository->findOwnedByManga($manga, $user),
             'tome_spoiler_levels' => $tomeLevels,
             'chapitre_spoiler_levels' => $chapitreLevels,
             'favorite_oeuvre' => ['id' => $manga->getId(), 'type' => 'manga', 'title' => $manga->getTitle(), 'isFavorite' => $favoriteState['manga'][$manga->getId()] ?? false],
+            'tome_summary_states' => $summaryRepository->buildCardStates($tomeSummaries, $user, $summaryLikeRepository),
+            'chapitre_summary_states' => $summaryRepository->buildCardStates($chapitreSummaries, $user, $summaryLikeRepository),
         ]);
     }
 

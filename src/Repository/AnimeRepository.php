@@ -57,6 +57,21 @@ class AnimeRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /** @return Anime[] */
+    public function searchPublic(array $filters): array
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->leftJoin('a.categories', 'c')->addSelect('c')
+            ->andWhere('a.isPublic = true')->distinct();
+        if (!empty($filters['q'])) {
+            $qb->andWhere('(LOWER(a.title) LIKE :q OR LOWER(a.synopsis) LIKE :q OR LOWER(a.author) LIKE :q)')
+                ->setParameter('q', '%' . mb_strtolower($filters['q']) . '%');
+        }
+        if (!empty($filters['genre'])) { $qb->andWhere('c.slug = :genre')->setParameter('genre', $filters['genre']); }
+        if (!empty($filters['annee'])) { $qb->andWhere('a.animeDate = :annee')->setParameter('annee', (int) $filters['annee']); }
+        return $qb->orderBy('a.title', 'ASC')->getQuery()->getResult();
+    }
+
     public function findOneVisibleTo(int $id, User $viewer): ?Anime
     {
         return $this->createVisibleQueryBuilder($viewer)
@@ -100,6 +115,14 @@ class AnimeRepository extends ServiceEntityRepository
             ->andWhere('a.isPublic = :isPublic')
             ->setParameter('owner', $owner)
             ->setParameter('isPublic', false)
+            ->orderBy('a.title', 'ASC');
+    }
+
+    public function createOwnedQueryBuilder(User $owner): QueryBuilder
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.owner = :owner')
+            ->setParameter('owner', $owner)
             ->orderBy('a.title', 'ASC');
     }
 

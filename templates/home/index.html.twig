@@ -20,22 +20,34 @@
                 {% include 'components/_flash_messages.html.twig' %}
                 <h1 class="page-title"><span>ホーム Home</span></h1>
 
+                {% if not is_authenticated %}
+                    <section class="visitor-welcome" aria-labelledby="visitor-welcome-title">
+                        <h2 id="visitor-welcome-title">Découvrez les publications AniRecap</h2>
+                        <p>Consultez les œuvres récemment publiées. Connectez-vous ou créez un compte pour ouvrir les fiches, aimer et ajouter des favoris.</p>
+                        <div class="visitor-welcome__actions">
+                            <a href="{{ path('app_login') }}">Se connecter</a>
+                            <a href="{{ path('app_register') }}">S’inscrire</a>
+                        </div>
+                    </section>
+                {% endif %}
+
                 <twig:SearchCard :genres="genres" :filters="filters" actionRoute="app_home"/>
 
                 <section class="home-section" aria-labelledby="popular-title">
                     <h2 id="popular-title" class="section-title"><span>人気 Populaire</span></h2>
+                    {% if popular_uses_fallback and popular is not empty %}<p class="home-section-note">Aucun J’aime pour le moment : voici les publications les plus récentes.</p>{% endif %}
                     <twig:OeuvreCard :results="popular"/>
                 </section>
 
-                <section class="home-section" aria-labelledby="latest-title">
-                    <h2 id="latest-title" class="section-title"><span>最終更新日 Derniere Modification</span></h2>
-                    <twig:OeuvreCard :results="latest"/>
+                <section class="home-section" aria-labelledby="available-title">
+                    <h2 id="available-title" class="section-title"><span>新着 Disponible récemment</span></h2>
+                    <twig:OeuvreCard :results="available"/>
                 </section>
 
                 {% include 'components/_scroll_top.html.twig' with {target: 'home-top'} only %}
             </div>
         </main>
 
-        {{ component('Navbar', { active: 'home' }) }}
+        {% if is_authenticated %}{{ component('Navbar', { active: 'home' }) }}{% endif %}
     </div>
 {% endblock %}

@@ -309,6 +309,15 @@ body {
     font-weight: 900;
 }
 
+.page-anime .anime-row__link {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+    align-items: center;
+    text-decoration: none;
+}
+
 .page-anime .anime-row__meta {
     display: inline-flex;
     align-items: center;

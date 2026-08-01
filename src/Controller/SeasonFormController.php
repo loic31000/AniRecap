@@ -13,8 +13,10 @@ use App\Repository\EpisodeRepository;
 use App\Repository\DiaporamaRepository;
 use App\Repository\SlideRepository;
 use App\Repository\CharacterRepository;
+use App\Repository\SummaryLikeRepository;
 use App\Enum\SpoilerLevel;
 use App\Service\SynopsisImageUploader;
+use App\Service\OwnedContentDeletionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -89,6 +91,27 @@ final class SeasonFormController extends AbstractController
         ]);
     }
 
+    #[Route('/formulaires/saisons/{id}/supprimer', name: 'app_forms_season_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function delete(int $id, Request $request, SeasonRepository $seasonRepository, OwnedContentDeletionService $deletionService): Response
+    {
+        $user = $this->requireUser();
+        $season = $seasonRepository->findOneOwned($id, $user);
+        if ($season === null) {
+            throw $this->createNotFoundException();
+        }
+        if (!$this->isCsrfTokenValid('season_delete_' . $id, (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $animeId = $season->getAnime()?->getId();
+        $deletionService->deleteSeason($season);
+        $this->addFlash('success', 'La saison et ses épisodes ont été supprimés.');
+
+        return $animeId !== null
+            ? $this->redirectToRoute('app_anime_show', ['id' => $animeId])
+            : $this->redirectToRoute('app_catalogue');
+    }
+
     #[Route('/formulaires/saisons/{id}/modifier', name: 'app_forms_season_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function edit(
         int $id,
@@ -113,7 +136,7 @@ final class SeasonFormController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if (!$this->isOwnedPrivateAnime($input->anime, $user)) {
+            if (!$this->isOwnedAnime($input->anime, $user)) {
                 throw $this->createNotFoundException();
             }
 
@@ -170,6 +193,8 @@ final class SeasonFormController extends AbstractController
         DiaporamaRepository $diaporamaRepository,
         SlideRepository $slideRepository,
         CharacterRepository $characterRepository,
+        SummaryRepository $summaryRepository,
+        SummaryLikeRepository $summaryLikeRepository,
     ): Response
     {
         $user = $this->requireUser();
@@ -184,6 +209,7 @@ final class SeasonFormController extends AbstractController
             $episodes,
         );
         $slideLevels = $slideRepository->findHighestLevelsForEpisodes($episodeIds);
+        $episodeSummaries = $summaryRepository->findForParents('episode', $episodeIds, $user);
         $effectiveLevels = [];
         foreach ($episodes as $episode) {
             $effectiveLevels[$episode->getId()] = $this->highestLevel(
@@ -198,6 +224,7 @@ final class SeasonFormController extends AbstractController
             'episode_diaporamas' => $diaporamaRepository->findOwnedLinksForEpisodes($episodeIds, $user),
             'episode_spoiler_levels' => $effectiveLevels,
             'characters' => $characterRepository->findOwnedBySeason($season, $user),
+            'episode_summary_states' => $summaryRepository->buildCardStates($episodeSummaries, $user, $summaryLikeRepository),
         ]);
     }
 
@@ -227,6 +254,11 @@ final class SeasonFormController extends AbstractController
         return $anime !== null
             && $anime->getOwner()?->getId() === $user->getId()
             && $anime->isPublic() === false;
+    }
+
+    private function isOwnedAnime(?Anime $anime, User $user): bool
+    {
+        return $anime !== null && $anime->getOwner()?->getId() === $user->getId();
     }
 
     private function applyInput(Season $season, SeasonInput $input, ?string $coverUrl): void

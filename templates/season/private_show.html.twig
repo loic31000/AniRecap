@@ -67,7 +67,7 @@
                             {% set linkedDiaporamas = episode_diaporamas[episode.id]|default([]) %}
                             <div class="timeline-item">
                                 <div class="timeline-node" aria-hidden="true"><span class="play-circle"><i class="fa-solid fa-play"></i></span></div>
-                                {% include 'components/_spoiler_card.html.twig' with {item_id: episode.id, title: episode.title, summary: episode.synopsis, status: episode.status, badge: 'ÉP. ' ~ episode.number, image_url: episode.coverEpisodeUrl, effective_level: episode_spoiler_levels[episode.id], linked_diaporamas: linkedDiaporamas, edit_route: 'app_forms_episode_edit', edit_class: 'card-edit-link'} only %}
+                                {% include 'components/_spoiler_card.html.twig' with {item_id: episode.id, title: episode.title, summary: episode.synopsis, status: episode.status, badge: 'ÉP. ' ~ episode.number, image_url: episode.coverEpisodeUrl, effective_level: episode_spoiler_levels[episode.id], linked_diaporamas: linkedDiaporamas, edit_route: 'app_forms_episode_edit', edit_class: 'card-edit-link', delete_route: 'app_forms_episode_delete', delete_token_id: 'episode_delete_', delete_message: 'Supprimer définitivement cet épisode, son résumé et ses scènes associées ?', delete_label: 'Supprimer ' ~ episode.title, summary_state: episode_summary_states[episode.id]|default(null)} only %}
                             </div>
                         {% endfor %}
                     </div>

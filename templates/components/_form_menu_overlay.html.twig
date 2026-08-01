@@ -1,0 +1,38 @@
+<div id="creation-menu" class="form-menu-overlay" role="dialog" aria-modal="true"
+     aria-labelledby="creation-menu-title" hidden data-form-menu-target="overlay"
+     data-action="keydown@window->form-menu#escape">
+    <button type="button" class="form-menu-overlay__backdrop" aria-label="Fermer le menu de création"
+            data-action="form-menu#close"></button>
+
+    <section class="form-menu">
+        <header class="form-menu__header">
+            <span class="form-menu__line" aria-hidden="true"></span>
+            <h2 id="creation-menu-title"><span lang="ja">フォーム</span> Création</h2>
+        </header>
+
+        <nav class="form-menu__list" aria-label="Choisir un éditeur">
+            {% set actions = [
+                {route: 'app_forms_anime_synopsis', icon: 'fa-file-pen', title: 'Éditeur de Synopsis Animé'},
+                {route: 'app_forms_season', icon: 'fa-file-pen', title: 'Éditeur de Saison'},
+                {route: 'app_forms_season_scene', icon: 'fa-film', title: 'Éditeur de Scène Saison'},
+                {route: 'app_forms_manga_synopsis', icon: 'fa-file-pen', title: 'Éditeur de Synopsis Manga'},
+                {route: 'app_forms_manga_scene', icon: 'fa-film', title: 'Éditeur de Scène Manga'},
+                {route: 'app_forms_character', icon: 'fa-user', title: 'Éditeur de Personnage'}
+            ] %}
+            {% for action in actions %}
+                <a class="form-menu-card" href="{{ path(action.route) }}">
+                    <span class="form-menu-card__icon" aria-hidden="true"><i class="fa-solid {{ action.icon }}"></i></span>
+                    <span class="form-menu-card__content">
+                        <strong>{{ action.title }}</strong>
+                        <small>Rédiger le contenu détaillé</small>
+                    </span>
+                </a>
+            {% endfor %}
+        </nav>
+
+        <button type="button" class="form-menu__close" aria-label="Fermer le menu de création"
+                data-form-menu-target="close" data-action="form-menu#close">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+    </section>
+</div>

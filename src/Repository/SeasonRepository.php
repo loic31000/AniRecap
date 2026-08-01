@@ -26,10 +26,8 @@ class SeasonRepository extends ServiceEntityRepository
             ->addSelect('a', 'c')
             ->andWhere('s.id = :id')
             ->andWhere('a.owner = :owner')
-            ->andWhere('a.isPublic = :isPublic')
             ->setParameter('id', $id)
             ->setParameter('owner', $owner)
-            ->setParameter('isPublic', false)
             ->getQuery()
             ->getOneOrNullResult();
     }
@@ -65,10 +63,8 @@ class SeasonRepository extends ServiceEntityRepository
             ->innerJoin('s.anime', 'a')
             ->andWhere('s.coverSeasonUrl = :coverUrl')
             ->andWhere('a.owner = :owner')
-            ->andWhere('a.isPublic = :isPublic')
             ->setParameter('coverUrl', $coverUrl)
             ->setParameter('owner', $owner)
-            ->setParameter('isPublic', false)
             ->getQuery()
             ->getOneOrNullResult();
     }

@@ -22,7 +22,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -33,7 +32,7 @@ final class FormsController extends AbstractController
     #[Route('/formulaires', name: 'app_forms_index', methods: ['GET'])]
     public function index(): Response
     {
-        return $this->render('forms/index.html.twig');
+        return $this->redirectToRoute('app_home', ['creation' => 1]);
     }
 
     #[Route('/formulaires/synopsis-anime', name: 'app_forms_anime_synopsis', methods: ['GET', 'POST'])]
@@ -322,47 +321,6 @@ final class FormsController extends AbstractController
             'is_edit' => true,
             'current_cover_url' => $manga->getCoverMangaUrl(),
         ]);
-    }
-
-    #[Route(
-        '/formulaires/miniature/{filename}',
-        name: 'app_forms_synopsis_image',
-        methods: ['GET'],
-        requirements: ['filename' => '[a-f0-9]{32}\.(?:png|jpg)'],
-    )]
-    public function synopsisImage(
-        string $filename,
-        AnimeRepository $animeRepository,
-        ChapitreRepository $chapitreRepository,
-        EpisodeRepository $episodeRepository,
-        MangaRepository $mangaRepository,
-        SeasonRepository $seasonRepository,
-        TomeRepository $tomeRepository,
-        SynopsisImageUploader $imageUploader,
-    ): Response {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
-
-        $coverUrl = $this->generateUrl('app_forms_synopsis_image', ['filename' => $filename]);
-        $anime = $animeRepository->findOneOwnedByCoverUrl($coverUrl, $user);
-        $chapitre = $chapitreRepository->findOneOwnedByCoverUrl($coverUrl, $user);
-        $episode = $episodeRepository->findOneOwnedByCoverUrl($coverUrl, $user);
-        $manga = $mangaRepository->findOneOwnedByCoverUrl($coverUrl, $user);
-        $season = $seasonRepository->findOneOwnedByCoverUrl($coverUrl, $user);
-        $tome = $tomeRepository->findOneOwnedByCoverUrl($coverUrl, $user);
-
-        if ($anime === null && $chapitre === null && $episode === null && $manga === null && $season === null && $tome === null) {
-            throw $this->createNotFoundException();
-        }
-
-        $path = $imageUploader->resolve($filename);
-        if ($path === null) {
-            throw $this->createNotFoundException();
-        }
-
-        return $this->file($path, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
     private function animeInputFromEntity(Anime $anime): AnimeSynopsisInput
