@@ -1,0 +1,40 @@
+.spoiler-card__content { position: relative; width: 100%; min-width: 0; height: 100%; }
+.page-season .spoiler-card__content { display: flex; flex-direction: column; }
+.page-manga .spoiler-card { display: block; }
+.page-manga .spoiler-card__content { display: flex; flex-direction: column; }
+.spoiler-card.is-spoiler { position: relative; min-height: 150px; }
+.spoiler-card.is-spoiler:not(.is-revealed) { aspect-ratio: 16 / 8; }
+.spoiler-card.is-spoiler:not(.is-revealed) .spoiler-card__content { position: absolute; inset: 0; filter: blur(8px) brightness(.68); transform: scale(1.06); pointer-events: none; user-select: none; }
+.spoiler-card.is-spoiler:not(.is-revealed) .card-media-wrap { position: absolute; inset: 0; height: 100%; max-height: none; aspect-ratio: auto; }
+.spoiler-card.is-spoiler:not(.is-revealed) .card-content-wrap { display: none; }
+.spoiler-card__overlay { position: absolute; z-index: 6; inset: 0; width: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 5px; border: 0; border-radius: inherit; background: rgba(4,14,27,.28); color: #fff; cursor: pointer; }
+.spoiler-card__overlay[hidden] { display: none; }
+.spoiler-card__overlay:focus-visible { outline: 3px solid #fff; outline-offset: -4px; }
+.spoiler-card__overlay .warning-icon { font-size: 1.6rem; }
+.spoiler-card__overlay .spoiler-title-text { font-size: .85rem; font-weight: 900; text-shadow: 0 2px 3px #000; }
+.spoiler-card__overlay .spoiler-action-text { font-size: .65rem; color: #fff; }
+.spoiler-card.spoiler-mineur > .spoiler-card__overlay .warning-icon,
+.spoiler-card.spoiler-mineur > .spoiler-card__overlay .spoiler-title-text,
+.spoiler-character.spoiler-mineur > .spoiler-card__overlay .warning-icon,
+.spoiler-character.spoiler-mineur > .spoiler-card__overlay .spoiler-title-text { color: #e5a93b; }
+.spoiler-card.spoiler-majeur > .spoiler-card__overlay .warning-icon,
+.spoiler-card.spoiler-majeur > .spoiler-card__overlay .spoiler-title-text,
+.spoiler-character.spoiler-majeur > .spoiler-card__overlay .warning-icon,
+.spoiler-character.spoiler-majeur > .spoiler-card__overlay .spoiler-title-text { color: #ef4444; }
+.spoiler-character { position: relative; min-width: 0; border-radius: 50%; }
+.spoiler-character__content { min-width: 0; }
+.spoiler-character.is-spoiler:not(.is-revealed) .spoiler-character__content { filter: blur(6px) brightness(.4); pointer-events: none; }
+.spoiler-card__overlay--compact { aspect-ratio: 1; border-radius: 50%; padding: 2px; }
+.spoiler-card__overlay--compact .warning-icon { font-size: .9rem; }
+.spoiler-card__overlay--compact .spoiler-title-text { font-size: .45rem; }
+.spoiler-card__overlay--compact .spoiler-action-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+@media (prefers-reduced-motion: reduce) { .spoiler-card__content { transition: none; } }
+
+.detail-favorite-action { position: relative; display: flex; width: min(100%, 360px); min-height: 48px; align-items: center; justify-content: center; gap: 8px; margin: 8px auto 4px; border: 1px solid rgba(229,169,59,.35); background: #02070d; color: #e5a93b; }
+.detail-favorite-action .favorite-toggle-form--detail { position: static; }
+.detail-favorite-action .favorite-toggle-button { color: #e5a93b; }
+
+@media (max-width: 430px) {
+    .spoiler-card.is-spoiler { min-height: 132px; }
+    .spoiler-card__overlay .warning-icon { font-size: 1.45rem; }
+}

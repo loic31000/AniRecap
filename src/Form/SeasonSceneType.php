@@ -39,7 +39,7 @@ final class SeasonSceneType extends AbstractType
                 'attr' => ['rows' => 10],
             ])
             ->add('spoilerLevel', ChoiceType::class, [
-                'label' => 'Niveau de spoiler',
+                'label' => 'Niveau de Spoiler',
                 'choices' => [
                     'Aucun' => SpoilerLevel::Aucun,
                     'Mineur' => SpoilerLevel::Mineur,

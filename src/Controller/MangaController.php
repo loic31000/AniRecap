@@ -7,6 +7,9 @@ use App\Repository\MangaRepository;
 use App\Repository\TomeRepository;
 use App\Repository\ChapitreRepository;
 use App\Repository\DiaporamaRepository;
+use App\Repository\SlideRepository;
+use App\Repository\FavoriteRepository;
+use App\Enum\SpoilerLevel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -22,6 +25,8 @@ final class MangaController extends AbstractController
         TomeRepository $tomeRepository,
         ChapitreRepository $chapitreRepository,
         DiaporamaRepository $diaporamaRepository,
+        SlideRepository $slideRepository,
+        FavoriteRepository $favoriteRepository,
     ): Response
     {
         $user = $this->getUser();
@@ -39,6 +44,17 @@ final class MangaController extends AbstractController
         $chapitres = $isOwnerPrivate ? $chapitreRepository->findOwnedByManga($manga, $user) : [];
         $tomeIds = array_map(static fn ($tome): int => (int) $tome->getId(), $tomes);
         $chapitreIds = array_map(static fn ($chapitre): int => (int) $chapitre->getId(), $chapitres);
+        $tomeSlideLevels = $slideRepository->findHighestLevelsForTomes($tomeIds);
+        $chapitreSlideLevels = $slideRepository->findHighestLevelsForChapitres($chapitreIds);
+        $tomeLevels = [];
+        foreach ($tomes as $tome) {
+            $tomeLevels[$tome->getId()] = $this->highestLevel($tome->getSpoilerLevel(), $tomeSlideLevels[$tome->getId()] ?? SpoilerLevel::Aucun);
+        }
+        $chapitreLevels = [];
+        foreach ($chapitres as $chapitre) {
+            $chapitreLevels[$chapitre->getId()] = $this->highestLevel($chapitre->getSpoilerLevel(), $chapitreSlideLevels[$chapitre->getId()] ?? SpoilerLevel::Aucun);
+        }
+        $favoriteState = $favoriteRepository->findRootFavoriteStates($user, [], [$manga->getId()]);
 
         return $this->render('manga/index.html.twig', [
             'manga' => $manga,
@@ -48,6 +64,20 @@ final class MangaController extends AbstractController
             'tome_diaporamas' => $diaporamaRepository->findOwnedLinksForTomes($tomeIds, $user),
             'chapitre_diaporamas' => $diaporamaRepository->findOwnedLinksForChapitres($chapitreIds, $user),
             'characters' => $manga->getCharacters()->toArray(),
+            'tome_spoiler_levels' => $tomeLevels,
+            'chapitre_spoiler_levels' => $chapitreLevels,
+            'favorite_oeuvre' => ['id' => $manga->getId(), 'type' => 'manga', 'title' => $manga->getTitle(), 'isFavorite' => $favoriteState['manga'][$manga->getId()] ?? false],
         ]);
+    }
+
+    private function highestLevel(SpoilerLevel $first, SpoilerLevel $second): SpoilerLevel
+    {
+        $rank = static fn (SpoilerLevel $level): int => match ($level) {
+            SpoilerLevel::Aucun => 0,
+            SpoilerLevel::Mineur => 1,
+            SpoilerLevel::Majeur => 2,
+        };
+
+        return $rank($first) >= $rank($second) ? $first : $second;
     }
 }

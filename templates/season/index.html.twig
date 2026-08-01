@@ -119,67 +119,7 @@
 				{# Sous-titre placé sous la ligne dorée #}
 				<p class="episode-count-meta">{{ episodesCountText|default('6 Episode disponibles') }}</p>
 
-				{# Liste en mode Timeline #}
-				<div
-					class="episodes-timeline-list">
-
-					{# ÉPISODE 1 : Standard avec image et détails #}
-					<div class="timeline-item">
-						<div class="timeline-node">
-							<div class="play-circle">
-								<i class="fa-solid fa-play"></i>
-							</div>
-						</div>
-						<div class="episode-figma-card">
-							<div class="card-media-wrap">
-								<img src="{{ asset('images/coverCardSeason.png') }}" alt="" class="card-banner">
-							</div>
-							<div class="card-content-wrap">
-								<div class="card-meta-line">
-									<span class="badge-episodes">{{ arcRange|default('EP. 01 • EP. 15') }}</span>
-									<i class="fa-solid fa-pencil icon-edit-gold"></i>
-								</div>
-								<h3 class="card-episode-title">{{ originalTitle|default('ガンダムSEED デスティニー') }}</h3>
-								<p class="card-episode-desc">{{ episodeDescription|default("L'attaque surprise des Net-Hunters déstabilise la défense locale et force Kael à fuir.") }}</p>
-							</div>
-						</div>
-					</div>
-
-					{# ÉPISODE 2 : Spoiler Mineur (Flouté) #}
-					<div class="timeline-item">
-						<div class="timeline-node">
-							<div class="play-circle">
-								<i class="fa-solid fa-play"></i>
-							</div>
-						</div>
-						<div class="episode-figma-card is-spoiler spoiler-minor">
-							<div class="spoiler-blur-bg" style="background-image: url('{{ asset('images/coverCardSeason.png') }}');"></div>
-							<div class="spoiler-overlay-content">
-								<i class="fa-solid fa-triangle-exclamation warning-icon"></i>
-								<span class="spoiler-title-text">SPOILER MINEUR</span>
-								<span class="spoiler-action-text">APPUYER POUR REVELER</span>
-							</div>
-						</div>
-					</div>
-
-					{# ÉPISODE 3 : Spoiler Majeur (Flouté) #}
-					<div class="timeline-item">
-						<div class="timeline-node">
-							<div class="play-circle">
-								<i class="fa-solid fa-play"></i>
-							</div>
-						</div>
-						<div class="episode-figma-card is-spoiler spoiler-major">
-							<div class="spoiler-blur-bg" style="background-image: url('{{ asset('images/coverCardSeason.png') }}');"></div>
-							<div class="spoiler-overlay-content">
-								<i class="fa-solid fa-triangle-exclamation warning-icon"></i>
-								<span class="spoiler-title-text">SPOILER MAJEUR</span>
-								<span class="spoiler-action-text">APPUYER POUR REVELER</span>
-							</div>
-						</div>
-					</div>
-
-				</div>
+				<p class="episode-count-meta">Aucun épisode réel n’est disponible sur cette page.</p>
 
 				{# Bouton d'action "Voir plus de chapitres" #}
 				<div class="action-row-center">

@@ -33,7 +33,7 @@
                         <ul>
                             {% for error in form.vars.errors %}<li>{{ error.message }}</li>{% endfor %}
                             {% for field in form %}
-                                {% for error in field.vars.errors %}<li><a href="#{{ field.vars.id }}">{{ field.vars.label }} : {{ error.message }}</a></li>{% endfor %}
+                                {% for error in field.vars.errors|default([]) %}<li><a href="#{{ field.vars.id }}">{{ field.vars.label }} : {{ error.message }}</a></li>{% endfor %}
                             {% endfor %}
                         </ul>
                     </section>
@@ -53,7 +53,7 @@
 
                 {{ form_row(form.title) }}
                 {{ form_row(form.number) }}
-                {{ form_row(form.categories) }}
+                {{ include('forms/_category_selector.html.twig', {field: form.categories, max: 3}) }}
                 {{ form_row(form.description) }}
                 <fieldset class="synopsis-fieldset synopsis-fieldset--plain">
                     {{ form_row(form.type) }}

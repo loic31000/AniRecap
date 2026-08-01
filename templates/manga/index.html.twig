@@ -5,6 +5,8 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/manga.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/spoiler-card.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/oeuvreCard.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 {% endblock %}
 
@@ -15,6 +17,7 @@
 
     <main class="page-manga">
         <div class="manga-inner">
+            {% include 'components/_flash_messages.html.twig' %}
             <a href="{{ path('app_catalogue') }}" class="back-link">
                 <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
                 <span>Retour au Catalogue</span>
@@ -34,6 +37,7 @@
                             <span class="badge">PRIVÉ</span>
                         {% endif %}
                     </div>
+                    <div class="detail-favorite-action">{% include 'components/_favorite_toggle.html.twig' with {oeuvre: favorite_oeuvre, modifier: 'favorite-toggle-form--detail'} only %}<span>{{ favorite_oeuvre.isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris' }}</span></div>
                 </div>
             </section>
 
@@ -103,43 +107,7 @@
                                     {% set linkedDiaporamas = chapitre_diaporamas[chapitre.id]|default([]) %}
                                     <div class="manga-timeline-entry">
                                         <span class="manga-timeline-node" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
-                                        <article class="episode-figma-card{{ linkedDiaporamas|length == 1 ? ' has-diaporama-link' : '' }}">
-                                            {% if linkedDiaporamas|length == 1 %}
-                                                <a
-                                                    href="{{ path('app_diaporama_show', {id: linkedDiaporamas[0].id}) }}"
-                                                    class="card-diaporama-overlay"
-                                                    aria-label="Voir le diaporama {{ linkedDiaporamas[0].title }} lié au chapitre {{ chapitre.number }}"
-                                                ></a>
-                                            {% endif %}
-                                            <div class="card-media-wrap"><img src="{{ chapitre.coverChapitreUrl }}" alt="Miniature du chapitre {{ chapitre.number }}" class="card-banner"></div>
-                                            <div class="card-content-wrap">
-                                                <div class="card-meta-line">
-                                                    <span class="badge-episodes">CHAP {{ chapitre.number }}</span>
-                                                    <span class="content-card-status">{{ chapitre.status }}</span>
-                                                </div>
-                                                <h3 class="card-episode-title">{{ chapitre.title }}</h3>
-                                                <p class="card-episode-desc">{{ chapitre.synopsis }}</p>
-                                                <div class="content-card-footer">
-                                                    <span class="content-card-spoiler">{{ chapitre.spoilerLevel.value|upper }}</span>
-                                                    {% if linkedDiaporamas|length == 1 %}
-                                                        <span class="card-diaporama-hint" aria-hidden="true">Voir le diaporama</span>
-                                                    {% elseif linkedDiaporamas|length > 1 %}
-                                                        <details class="card-diaporama-list">
-                                                            <summary>Voir les diaporamas ({{ linkedDiaporamas|length }})</summary>
-                                                            <ul>
-                                                                {% for diaporama in linkedDiaporamas %}
-                                                                    <li><a href="{{ path('app_diaporama_show', {id: diaporama.id}) }}">{{ diaporama.title }}</a></li>
-                                                                {% endfor %}
-                                                            </ul>
-                                                        </details>
-                                                    {% endif %}
-                                                    <a href="{{ path('app_forms_chapitre_edit', {id: chapitre.id}) }}" class="content-card-edit" aria-label="Modifier le chapitre {{ chapitre.number }}">
-                                                        <i class="fa-solid fa-pen" aria-hidden="true"></i>
-                                                        <span class="visually-hidden">Modifier</span>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </article>
+                                        {% include 'components/_spoiler_card.html.twig' with {item_id: chapitre.id, title: chapitre.title, summary: chapitre.synopsis, status: chapitre.status, badge: 'CHAP ' ~ chapitre.number, image_url: chapitre.coverChapitreUrl, effective_level: chapitre_spoiler_levels[chapitre.id], linked_diaporamas: linkedDiaporamas, edit_route: 'app_forms_chapitre_edit', edit_class: 'content-card-edit'} only %}
                                     </div>
                                 {% endfor %}
                             </div>
@@ -167,43 +135,7 @@
                                     {% set linkedDiaporamas = tome_diaporamas[tome.id]|default([]) %}
                                     <div class="manga-timeline-entry">
                                         <span class="manga-timeline-node" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
-                                        <article class="episode-figma-card{{ linkedDiaporamas|length == 1 ? ' has-diaporama-link' : '' }}">
-                                            {% if linkedDiaporamas|length == 1 %}
-                                                <a
-                                                    href="{{ path('app_diaporama_show', {id: linkedDiaporamas[0].id}) }}"
-                                                    class="card-diaporama-overlay"
-                                                    aria-label="Voir le diaporama {{ linkedDiaporamas[0].title }} lié au tome {{ tome.number }}"
-                                                ></a>
-                                            {% endif %}
-                                            <div class="card-media-wrap"><img src="{{ tome.coverTomeUrl }}" alt="Miniature du tome {{ tome.number }}" class="card-banner"></div>
-                                            <div class="card-content-wrap">
-                                                <div class="card-meta-line">
-                                                    <span class="badge-episodes">TOME {{ tome.number }}</span>
-                                                    <span class="content-card-status">{{ tome.status }}</span>
-                                                </div>
-                                                <h3 class="card-episode-title">{{ tome.title }}</h3>
-                                                <p class="card-episode-desc">{{ tome.synopsis }}</p>
-                                                <div class="content-card-footer">
-                                                    <span class="content-card-spoiler">{{ tome.spoilerLevel.value|upper }}</span>
-                                                    {% if linkedDiaporamas|length == 1 %}
-                                                        <span class="card-diaporama-hint" aria-hidden="true">Voir le diaporama</span>
-                                                    {% elseif linkedDiaporamas|length > 1 %}
-                                                        <details class="card-diaporama-list">
-                                                            <summary>Voir les diaporamas ({{ linkedDiaporamas|length }})</summary>
-                                                            <ul>
-                                                                {% for diaporama in linkedDiaporamas %}
-                                                                    <li><a href="{{ path('app_diaporama_show', {id: diaporama.id}) }}">{{ diaporama.title }}</a></li>
-                                                                {% endfor %}
-                                                            </ul>
-                                                        </details>
-                                                    {% endif %}
-                                                    <a href="{{ path('app_forms_tome_edit', {id: tome.id}) }}" class="content-card-edit" aria-label="Modifier le tome {{ tome.number }}">
-                                                        <i class="fa-solid fa-pen" aria-hidden="true"></i>
-                                                        <span class="visually-hidden">Modifier</span>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </article>
+                                        {% include 'components/_spoiler_card.html.twig' with {item_id: tome.id, title: tome.title, summary: tome.synopsis, status: tome.status, badge: 'TOME ' ~ tome.number, image_url: tome.coverTomeUrl, effective_level: tome_spoiler_levels[tome.id], linked_diaporamas: linkedDiaporamas, edit_route: 'app_forms_tome_edit', edit_class: 'content-card-edit'} only %}
                                     </div>
                                 {% endfor %}
                             </div>
@@ -219,21 +151,7 @@
                 {% else %}
                     <div class="manga-characters-grid">
                         {% for character in characters %}
-                            <article class="manga-character-card">
-                                {% if character.imageUrl %}
-                                    <img
-                                        src="{{ asset(character.imageUrl) }}"
-                                        alt="Portrait de {{ character.name }}"
-                                        class="manga-character-portrait"
-                                        loading="lazy"
-                                    >
-                                {% else %}
-                                    <span class="manga-character-portrait manga-character-placeholder" role="img" aria-label="Portrait non disponible pour {{ character.name }}">
-                                        <i class="fa-solid fa-user" aria-hidden="true"></i>
-                                    </span>
-                                {% endif %}
-                                <h3 class="manga-character-name">{{ character.name }}</h3>
-                            </article>
+                            {% include 'components/_spoiler_card.html.twig' with {variant: 'character', effective_level: character.spoilerLevel, image_url: character.imageUrl ? asset(character.imageUrl) : null, title: character.name} only %}
                         {% endfor %}
                     </div>
                 {% endif %}

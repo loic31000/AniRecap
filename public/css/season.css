@@ -356,62 +356,6 @@ body {
     opacity: 0.85;
 }
 
-/* CARTES BLUR / SPOILER */
-.episode-figma-card.is-spoiler {
-    aspect-ratio: 16 / 7;
-    justify-content: center;
-    align-items: center;
-}
-
-.spoiler-blur-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-size: cover;
-    background-position: center;
-    filter: blur(8px) brightness(0.25);
-    z-index: 1;
-}
-
-.spoiler-overlay-content {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    text-align: center;
-}
-
-.warning-icon {
-    font-size: 1.4rem;
-    margin-bottom: 2px;
-}
-
-.spoiler-title-text {
-    font-weight: bold;
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
-}
-
-.spoiler-action-text {
-    color: #ffffff;
-    font-size: 0.65rem;
-    opacity: 0.6;
-}
-
-.spoiler-minor .warning-icon,
-.spoiler-minor .spoiler-title-text {
-    color: var(--gold);
-}
-
-.spoiler-major .warning-icon,
-.spoiler-major .spoiler-title-text {
-    color: #ef4444;
-}
-
 .btn-figma-more {
     width: 100%;
     background: transparent;

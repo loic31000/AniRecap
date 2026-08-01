@@ -160,7 +160,10 @@ final class EpisodeFormController extends AbstractController
 
         $this->addFlash('success', 'L’épisode et son diaporama ont été créés avec succès.');
 
-        return $this->redirectToRoute('app_diaporama_show', ['id' => $diaporama->getId()]);
+        return $this->redirectToRoute('app_private_season_show', [
+            'id' => $season->getId(),
+            '_fragment' => 'episodes',
+        ]);
     }
 
     #[Route(

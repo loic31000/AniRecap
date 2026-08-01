@@ -1,0 +1,29 @@
+{% set level = effective_level.value %}
+{% set is_spoiler = level != 'aucun' %}
+
+{% if variant|default('content') == 'character' %}
+    <article class="manga-character-card spoiler-character{{ is_spoiler ? ' is-spoiler spoiler-' ~ level : '' }}"{% if is_spoiler %} data-controller="spoiler-card"{% endif %}>
+        <div class="spoiler-character__content"{% if is_spoiler %} data-spoiler-card-target="content" aria-hidden="true" inert{% endif %}>
+            {% if image_url %}<img src="{{ image_url }}" alt="Portrait de {{ title }}" class="manga-character-portrait" loading="lazy">{% else %}<span class="manga-character-portrait manga-character-placeholder"><i class="fa-solid fa-user" aria-hidden="true"></i></span>{% endif %}
+            <h3 class="manga-character-name">{{ title }}</h3>
+        </div>
+        {% if is_spoiler %}{% include 'components/_spoiler_overlay.html.twig' with {level: level, compact: true} only %}{% endif %}
+    </article>
+{% else %}
+    <article class="episode-figma-card spoiler-card{{ is_spoiler ? ' is-spoiler spoiler-' ~ level : '' }}{{ linked_diaporamas|length == 1 ? ' has-diaporama-link' : '' }}"{% if is_spoiler %} data-controller="spoiler-card"{% endif %}>
+        <div class="spoiler-card__content"{% if is_spoiler %} data-spoiler-card-target="content" aria-hidden="true" inert{% endif %}>
+            {% if linked_diaporamas|length == 1 %}<a href="{{ path('app_diaporama_show', {id: linked_diaporamas[0].id}) }}" class="card-diaporama-overlay" aria-label="Voir le diaporama {{ linked_diaporamas[0].title }} lié à ce contenu"></a>{% endif %}
+            <div class="card-media-wrap"><img src="{{ image_url }}" alt="Miniature de {{ title }}" class="card-banner"></div>
+            <div class="card-content-wrap">
+                <div class="card-meta-line"><span class="badge-episodes">{{ badge }}</span>{% if status %}<span class="content-card-status">{{ status }}</span>{% endif %}</div>
+                <h3 class="card-episode-title">{{ title }}</h3>
+                <p class="card-episode-desc">{{ summary }}</p>
+                <div class="card-actions content-card-footer">
+                    {% if linked_diaporamas|length == 1 %}<span class="card-diaporama-hint" aria-hidden="true">Voir le diaporama</span>{% elseif linked_diaporamas|length > 1 %}<details class="card-diaporama-list"><summary>Voir les diaporamas ({{ linked_diaporamas|length }})</summary><ul>{% for diaporama in linked_diaporamas %}<li><a href="{{ path('app_diaporama_show', {id: diaporama.id}) }}">{{ diaporama.title }}</a></li>{% endfor %}</ul></details>{% endif %}
+                    <a href="{{ path(edit_route, {id: item_id}) }}" class="{{ edit_class }}" aria-label="Modifier {{ title }}"><i class="fa-solid fa-pen" aria-hidden="true"></i><span class="visually-hidden">Modifier</span></a>
+                </div>
+            </div>
+        </div>
+        {% if is_spoiler %}{% include 'components/_spoiler_overlay.html.twig' with {level: level, compact: false} only %}{% endif %}
+    </article>
+{% endif %}

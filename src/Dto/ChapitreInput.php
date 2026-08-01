@@ -37,7 +37,7 @@ final class ChapitreInput
     public ?int $number = null;
 
     /** @var Categorie[] */
-    #[Assert\Count(min: 1, max: 5, minMessage: 'Sélectionnez au moins une catégorie.', maxMessage: 'Sélectionnez au maximum cinq catégories.')]
+    #[Assert\Count(min: 1, max: 3, minMessage: 'Sélectionnez au moins une catégorie.', maxMessage: 'Sélectionnez au maximum trois catégories.')]
     public array $categories = [];
 
     #[Assert\NotBlank(message: 'Saisissez la description du chapitre.')]

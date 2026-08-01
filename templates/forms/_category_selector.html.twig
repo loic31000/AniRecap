@@ -1,9 +1,10 @@
 {% set selectedCount = field.vars.data|length %}
+{% set maximum = max|default(5) %}
 
 <div
     class="category-selector"
     data-controller="category-selector"
-    data-category-selector-max-value="5"
+    data-category-selector-max-value="{{ maximum }}"
     data-action="click@window->category-selector#closeFromOutside keydown.esc@window->category-selector#closeFromEscape resize@window->category-selector#reposition"
 >
     {{ form_label(field) }}
@@ -17,8 +18,8 @@
     >
         <span data-category-selector-target="summary">
             {{ selectedCount > 0
-                ? selectedCount ~ ' catégorie' ~ (selectedCount > 1 ? 's' : '') ~ ' sélectionnée' ~ (selectedCount > 1 ? 's' : '') ~ ' sur 5'
-                : 'Choisir jusqu’à 5 catégories' }}
+                ? selectedCount ~ ' catégorie' ~ (selectedCount > 1 ? 's' : '') ~ ' sélectionnée' ~ (selectedCount > 1 ? 's' : '') ~ ' sur ' ~ maximum
+                : 'Choisir jusqu’à ' ~ maximum ~ ' catégories' }}
         </span>
         <span class="category-selector__chevron" aria-hidden="true">⌄</span>
     </button>
