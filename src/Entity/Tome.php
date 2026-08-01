@@ -83,19 +83,12 @@ class Tome implements Ownable
     #[ORM\OneToMany(targetEntity: Favorite::class, mappedBy: 'tome')]
     private Collection $favorites;
 
-    /**
-     * @var Collection<int, SpoilerPreference>
-     */
-    #[ORM\OneToMany(targetEntity: SpoilerPreference::class, mappedBy: 'tome')]
-    private Collection $spoilerPreferences;
-
     public function __construct()
     {
         $this->categorie = new ArrayCollection();
         $this->character = new ArrayCollection();
         $this->summaries = new ArrayCollection();
         $this->favorites = new ArrayCollection();
-        $this->spoilerPreferences = new ArrayCollection();
         $this->slides = new ArrayCollection();
     }
 
@@ -370,33 +363,4 @@ class Tome implements Ownable
         return $this;
     }
 
-    /**
-     * @return Collection<int, SpoilerPreference>
-     */
-    public function getSpoilerPreferences(): Collection
-    {
-        return $this->spoilerPreferences;
-    }
-
-    public function addSpoilerPreference(SpoilerPreference $spoilerPreference): static
-    {
-        if (!$this->spoilerPreferences->contains($spoilerPreference)) {
-            $this->spoilerPreferences->add($spoilerPreference);
-            $spoilerPreference->setTome($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSpoilerPreference(SpoilerPreference $spoilerPreference): static
-    {
-        if ($this->spoilerPreferences->removeElement($spoilerPreference)) {
-            // set the owning side to null (unless already changed)
-            if ($spoilerPreference->getTome() === $this) {
-                $spoilerPreference->setTome(null);
-            }
-        }
-
-        return $this;
-    }
 }

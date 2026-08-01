@@ -52,8 +52,6 @@
                         </span>{% endif %}
                         {% if oeuvre.popularityLikes|default(null) is not null %}
                             <span class="oeuvre-votes">{{ oeuvre.popularityLikes }} J’aime</span>
-                        {% elseif oeuvre.votesCount|default(null) is not null %}
-                            <span class="oeuvre-votes">{{ oeuvre.votesCount }} vote{{ oeuvre.votesCount > 1 ? 's' : '' }}</span>
                         {% endif %}
                     </div>
                 </div>

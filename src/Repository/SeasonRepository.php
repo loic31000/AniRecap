@@ -43,20 +43,6 @@ class SeasonRepository extends ServiceEntityRepository
             ->getQuery()->getResult();
     }
 
-    public function findFirstPublic(): ?Season
-    {
-        return $this->createQueryBuilder('s')
-            ->innerJoin('s.anime', 'a')
-            ->leftJoin('s.categorie', 'c')
-            ->addSelect('a', 'c')
-            ->andWhere('a.isPublic = :isPublic')
-            ->setParameter('isPublic', true)
-            ->orderBy('s.id', 'ASC')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
-
     public function findOneOwnedByCoverUrl(string $coverUrl, User $owner): ?Season
     {
         return $this->createQueryBuilder('s')

@@ -427,7 +427,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         resources?: string|array<string, scalar|Param|null>,
  *     },
  *     messenger?: bool|array{ // Messenger configuration
- *         enabled?: bool|Param, // Default: true
+ *         enabled?: bool|Param, // Default: false
  *         routing?: array<string, string|list<scalar|Param|null>>,
  *         serializer?: array{
  *             default_serializer?: scalar|Param|null, // Service id to use as the default serializer for the transports. // Default: "messenger.transport.native_php_serializer"
@@ -576,7 +576,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         }>,
  *     },
  *     mailer?: bool|array{ // Mailer configuration
- *         enabled?: bool|Param, // Default: true
+ *         enabled?: bool|Param, // Default: false
  *         message_bus?: scalar|Param|null, // The message bus to use. Defaults to the default bus if the Messenger component is installed. // Default: null
  *         dsn?: scalar|Param|null, // Default: null
  *         transports?: array<string, scalar|Param|null>,
@@ -617,7 +617,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         decryption_env_var?: scalar|Param|null, // Default: "base64:default::SYMFONY_DECRYPTION_SECRET"
  *     },
  *     notifier?: bool|array{ // Notifier configuration
- *         enabled?: bool|Param, // Default: true
+ *         enabled?: bool|Param, // Default: false
  *         message_bus?: scalar|Param|null, // The message bus to use. Defaults to the default bus if the Messenger component is installed. // Default: null
  *         chatter_transports?: array<string, scalar|Param|null>,
  *         texter_transports?: array<string, scalar|Param|null>,
@@ -959,16 +959,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * @psalm-type StimulusConfig = array{
  *     controller_paths?: list<scalar|Param|null>,
  *     controllers_json?: scalar|Param|null, // Default: "%kernel.project_dir%/assets/controllers.json"
- * }
- * @psalm-type TurboConfig = array{
- *     broadcast?: bool|array{
- *         enabled?: bool|Param, // Default: true
- *         entity_template_prefixes?: list<scalar|Param|null>,
- *         doctrine_orm?: bool|array{ // Enable the Doctrine ORM integration
- *             enabled?: bool|Param, // Default: true
- *         },
- *     },
- *     default_transport?: scalar|Param|null, // Default: "default"
  * }
  * @psalm-type TwigExtraConfig = array{
  *     cache?: bool|array{
@@ -1474,66 +1464,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     generate_final_classes?: bool|Param, // Default: true
  *     generate_final_entities?: bool|Param, // Default: false
  * }
- * @psalm-type VichUploaderConfig = array{
- *     default_filename_attribute_suffix?: scalar|Param|null, // Default: "_name"
- *     db_driver?: scalar|Param|null,
- *     storage?: scalar|Param|null, // Default: "file_system"
- *     use_flysystem_to_resolve_uri?: bool|Param, // Default: false
- *     twig?: scalar|Param|null, // twig requires templating // Default: true
- *     form?: scalar|Param|null, // Default: true
- *     metadata?: array{
- *         cache?: scalar|Param|null, // Default: "file"
- *         type?: scalar|Param|null, // Default: "attribute"
- *         file_cache?: array{
- *             dir?: scalar|Param|null, // Default: "%kernel.cache_dir%/vich_uploader"
- *         },
- *         auto_detection?: bool|Param, // Default: true
- *         directories?: list<array{ // Default: []
- *             path?: scalar|Param|null,
- *             namespace_prefix?: scalar|Param|null, // Default: ""
- *         }>,
- *     },
- *     mappings?: array<string, array{ // Default: []
- *         uri_prefix?: scalar|Param|null, // Default: "/uploads"
- *         upload_destination?: scalar|Param|null, // Default: null
- *         namer?: string|array{
- *             service?: scalar|Param|null, // Default: null
- *             options?: mixed, // Default: null
- *         },
- *         directory_namer?: string|array{
- *             service?: scalar|Param|null, // Default: null
- *             options?: mixed, // Default: null
- *         },
- *         delete_on_remove?: scalar|Param|null, // Default: true
- *         erase_fields?: scalar|Param|null, // Default: true
- *         delete_on_update?: scalar|Param|null, // Default: true
- *         inject_on_load?: scalar|Param|null, // Default: false
- *         namer_keep_extension?: scalar|Param|null, // Default: false
- *         db_driver?: scalar|Param|null, // Default: null
- *     }>,
- * }
- * @psalm-type KnpPaginatorConfig = array{
- *     default_options?: array{
- *         sort_field_name?: scalar|Param|null, // Default: "sort"
- *         sort_direction_name?: scalar|Param|null, // Default: "direction"
- *         filter_field_name?: scalar|Param|null, // Default: "filterField"
- *         filter_value_name?: scalar|Param|null, // Default: "filterValue"
- *         page_name?: scalar|Param|null, // Default: "page"
- *         distinct?: bool|Param, // Default: true
- *         page_out_of_range?: scalar|Param|null, // Default: "ignore"
- *         default_limit?: scalar|Param|null, // Default: 10
- *     },
- *     template?: array{
- *         pagination?: scalar|Param|null, // Default: "@KnpPaginator/Pagination/sliding.html.twig"
- *         rel_links?: scalar|Param|null, // Default: "@KnpPaginator/Pagination/rel_links.html.twig"
- *         filtration?: scalar|Param|null, // Default: "@KnpPaginator/Pagination/filtration.html.twig"
- *         sortable?: scalar|Param|null, // Default: "@KnpPaginator/Pagination/sortable_link.html.twig"
- *     },
- *     page_range?: scalar|Param|null, // Default: 5
- *     page_limit?: scalar|Param|null, // Default: null
- *     convert_exception?: bool|Param, // Default: false
- *     remove_first_page_param?: bool|Param, // Default: false
- * }
  * @psalm-type TwigComponentConfig = array{
  *     defaults?: array<string, string|array{ // Default: []
  *         template_directory?: scalar|Param|null, // Default: "components"
@@ -1545,10 +1475,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         collect_components?: bool|Param, // Collect components instances // Default: true
  *     },
  * }
- * @psalm-type LiveComponentConfig = array{
- *     secret?: scalar|Param|null, // The secret used to compute fingerprints and checksums // Default: "%kernel.secret%"
- *     fetch_credentials?: "same-origin"|"include"|"omit"|Param, // The default fetch credentials mode for all Live Components ('same-origin', 'include', 'omit') // Default: "same-origin"
- * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -1558,14 +1484,10 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     doctrine_migrations?: DoctrineMigrationsConfig,
  *     twig?: TwigConfig,
  *     stimulus?: StimulusConfig,
- *     turbo?: TurboConfig,
  *     twig_extra?: TwigExtraConfig,
  *     security?: SecurityConfig,
  *     monolog?: MonologConfig,
- *     vich_uploader?: VichUploaderConfig,
- *     knp_paginator?: KnpPaginatorConfig,
  *     twig_component?: TwigComponentConfig,
- *     live_component?: LiveComponentConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -1577,15 +1499,11 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         twig?: TwigConfig,
  *         web_profiler?: WebProfilerConfig,
  *         stimulus?: StimulusConfig,
- *         turbo?: TurboConfig,
  *         twig_extra?: TwigExtraConfig,
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
  *         maker?: MakerConfig,
- *         vich_uploader?: VichUploaderConfig,
- *         knp_paginator?: KnpPaginatorConfig,
  *         twig_component?: TwigComponentConfig,
- *         live_component?: LiveComponentConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -1596,14 +1514,10 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         doctrine_migrations?: DoctrineMigrationsConfig,
  *         twig?: TwigConfig,
  *         stimulus?: StimulusConfig,
- *         turbo?: TurboConfig,
  *         twig_extra?: TwigExtraConfig,
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
- *         vich_uploader?: VichUploaderConfig,
- *         knp_paginator?: KnpPaginatorConfig,
  *         twig_component?: TwigComponentConfig,
- *         live_component?: LiveComponentConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -1615,14 +1529,10 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         twig?: TwigConfig,
  *         web_profiler?: WebProfilerConfig,
  *         stimulus?: StimulusConfig,
- *         turbo?: TurboConfig,
  *         twig_extra?: TwigExtraConfig,
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
- *         vich_uploader?: VichUploaderConfig,
- *         knp_paginator?: KnpPaginatorConfig,
  *         twig_component?: TwigComponentConfig,
- *         live_component?: LiveComponentConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

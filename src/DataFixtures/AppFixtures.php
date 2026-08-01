@@ -86,7 +86,7 @@ class AppFixtures extends Fixture
         $anime->setType('Shonen');
         $anime->setStatus('Terminé');
         $anime->setAuthor('Akira Amano');
-        $anime->setAnimeDate(2006);
+        $anime->setReleaseDate(new \DateTimeImmutable('2006-10-07'));
         $anime
             ->addCategorie($categories['category-action'])
             ->addCategorie($categories['category-comedy'])
@@ -101,7 +101,7 @@ class AppFixtures extends Fixture
         $animeDemon->setType('Shonen');
         $animeDemon->setStatus('En cours');
         $animeDemon->setAuthor('Koyoharu Gotouge');
-        $animeDemon->setAnimeDate(2019);
+        $animeDemon->setReleaseDate(new \DateTimeImmutable('2019-04-06'));
         $animeDemon
             ->addCategorie($categories['category-action'])
             ->addCategorie($categories['category-adventure'])
@@ -117,7 +117,7 @@ class AppFixtures extends Fixture
         $animeMecha->setType('Anime');
         $animeMecha->setStatus('Terminé');
         $animeMecha->setAuthor('Hajime Yatate');
-        $animeMecha->setAnimeDate(2004);
+        $animeMecha->setReleaseDate(new \DateTimeImmutable('2004-10-09'));
         $animeMecha
             ->addCategorie($categories['category-action'])
             ->addCategorie($categories['category-mecha'])
@@ -156,7 +156,7 @@ class AppFixtures extends Fixture
         $manga->setSynopsis('Luffy rêve de devenir le roi des pirates.');
         $manga->setCoverMangaUrl('https://images.unsplash.com/photo-1519682337058-a94d519337bc?auto=format&fit=crop&w=800&q=80');
         $manga->setType('Manga');
-        $manga->setMangaDate(1997);
+        $manga->setReleaseDate(new \DateTimeImmutable('1997-07-22'));
         $manga->setStatus('En cours');
         $manga->setAuthor('Eiichiro Oda');
         $manga
@@ -172,7 +172,7 @@ class AppFixtures extends Fixture
         $mangaDragon->setSynopsis('Goku et ses amis défendent l’univers face à de nouveaux rivaux.');
         $mangaDragon->setCoverMangaUrl('https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=800&q=80');
         $mangaDragon->setType('Manga');
-        $mangaDragon->setMangaDate(2015);
+        $mangaDragon->setReleaseDate(new \DateTimeImmutable('2015-06-20'));
         $mangaDragon->setStatus('En cours');
         $mangaDragon->setAuthor('Akira Toriyama');
         $mangaDragon
@@ -188,7 +188,7 @@ class AppFixtures extends Fixture
         $mangaRomance->setSynopsis('Deux jeunes femmes portant le même prénom se rencontrent et partagent un appartement à Tokyo.');
         $mangaRomance->setCoverMangaUrl('/images/coverMangaCard.png');
         $mangaRomance->setType('Manga');
-        $mangaRomance->setMangaDate(2000);
+        $mangaRomance->setReleaseDate(new \DateTimeImmutable('2000-01-01'));
         $mangaRomance->setStatus('En pause');
         $mangaRomance->setAuthor('Ai Yazawa');
         $mangaRomance

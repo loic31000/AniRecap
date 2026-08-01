@@ -19,3 +19,7 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+# User-generated files must never be committed.
+/public/uploads/avatars/*
+!/public/uploads/avatars/.gitkeep

@@ -21,17 +21,6 @@ class AnimeRepository extends ServiceEntityRepository
     /**
      * @return Anime[]
      */
-    public function findVisibleTo(User $viewer): array
-    {
-        return $this->createVisibleQueryBuilder($viewer)
-            ->orderBy('a.title', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     * @return Anime[]
-     */
     public function searchVisibleTo(array $filters, User $viewer): array
     {
         $qb = $this->createVisibleQueryBuilder($viewer);
@@ -50,8 +39,10 @@ class AnimeRepository extends ServiceEntityRepository
             $qb->andWhere('a.releaseDate = :releaseDate')
                 ->setParameter('releaseDate', new \DateTimeImmutable($filters['date']));
         } elseif (!empty($filters['annee'])) {
-            $qb->andWhere('a.animeDate = :annee')
-                ->setParameter('annee', (int) $filters['annee']);
+            $year = (int) $filters['annee'];
+            $qb->andWhere('a.releaseDate >= :yearStart AND a.releaseDate < :yearEnd')
+                ->setParameter('yearStart', new \DateTimeImmutable(sprintf('%d-01-01', $year)))
+                ->setParameter('yearEnd', new \DateTimeImmutable(sprintf('%d-01-01', $year + 1)));
         }
 
         return $qb
@@ -72,7 +63,12 @@ class AnimeRepository extends ServiceEntityRepository
         }
         if (!empty($filters['genre'])) { $qb->andWhere('c.slug = :genre')->setParameter('genre', $filters['genre']); }
         if (!empty($filters['date'])) { $qb->andWhere('a.releaseDate = :releaseDate')->setParameter('releaseDate', new \DateTimeImmutable($filters['date'])); }
-        elseif (!empty($filters['annee'])) { $qb->andWhere('a.animeDate = :annee')->setParameter('annee', (int) $filters['annee']); }
+        elseif (!empty($filters['annee'])) {
+            $year = (int) $filters['annee'];
+            $qb->andWhere('a.releaseDate >= :yearStart AND a.releaseDate < :yearEnd')
+                ->setParameter('yearStart', new \DateTimeImmutable(sprintf('%d-01-01', $year)))
+                ->setParameter('yearEnd', new \DateTimeImmutable(sprintf('%d-01-01', $year + 1)));
+        }
         return $qb->orderBy('a.title', 'ASC')->getQuery()->getResult();
     }
 
@@ -94,14 +90,6 @@ class AnimeRepository extends ServiceEntityRepository
             ->setParameter('isPublic', true)
             ->setParameter('viewer', $viewer)
             ->distinct();
-    }
-
-    /**
-     * @return Anime[]
-     */
-    public function findPublic(): array
-    {
-        return $this->findBy(['isPublic' => true], ['title' => 'ASC']);
     }
 
     public function findOneOwnedByCoverUrl(string $coverUrl, User $owner): ?Anime

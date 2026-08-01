@@ -2,14 +2,11 @@
 
 namespace App\Twig\Components;
 
-use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
-use Symfony\UX\LiveComponent\DefaultActionTrait;
+use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 
-#[AsLiveComponent]
+#[AsTwigComponent]
 final class SearchCard
 {
-    use DefaultActionTrait;
-
     /** @var list<array{slug: string, name: string}> */
     public array $genres = [];
 

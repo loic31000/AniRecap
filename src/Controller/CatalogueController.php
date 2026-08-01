@@ -88,9 +88,8 @@ final class CatalogueController extends AbstractController
             'title' => $anime->getTitle(),
             'subtitle' => sprintf('%d saison(s) • %s', $anime->getSeasons()->count(), $anime->getStatus() ?: 'Statut non renseigné'),
             'author' => $anime->getAuthor(),
-            'date' => (string) ($anime->getAnimeDate() ?? ''),
+            'date' => $anime->getReleaseDate()?->format('Y') ?? '',
             'cover' => $anime->getCoverAnimeUrl(),
-            'votesCount' => $anime->getVotes()->count(),
             'isPrivate' => !$anime->isPublic(),
         ];
     }
@@ -103,9 +102,8 @@ final class CatalogueController extends AbstractController
             'title' => $manga->getTitle(),
             'subtitle' => $manga->getStatus() ?: 'Statut non renseigné',
             'author' => $manga->getAuthor(),
-            'date' => (string) ($manga->getMangaDate() ?? ''),
+            'date' => $manga->getReleaseDate()?->format('Y') ?? '',
             'cover' => $manga->getCoverMangaUrl(),
-            'votesCount' => $manga->getVotes()->count(),
             'isPrivate' => !$manga->isPublic(),
         ];
     }

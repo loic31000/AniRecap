@@ -96,24 +96,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Favorite::class, mappedBy: 'user')]
     private Collection $favorites;
 
-    /**
-     * @var Collection<int, Vote>
-     */
-    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'user')]
-    private Collection $votes;
-
-    /**
-     * @var Collection<int, Recommandation>
-     */
-    #[ORM\OneToMany(targetEntity: Recommandation::class, mappedBy: 'user')]
-    private Collection $recommandations;
-
-    /**
-     * @var Collection<int, SpoilerPreference>
-     */
-    #[ORM\OneToMany(targetEntity: SpoilerPreference::class, mappedBy: 'user')]
-    private Collection $spoilerPreferences;
-
     public function __construct()
     {
         $this->characters = new ArrayCollection();
@@ -125,9 +107,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->animes = new ArrayCollection();
         $this->mangas = new ArrayCollection();
         $this->favorites = new ArrayCollection();
-        $this->votes = new ArrayCollection();
-        $this->recommandations = new ArrayCollection();
-        $this->spoilerPreferences = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -505,93 +484,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, Vote>
-     */
-    public function getVotes(): Collection
-    {
-        return $this->votes;
-    }
-
-    public function addVote(Vote $vote): static
-    {
-        if (!$this->votes->contains($vote)) {
-            $this->votes->add($vote);
-            $vote->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeVote(Vote $vote): static
-    {
-        if ($this->votes->removeElement($vote)) {
-            // set the owning side to null (unless already changed)
-            if ($vote->getUser() === $this) {
-                $vote->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Recommandation>
-     */
-    public function getRecommandations(): Collection
-    {
-        return $this->recommandations;
-    }
-
-    public function addRecommandation(Recommandation $recommandation): static
-    {
-        if (!$this->recommandations->contains($recommandation)) {
-            $this->recommandations->add($recommandation);
-            $recommandation->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRecommandation(Recommandation $recommandation): static
-    {
-        if ($this->recommandations->removeElement($recommandation)) {
-            // set the owning side to null (unless already changed)
-            if ($recommandation->getUser() === $this) {
-                $recommandation->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, SpoilerPreference>
-     */
-    public function getSpoilerPreferences(): Collection
-    {
-        return $this->spoilerPreferences;
-    }
-
-    public function addSpoilerPreference(SpoilerPreference $spoilerPreference): static
-    {
-        if (!$this->spoilerPreferences->contains($spoilerPreference)) {
-            $this->spoilerPreferences->add($spoilerPreference);
-            $spoilerPreference->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSpoilerPreference(SpoilerPreference $spoilerPreference): static
-    {
-        if ($this->spoilerPreferences->removeElement($spoilerPreference)) {
-            // set the owning side to null (unless already changed)
-            if ($spoilerPreference->getUser() === $this) {
-                $spoilerPreference->setUser(null);
-            }
-        }
-
-        return $this;
-    }
 }

@@ -71,12 +71,6 @@ class Character implements Ownable
     #[ORM\ManyToMany(targetEntity: Chapitre::class, mappedBy: 'character')]
     private Collection $chapitres;
 
-    /**
-     * @var Collection<int, SpoilerPreference>
-     */
-    #[ORM\OneToMany(targetEntity: SpoilerPreference::class, mappedBy: 'character')]
-    private Collection $spoilerPreferences;
-
     public function __construct()
     {
         $this->animes = new ArrayCollection();
@@ -85,7 +79,6 @@ class Character implements Ownable
         $this->episodes = new ArrayCollection();
         $this->tomes = new ArrayCollection();
         $this->chapitres = new ArrayCollection();
-        $this->spoilerPreferences = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -310,33 +303,4 @@ class Character implements Ownable
         return $this;
     }
 
-    /**
-     * @return Collection<int, SpoilerPreference>
-     */
-    public function getSpoilerPreferences(): Collection
-    {
-        return $this->spoilerPreferences;
-    }
-
-    public function addSpoilerPreference(SpoilerPreference $spoilerPreference): static
-    {
-        if (!$this->spoilerPreferences->contains($spoilerPreference)) {
-            $this->spoilerPreferences->add($spoilerPreference);
-            $spoilerPreference->setCharacter($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSpoilerPreference(SpoilerPreference $spoilerPreference): static
-    {
-        if ($this->spoilerPreferences->removeElement($spoilerPreference)) {
-            // set the owning side to null (unless already changed)
-            if ($spoilerPreference->getCharacter() === $this) {
-                $spoilerPreference->setCharacter(null);
-            }
-        }
-
-        return $this;
-    }
 }

@@ -73,7 +73,6 @@ final class OwnedContentDeletionService
 
         $this->removeRelations($episode->getSummaries()->toArray());
         $this->removeRelations($episode->getFavorites()->toArray());
-        $this->removeRelations($episode->getSpoilerPreferences()->toArray());
         $this->entityManager->remove($episode);
 
         return $filenames;
@@ -94,7 +93,6 @@ final class OwnedContentDeletionService
 
         $this->removeRelations($child->getSummaries()->toArray());
         $this->removeRelations($child->getFavorites()->toArray());
-        $this->removeRelations($child->getSpoilerPreferences()->toArray());
         $this->entityManager->remove($child);
 
         return $filenames;

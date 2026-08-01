@@ -28,9 +28,6 @@ class Manga
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $type = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $mangaDate = null;
-
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $status = null;
 
@@ -84,18 +81,6 @@ class Manga
     private Collection $favorites;
 
     /**
-     * @var Collection<int, Vote>
-     */
-    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'manga')]
-    private Collection $votes;
-
-    /**
-     * @var Collection<int, Recommandation>
-     */
-    #[ORM\OneToMany(targetEntity: Recommandation::class, mappedBy: 'manga')]
-    private Collection $recommandations;
-
-    /**
      * @var Collection<int, Categorie>
      */
     #[ORM\ManyToMany(targetEntity: Categorie::class, inversedBy: 'mangas')]
@@ -113,8 +98,6 @@ class Manga
         $this->chapitres = new ArrayCollection();
         $this->summaries = new ArrayCollection();
         $this->favorites = new ArrayCollection();
-        $this->votes = new ArrayCollection();
-        $this->recommandations = new ArrayCollection();
         $this->categorie = new ArrayCollection();
         $this->character = new ArrayCollection();
     }
@@ -168,18 +151,6 @@ class Manga
     public function setType(?string $type): static
     {
         $this->type = $type;
-
-        return $this;
-    }
-
-    public function getMangaDate(): ?int
-    {
-        return $this->mangaDate;
-    }
-
-    public function setMangaDate(?int $mangaDate): static
-    {
-        $this->mangaDate = $mangaDate;
 
         return $this;
     }
@@ -406,66 +377,6 @@ class Manga
             // set the owning side to null (unless already changed)
             if ($favorite->getManga() === $this) {
                 $favorite->setManga(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Vote>
-     */
-    public function getVotes(): Collection
-    {
-        return $this->votes;
-    }
-
-    public function addVote(Vote $vote): static
-    {
-        if (!$this->votes->contains($vote)) {
-            $this->votes->add($vote);
-            $vote->setManga($this);
-        }
-
-        return $this;
-    }
-
-    public function removeVote(Vote $vote): static
-    {
-        if ($this->votes->removeElement($vote)) {
-            // set the owning side to null (unless already changed)
-            if ($vote->getManga() === $this) {
-                $vote->setManga(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Recommandation>
-     */
-    public function getRecommandations(): Collection
-    {
-        return $this->recommandations;
-    }
-
-    public function addRecommandation(Recommandation $recommandation): static
-    {
-        if (!$this->recommandations->contains($recommandation)) {
-            $this->recommandations->add($recommandation);
-            $recommandation->setManga($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRecommandation(Recommandation $recommandation): static
-    {
-        if ($this->recommandations->removeElement($recommandation)) {
-            // set the owning side to null (unless already changed)
-            if ($recommandation->getManga() === $this) {
-                $recommandation->setManga(null);
             }
         }
 

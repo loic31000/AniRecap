@@ -13,10 +13,8 @@
 	--radius-md: 12px;
 }
 
-.personnage-portrait--placeholder,
-.character-chip-placeholder { display:grid; place-items:center; background:#071729; color:#d9a323; }
+.personnage-portrait--placeholder { display:grid; place-items:center; background:#071729; color:#d9a323; }
 .personnage-portrait--placeholder { font-size:5rem; }
-.character-chip-placeholder { font-size:1.2rem; }
 
 .page-personnage {
 	background: radial-gradient(circle at top, var(--perso-bg-alt) 0%, var(--perso-bg) 55%);
@@ -115,12 +113,6 @@
 	margin-top: 20px;
 }
 
-.panel--characters {
-	background: transparent;
-	border: none;
-	padding: 0;
-}
-
 .section-title--inline {
 	display: flex;
 	align-items: baseline;
@@ -158,46 +150,6 @@
 
 .synopsis-content p:last-child {
 	margin-bottom: 0;
-}
-
-/* ---------- GRILLE PERSONNAGES ---------- */
-
-.character-grid {
-	display: grid;
-	grid-template-columns: repeat(5, 1fr);
-	gap: 14px 8px;
-}
-
-.character-chip {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 6px;
-	text-decoration: none;
-}
-
-.character-chip-avatar {
-	width: 56px;
-	height: 56px;
-	border-radius: 50%;
-	object-fit: cover;
-	border: 2px solid var(--perso-gold);
-}
-
-.character-chip-name {
-	font-size: 11px;
-	font-weight: 600;
-	color: var(--perso-text);
-	text-align: center;
-	line-height: 1.3;
-}
-
-/* ---------- RESPONSIVE ---------- */
-
-@media (min-width: 600px) {
-	.character-grid {
-		grid-template-columns: repeat(6, 1fr);
-	}
 }
 
 @media (min-width: 900px) {

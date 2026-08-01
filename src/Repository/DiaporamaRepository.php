@@ -17,47 +17,6 @@ class DiaporamaRepository extends ServiceEntityRepository
         parent::__construct($registry, Diaporama::class);
     }
 
-    /**
-     * @return Diaporama[]
-     */
-    public function findOwnedByUser(User $user): array
-    {
-        return $this->createQueryBuilder('d')
-            ->leftJoin('d.categorie', 'cat')
-            ->addSelect('cat')
-            ->andWhere('d.user = :user')
-            ->setParameter('user', $user)
-            ->orderBy('d.title', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     * @return Diaporama[]
-     */
-    public function findOwnedByUserWithSlides(User $user): array
-    {
-        return $this->createQueryBuilder('d')
-            ->leftJoin('d.slides', 's')->addSelect('s')
-            ->leftJoin('d.categorie', 'cat')->addSelect('cat')
-            ->andWhere('d.user = :user')
-            ->setParameter('user', $user)
-            ->orderBy('d.title', 'ASC')
-            ->addOrderBy('s.position', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function countFilenameReferences(string $filename): int
-    {
-        return (int) $this->createQueryBuilder('d')
-            ->select('COUNT(d.id)')
-            ->andWhere('d.coverImageFilename = :filename')
-            ->setParameter('filename', $filename)
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-
     public function findOneOwned(int $id, User $user): ?Diaporama
     {
         return $this->createQueryBuilder('d')

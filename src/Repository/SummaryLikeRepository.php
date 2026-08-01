@@ -74,7 +74,7 @@ final class SummaryLikeRepository extends ServiceEntityRepository
             $animeWhere[] = 'a.release_date = :release_date'; $mangaWhere[] = 'm.release_date = :release_date';
             $parameters['release_date'] = $filters['date'];
         } elseif (!empty($filters['annee'])) {
-            $animeWhere[] = 'a.anime_date = :year'; $mangaWhere[] = 'm.manga_date = :year';
+            $animeWhere[] = 'YEAR(a.release_date) = :year'; $mangaWhere[] = 'YEAR(m.release_date) = :year';
             $parameters['year'] = (int) $filters['annee'];
         }
         $animeGenreJoin = $mangaGenreJoin = '';
@@ -118,7 +118,7 @@ final class SummaryLikeRepository extends ServiceEntityRepository
             $animeWhere[] = 'a.release_date = :recent_date'; $mangaWhere[] = 'm.release_date = :recent_date';
             $parameters['recent_date'] = $filters['date'];
         } elseif (!empty($filters['annee'])) {
-            $animeWhere[] = 'a.anime_date = :recent_year'; $mangaWhere[] = 'm.manga_date = :recent_year';
+            $animeWhere[] = 'YEAR(a.release_date) = :recent_year'; $mangaWhere[] = 'YEAR(m.release_date) = :recent_year';
             $parameters['recent_year'] = (int) $filters['annee'];
         }
         $animeGenreJoin = $mangaGenreJoin = '';

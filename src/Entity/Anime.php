@@ -34,9 +34,6 @@ class Anime
     #[ORM\Column(length: 150, nullable: true)]
     private ?string $author = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $animeDate = null;
-
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $releaseDate = null;
 
@@ -83,18 +80,6 @@ class Anime
     #[ORM\OneToMany(targetEntity: Favorite::class, mappedBy: 'anime')]
     private Collection $favorites;
 
-    /**
-     * @var Collection<int, Vote>
-     */
-    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'anime')]
-    private Collection $votes;
-
-    /**
-     * @var Collection<int, Recommandation>
-     */
-    #[ORM\OneToMany(targetEntity: Recommandation::class, mappedBy: 'anime')]
-    private Collection $recommandations;
-
     public function __construct()
     {
         $this->seasons = new ArrayCollection();
@@ -102,8 +87,6 @@ class Anime
         $this->characters = new ArrayCollection();
         $this->summaries = new ArrayCollection();
         $this->favorites = new ArrayCollection();
-        $this->votes = new ArrayCollection();
-        $this->recommandations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -174,17 +157,6 @@ class Anime
     public function setAuthor(?string $author): static
     {
         $this->author = $author;
-        return $this;
-    }
-
-    public function getAnimeDate(): ?int
-    {
-        return $this->animeDate;
-    }
-
-    public function setAnimeDate(?int $animeDate): static
-    {
-        $this->animeDate = $animeDate;
         return $this;
     }
 
@@ -329,66 +301,6 @@ class Anime
             // set the owning side to null (unless already changed)
             if ($favorite->getAnime() === $this) {
                 $favorite->setAnime(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Vote>
-     */
-    public function getVotes(): Collection
-    {
-        return $this->votes;
-    }
-
-    public function addVote(Vote $vote): static
-    {
-        if (!$this->votes->contains($vote)) {
-            $this->votes->add($vote);
-            $vote->setAnime($this);
-        }
-
-        return $this;
-    }
-
-    public function removeVote(Vote $vote): static
-    {
-        if ($this->votes->removeElement($vote)) {
-            // set the owning side to null (unless already changed)
-            if ($vote->getAnime() === $this) {
-                $vote->setAnime(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Recommandation>
-     */
-    public function getRecommandations(): Collection
-    {
-        return $this->recommandations;
-    }
-
-    public function addRecommandation(Recommandation $recommandation): static
-    {
-        if (!$this->recommandations->contains($recommandation)) {
-            $this->recommandations->add($recommandation);
-            $recommandation->setAnime($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRecommandation(Recommandation $recommandation): static
-    {
-        if ($this->recommandations->removeElement($recommandation)) {
-            // set the owning side to null (unless already changed)
-            if ($recommandation->getAnime() === $this) {
-                $recommandation->setAnime(null);
             }
         }
 

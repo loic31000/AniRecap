@@ -52,7 +52,7 @@
                     <article class="info-item"><p class="info-label">TYPE</p><p class="info-value">{{ manga.type ?: 'Non renseigné' }}</p></article>
                     <article class="info-item"><p class="info-label">STATUT</p><p class="info-value">{{ manga.status ?: 'Non renseigné' }}</p></article>
                     <article class="info-item"><p class="info-label">AUTEUR</p><p class="info-value">{{ manga.author ?: 'Non renseigné' }}</p></article>
-                    <article class="info-item"><p class="info-label">ANNÉE</p><p class="info-value">{{ manga.mangaDate ?: 'Non renseignée' }}</p></article>
+                    <article class="info-item"><p class="info-label">ANNÉE</p><p class="info-value">{{ manga.releaseDate ? manga.releaseDate|date('Y') : 'Non renseignée' }}</p></article>
                 </div>
             </section>
 
