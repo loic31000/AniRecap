@@ -37,8 +37,8 @@ class AnimeRepository extends ServiceEntityRepository
         $qb = $this->createVisibleQueryBuilder($viewer);
 
         if (!empty($filters['q'])) {
-            $qb->andWhere('(LOWER(a.title) LIKE :q OR LOWER(a.synopsis) LIKE :q OR LOWER(a.author) LIKE :q)')
-                ->setParameter('q', '%' . mb_strtolower($filters['q']) . '%');
+            $qb->andWhere("(LOWER(a.title) LIKE :q ESCAPE '!' OR LOWER(a.synopsis) LIKE :q ESCAPE '!' OR LOWER(a.author) LIKE :q ESCAPE '!')")
+                ->setParameter('q', $filters['q_pattern']);
         }
 
         if (!empty($filters['genre'])) {
@@ -46,7 +46,10 @@ class AnimeRepository extends ServiceEntityRepository
                 ->setParameter('genre', $filters['genre']);
         }
 
-        if (!empty($filters['annee'])) {
+        if (!empty($filters['date'])) {
+            $qb->andWhere('a.releaseDate = :releaseDate')
+                ->setParameter('releaseDate', new \DateTimeImmutable($filters['date']));
+        } elseif (!empty($filters['annee'])) {
             $qb->andWhere('a.animeDate = :annee')
                 ->setParameter('annee', (int) $filters['annee']);
         }
@@ -64,11 +67,12 @@ class AnimeRepository extends ServiceEntityRepository
             ->leftJoin('a.categories', 'c')->addSelect('c')
             ->andWhere('a.isPublic = true')->distinct();
         if (!empty($filters['q'])) {
-            $qb->andWhere('(LOWER(a.title) LIKE :q OR LOWER(a.synopsis) LIKE :q OR LOWER(a.author) LIKE :q)')
-                ->setParameter('q', '%' . mb_strtolower($filters['q']) . '%');
+            $qb->andWhere("(LOWER(a.title) LIKE :q ESCAPE '!' OR LOWER(a.synopsis) LIKE :q ESCAPE '!' OR LOWER(a.author) LIKE :q ESCAPE '!')")
+                ->setParameter('q', $filters['q_pattern']);
         }
         if (!empty($filters['genre'])) { $qb->andWhere('c.slug = :genre')->setParameter('genre', $filters['genre']); }
-        if (!empty($filters['annee'])) { $qb->andWhere('a.animeDate = :annee')->setParameter('annee', (int) $filters['annee']); }
+        if (!empty($filters['date'])) { $qb->andWhere('a.releaseDate = :releaseDate')->setParameter('releaseDate', new \DateTimeImmutable($filters['date'])); }
+        elseif (!empty($filters['annee'])) { $qb->andWhere('a.animeDate = :annee')->setParameter('annee', (int) $filters['annee']); }
         return $qb->orderBy('a.title', 'ASC')->getQuery()->getResult();
     }
 

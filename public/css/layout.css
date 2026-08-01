@@ -160,9 +160,10 @@
 }
 
 .nav-item--center img {
-    width: 83px;
-    height: 53px;
+    width: 44px;
+    height: 45px;
     display: block;
+    object-fit: contain;
 }
 
 /* ---------- Bouton central navbar ---------- */
@@ -186,9 +187,10 @@
 }
 
 .nav-item--center img {
-    width: 83px;
-    height: 53px;
+    width: 44px;
+    height: 45px;
     display: block;
+    object-fit: contain;
 }
 
 /* ---------- Overlay formulaires ---------- */

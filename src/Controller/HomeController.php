@@ -11,6 +11,7 @@ use App\Repository\MangaRepository;
 use App\Repository\FavoriteRepository;
 use App\Repository\SummaryRepository;
 use App\Repository\SummaryLikeRepository;
+use App\Service\OeuvreFilterNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,16 +27,16 @@ final class HomeController extends AbstractController
         FavoriteRepository $favoriteRepository,
         SummaryRepository $summaryRepository,
         SummaryLikeRepository $summaryLikeRepository,
+        OeuvreFilterNormalizer $filterNormalizer,
     ): Response {
         $user = $this->getUser();
         $isAuthenticated = $user instanceof User;
 
-        $filters = [
-            'q' => trim((string) $request->query->get('q', '')),
-            'type' => (string) $request->query->get('type', 'all'),
-            'genre' => $request->query->get('genre') ?: null,
-            'annee' => $request->query->get('annee') ?: null,
-        ];
+        $genres = array_map(
+            static fn ($category): array => ['slug' => $category->getSlug(), 'name' => $category->getName()],
+            $categorieRepository->findBy([], ['name' => 'ASC']),
+        );
+        $filters = $filterNormalizer->normalize($request, $genres);
 
         $items = [];
         if ($filters['type'] === 'all' || $filters['type'] === 'anime') {
@@ -89,14 +90,6 @@ final class HomeController extends AbstractController
                 $available[] = $item;
             }
         }
-
-        $genres = array_map(
-            static fn ($category): array => [
-                'slug' => $category->getSlug(),
-                'name' => $category->getName(),
-            ],
-            $categorieRepository->findBy([], ['name' => 'ASC']),
-        );
 
         return $this->render('home/index.html.twig', [
             'popular' => $popular,

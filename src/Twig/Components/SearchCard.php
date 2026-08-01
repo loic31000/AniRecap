@@ -2,7 +2,6 @@
 
 namespace App\Twig\Components;
 
-use App\Entity\Categorie;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
@@ -11,7 +10,7 @@ final class SearchCard
 {
     use DefaultActionTrait;
 
-    /** @var Categorie[] */
+    /** @var list<array{slug: string, name: string}> */
     public array $genres = [];
 
     public array $filters = [
@@ -19,5 +18,8 @@ final class SearchCard
         'type' => 'all',
         'genre' => null,
         'annee' => null,
+        'date' => null,
     ];
+
+    public string $actionRoute = 'app_catalogue';
 }

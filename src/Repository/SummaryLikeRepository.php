@@ -66,11 +66,14 @@ final class SummaryLikeRepository extends ServiceEntityRepository
         if (($filters['type'] ?? 'all') === 'anime') { $mangaWhere[] = '1 = 0'; }
         if (($filters['type'] ?? 'all') === 'manga') { $animeWhere[] = '1 = 0'; }
         if (($filters['q'] ?? '') !== '') {
-            $animeWhere[] = '(LOWER(a.title) LIKE :query OR LOWER(a.synopsis) LIKE :query OR LOWER(a.author) LIKE :query)';
-            $mangaWhere[] = '(LOWER(m.title) LIKE :query OR LOWER(m.synopsis) LIKE :query OR LOWER(m.author) LIKE :query)';
-            $parameters['query'] = '%' . mb_strtolower($filters['q']) . '%';
+            $animeWhere[] = "(LOWER(a.title) LIKE :query ESCAPE '!' OR LOWER(a.synopsis) LIKE :query ESCAPE '!' OR LOWER(a.author) LIKE :query ESCAPE '!')";
+            $mangaWhere[] = "(LOWER(m.title) LIKE :query ESCAPE '!' OR LOWER(m.synopsis) LIKE :query ESCAPE '!' OR LOWER(m.author) LIKE :query ESCAPE '!')";
+            $parameters['query'] = $filters['q_pattern'];
         }
-        if (!empty($filters['annee'])) {
+        if (!empty($filters['date'])) {
+            $animeWhere[] = 'a.release_date = :release_date'; $mangaWhere[] = 'm.release_date = :release_date';
+            $parameters['release_date'] = $filters['date'];
+        } elseif (!empty($filters['annee'])) {
             $animeWhere[] = 'a.anime_date = :year'; $mangaWhere[] = 'm.manga_date = :year';
             $parameters['year'] = (int) $filters['annee'];
         }
@@ -107,11 +110,14 @@ final class SummaryLikeRepository extends ServiceEntityRepository
         if (($filters['type'] ?? 'all') === 'anime') { $mangaWhere[] = '1 = 0'; }
         if (($filters['type'] ?? 'all') === 'manga') { $animeWhere[] = '1 = 0'; }
         if (($filters['q'] ?? '') !== '') {
-            $animeWhere[] = '(LOWER(a.title) LIKE :recent_query OR LOWER(a.synopsis) LIKE :recent_query OR LOWER(a.author) LIKE :recent_query)';
-            $mangaWhere[] = '(LOWER(m.title) LIKE :recent_query OR LOWER(m.synopsis) LIKE :recent_query OR LOWER(m.author) LIKE :recent_query)';
-            $parameters['recent_query'] = '%' . mb_strtolower($filters['q']) . '%';
+            $animeWhere[] = "(LOWER(a.title) LIKE :recent_query ESCAPE '!' OR LOWER(a.synopsis) LIKE :recent_query ESCAPE '!' OR LOWER(a.author) LIKE :recent_query ESCAPE '!')";
+            $mangaWhere[] = "(LOWER(m.title) LIKE :recent_query ESCAPE '!' OR LOWER(m.synopsis) LIKE :recent_query ESCAPE '!' OR LOWER(m.author) LIKE :recent_query ESCAPE '!')";
+            $parameters['recent_query'] = $filters['q_pattern'];
         }
-        if (!empty($filters['annee'])) {
+        if (!empty($filters['date'])) {
+            $animeWhere[] = 'a.release_date = :recent_date'; $mangaWhere[] = 'm.release_date = :recent_date';
+            $parameters['recent_date'] = $filters['date'];
+        } elseif (!empty($filters['annee'])) {
             $animeWhere[] = 'a.anime_date = :recent_year'; $mangaWhere[] = 'm.manga_date = :recent_year';
             $parameters['recent_year'] = (int) $filters['annee'];
         }

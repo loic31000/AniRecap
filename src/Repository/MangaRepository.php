@@ -37,8 +37,8 @@ class MangaRepository extends ServiceEntityRepository
         $qb = $this->createVisibleQueryBuilder($viewer);
 
         if (!empty($filters['q'])) {
-            $qb->andWhere('(LOWER(m.title) LIKE :q OR LOWER(m.synopsis) LIKE :q OR LOWER(m.author) LIKE :q)')
-                ->setParameter('q', '%' . mb_strtolower($filters['q']) . '%');
+            $qb->andWhere("(LOWER(m.title) LIKE :q ESCAPE '!' OR LOWER(m.synopsis) LIKE :q ESCAPE '!' OR LOWER(m.author) LIKE :q ESCAPE '!')")
+                ->setParameter('q', $filters['q_pattern']);
         }
 
         if (!empty($filters['genre'])) {
@@ -46,7 +46,10 @@ class MangaRepository extends ServiceEntityRepository
                 ->setParameter('genre', $filters['genre']);
         }
 
-        if (!empty($filters['annee'])) {
+        if (!empty($filters['date'])) {
+            $qb->andWhere('m.releaseDate = :releaseDate')
+                ->setParameter('releaseDate', new \DateTimeImmutable($filters['date']));
+        } elseif (!empty($filters['annee'])) {
             $qb->andWhere('m.mangaDate = :annee')
                 ->setParameter('annee', (int) $filters['annee']);
         }
@@ -64,11 +67,12 @@ class MangaRepository extends ServiceEntityRepository
             ->leftJoin('m.categorie', 'c')->addSelect('c')
             ->andWhere('m.isPublic = true')->distinct();
         if (!empty($filters['q'])) {
-            $qb->andWhere('(LOWER(m.title) LIKE :q OR LOWER(m.synopsis) LIKE :q OR LOWER(m.author) LIKE :q)')
-                ->setParameter('q', '%' . mb_strtolower($filters['q']) . '%');
+            $qb->andWhere("(LOWER(m.title) LIKE :q ESCAPE '!' OR LOWER(m.synopsis) LIKE :q ESCAPE '!' OR LOWER(m.author) LIKE :q ESCAPE '!')")
+                ->setParameter('q', $filters['q_pattern']);
         }
         if (!empty($filters['genre'])) { $qb->andWhere('c.slug = :genre')->setParameter('genre', $filters['genre']); }
-        if (!empty($filters['annee'])) { $qb->andWhere('m.mangaDate = :annee')->setParameter('annee', (int) $filters['annee']); }
+        if (!empty($filters['date'])) { $qb->andWhere('m.releaseDate = :releaseDate')->setParameter('releaseDate', new \DateTimeImmutable($filters['date'])); }
+        elseif (!empty($filters['annee'])) { $qb->andWhere('m.mangaDate = :annee')->setParameter('annee', (int) $filters['annee']); }
         return $qb->orderBy('m.title', 'ASC')->getQuery()->getResult();
     }
 
